@@ -43,7 +43,9 @@ describe("/api/profile route", () => {
 
   it("GET → 200 returns { user }", async () => {
     jest.mocked(getSessionCookie).mockResolvedValueOnce("token");
-    jest.mocked(verifySession).mockResolvedValueOnce({ id: "u1", email: "a@b.com", name: "User" });
+    jest
+      .mocked(verifySession)
+      .mockResolvedValueOnce({ id: "u1", email: "a@b.com", name: "User" });
 
     const res = await ProfileRoute.GET();
     expect(res.status).toBe(200);
@@ -68,11 +70,18 @@ describe("/api/profile route", () => {
 
   it("PATCH → 400 when email already in use", async () => {
     jest.mocked(getSessionCookie).mockResolvedValueOnce("token");
-    jest.mocked(verifySession).mockResolvedValueOnce({ id: "u1", email: "a@b.com", name: "User" });
+    jest
+      .mocked(verifySession)
+      .mockResolvedValueOnce({ id: "u1", email: "a@b.com", name: "User" });
 
-    prismaMock.user.findUnique.mockResolvedValueOnce({ id: "u2", email: "busy@b.com" });
+    prismaMock.user.findUnique.mockResolvedValueOnce({
+      id: "u2",
+      email: "busy@b.com",
+    });
 
-    const res = await ProfileRoute.PATCH(makePatchRequest({ email: "busy@b.com" }));
+    const res = await ProfileRoute.PATCH(
+      makePatchRequest({ email: "busy@b.com" }),
+    );
     expect(res.status).toBe(400);
     const json = await res.json();
     expect(json.error).toMatch(/Email already in use/i);
@@ -80,12 +89,20 @@ describe("/api/profile route", () => {
 
   it("PATCH → 200 updates name", async () => {
     jest.mocked(getSessionCookie).mockResolvedValueOnce("token");
-    jest.mocked(verifySession).mockResolvedValueOnce({ id: "u1", email: "a@b.com", name: "User" });
+    jest
+      .mocked(verifySession)
+      .mockResolvedValueOnce({ id: "u1", email: "a@b.com", name: "User" });
 
     prismaMock.user.findUnique.mockResolvedValueOnce(null);
-    prismaMock.user.update.mockResolvedValueOnce({ id: "u1", email: "a@b.com", name: "New Name" });
+    prismaMock.user.update.mockResolvedValueOnce({
+      id: "u1",
+      email: "a@b.com",
+      name: "New Name",
+    });
 
-    const res = await ProfileRoute.PATCH(makePatchRequest({ name: "New Name" }));
+    const res = await ProfileRoute.PATCH(
+      makePatchRequest({ name: "New Name" }),
+    );
     expect(res.status).toBe(200);
     const json = await res.json();
     expect(json.user.name).toBe("New Name");
@@ -93,9 +110,13 @@ describe("/api/profile route", () => {
 
   it("PATCH → 400 when email format invalid", async () => {
     jest.mocked(getSessionCookie).mockResolvedValueOnce("token");
-    jest.mocked(verifySession).mockResolvedValueOnce({ id: "u1", email: "a@b.com", name: "User" });
+    jest
+      .mocked(verifySession)
+      .mockResolvedValueOnce({ id: "u1", email: "a@b.com", name: "User" });
 
-    const res = await ProfileRoute.PATCH(makePatchRequest({ email: "not-an-email" }));
+    const res = await ProfileRoute.PATCH(
+      makePatchRequest({ email: "not-an-email" }),
+    );
     expect(res.status).toBe(400);
     const json = await res.json();
     expect(json.error).toMatch(/Invalid input data/i);
@@ -104,7 +125,9 @@ describe("/api/profile route", () => {
 
   it("PATCH → 200 when payload has no changes", async () => {
     jest.mocked(getSessionCookie).mockResolvedValueOnce("token");
-    jest.mocked(verifySession).mockResolvedValueOnce({ id: "u1", email: "a@b.com", name: "User" });
+    jest
+      .mocked(verifySession)
+      .mockResolvedValueOnce({ id: "u1", email: "a@b.com", name: "User" });
 
     prismaMock.user.update.mockResolvedValueOnce({
       id: "u1",

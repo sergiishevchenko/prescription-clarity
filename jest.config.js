@@ -26,10 +26,7 @@ const createConfig = async () => {
     testEnvironment: "node",
     setupFilesAfterEnv: ["<rootDir>/jest.setup.unit.ts"],
     testMatch: ["<rootDir>/src/__tests__/unit/**/*.test.ts?(x)"],
-    collectCoverageFrom: [
-      "src/lib/**/*.{ts,tsx}",
-      "!src/lib/auth/cookies.ts",
-    ],
+    collectCoverageFrom: ["src/lib/**/*.{ts,tsx}", "!src/lib/auth/cookies.ts"],
   })();
 
   return {

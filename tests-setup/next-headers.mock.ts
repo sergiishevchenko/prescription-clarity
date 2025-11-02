@@ -18,7 +18,9 @@ const mockHeadersAPI = {
   get: jest.fn(() => undefined),
   set: jest.fn(() => {}),
   append: jest.fn(() => {}),
-  entries: jest.fn(function* () { /* iterator */ }),
+  entries: jest.fn(function* () {
+    /* iterator */
+  }),
 };
 
 jest.mock("next/headers", () => ({

@@ -37,9 +37,18 @@ describe("POST /api/auth/register", () => {
   it("201 when new user", async () => {
     hashMock.mockImplementationOnce(async () => "mocked-hash");
     prismaMock.user.findUnique.mockResolvedValueOnce(null);
-    prismaMock.user.create.mockResolvedValueOnce({ id: "u1", email: "a@b.com" });
+    prismaMock.user.create.mockResolvedValueOnce({
+      id: "u1",
+      email: "a@b.com",
+    });
 
-    const res = await RegisterRoute.POST(makeReq({ email: "abcde@booble.com", password: "Secret123", name: "User" }));
+    const res = await RegisterRoute.POST(
+      makeReq({
+        email: "abcde@booble.com",
+        password: "Secret123",
+        name: "User",
+      }),
+    );
     expect(res.status).toBe(201);
   });
 
@@ -47,7 +56,13 @@ describe("POST /api/auth/register", () => {
   it.failing("409 when email exists  [KNOWN BUG: returns 400 now", async () => {
     prismaMock.user.findUnique.mockResolvedValueOnce({ id: "u1" });
 
-    const res = await RegisterRoute.POST(makeReq({ email: "abcde@booble.com", password: "Secret123", name: "User2" }));
+    const res = await RegisterRoute.POST(
+      makeReq({
+        email: "abcde@booble.com",
+        password: "Secret123",
+        name: "User2",
+      }),
+    );
     expect(res.status).toBe(409); // коли бек виправлять -> тест пройде -> CI впаде (expected!)
   });
 });

@@ -1,11 +1,11 @@
 jest.mock("@/lib/auth/cookies", () => {
-  const { mockCookiesAPI } = jest.requireActual<typeof import("./next-headers.mock")>(
-    "./next-headers.mock",
-  );
-  const {
-    getSessionCookieName,
-    getSessionMaxAge,
-  } = jest.requireActual<typeof import("@/lib/auth/session")>("@/lib/auth/session");
+  const { mockCookiesAPI } = jest.requireActual<
+    typeof import("./next-headers.mock")
+  >("./next-headers.mock");
+  const { getSessionCookieName, getSessionMaxAge } =
+    jest.requireActual<typeof import("@/lib/auth/session")>(
+      "@/lib/auth/session",
+    );
 
   return {
     __esModule: true,

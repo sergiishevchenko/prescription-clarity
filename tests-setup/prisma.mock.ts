@@ -1,5 +1,7 @@
-type AsyncMockFn<Args extends unknown[] = unknown[], Return = unknown> =
-  jest.Mock<Promise<Return>, Args>;
+type AsyncMockFn<
+  Args extends unknown[] = unknown[],
+  Return = unknown,
+> = jest.Mock<Promise<Return>, Args>;
 
 const mockUser = {
   findUnique: jest.fn() as AsyncMockFn<[unknown], unknown>,

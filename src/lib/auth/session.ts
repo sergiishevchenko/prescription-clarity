@@ -1,7 +1,6 @@
 import { prisma } from "@/lib/db";
 import { cookies } from "next/headers";
 
-
 const SESSION_COOKIE_NAME = process.env.SESSION_COOKIE_NAME || "SESSION_ID";
 const SESSION_MAX_AGE = 30 * 24 * 60 * 60 * 1000; // 30 days
 
@@ -112,7 +111,6 @@ export function getSessionCookieName(): string {
 export function getSessionMaxAge(): number {
   return SESSION_MAX_AGE;
 }
-
 
 /** Дістати значення SESSION cookie з заголовка Cookie: ... */
 export function extractTokenFromRequest(req: Request): string | null {

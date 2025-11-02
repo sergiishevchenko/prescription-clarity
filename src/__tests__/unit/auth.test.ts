@@ -149,7 +149,11 @@ describe("Session Management", () => {
 
       const user = await getSessionUserFromRequest(req);
 
-      expect(user).toEqual({ id: "u2", email: "user@example.com", name: "User" });
+      expect(user).toEqual({
+        id: "u2",
+        email: "user@example.com",
+        name: "User",
+      });
     });
 
     it("getSessionUserFromRequest returns null when token missing", async () => {

@@ -4,7 +4,6 @@ import "@/__tests__/setup/bcrypt.mock";
 import "@/__tests__/setup/cookies.mock";
 import "@/__tests__/setup/session.mock";
 
-
 // Polyfill for TextEncoder/TextDecoder in Jest environment
 import { TextEncoder, TextDecoder } from "util";
 global.TextEncoder = TextEncoder;

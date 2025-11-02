@@ -47,7 +47,9 @@ describe("POST /api/auth/login", () => {
     });
     compareMock.mockImplementationOnce(async () => true);
 
-    const res = await LoginRoute.POST(makeReq({ email: "a@b.com", password: "Secret123" }));
+    const res = await LoginRoute.POST(
+      makeReq({ email: "a@b.com", password: "Secret123" }),
+    );
     if (res.status === 500) {
       console.log("500 body:", await res.text());
     }
@@ -69,7 +71,9 @@ describe("POST /api/auth/login", () => {
   it("401 when email not found", async () => {
     prismaMock.user.findUnique.mockResolvedValueOnce(null);
 
-    const res = await LoginRoute.POST(makeReq({ email: "missing@user.com", password: "Secret123" }));
+    const res = await LoginRoute.POST(
+      makeReq({ email: "missing@user.com", password: "Secret123" }),
+    );
     expect(res.status).toBe(401);
     const body = await res.json();
     expect(body.error).toMatch(/invalid email or password/i);
@@ -83,7 +87,9 @@ describe("POST /api/auth/login", () => {
     });
     compareMock.mockImplementationOnce(async () => false);
 
-    const res = await LoginRoute.POST(makeReq({ email: "a@b.com", password: "bad" }));
+    const res = await LoginRoute.POST(
+      makeReq({ email: "a@b.com", password: "bad" }),
+    );
     expect(res.status).toBe(401);
   });
 });

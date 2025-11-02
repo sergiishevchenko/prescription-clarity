@@ -18,7 +18,6 @@ import "./tests-setup/cookies.mock";
 import "./tests-setup/session.partial-mock";
 import "./tests-setup/bcrypt.mock";
 
-
 let errorSpy: jest.SpyInstance<void, Parameters<typeof console.error>>;
 beforeAll(() => {
   errorSpy = jest.spyOn(console, "error").mockImplementation(() => {});
