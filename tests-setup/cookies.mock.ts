@@ -1,9 +1,11 @@
 jest.mock("@/lib/auth/cookies", () => {
-  const { mockCookiesAPI } = require("./next-headers.mock");
+  const { mockCookiesAPI } = jest.requireActual<typeof import("./next-headers.mock")>(
+    "./next-headers.mock",
+  );
   const {
     getSessionCookieName,
     getSessionMaxAge,
-  } = jest.requireActual("@/lib/auth/session");
+  } = jest.requireActual<typeof import("@/lib/auth/session")>("@/lib/auth/session");
 
   return {
     __esModule: true,
@@ -11,23 +13,16 @@ jest.mock("@/lib/auth/cookies", () => {
 
     setSessionCookie: jest.fn(async (token: string) => {
       const cookieName = getSessionCookieName();
-      const maxAge = getSessionMaxAge();
-
-      mockCookiesAPI.set(cookieName, token, {
-        httpOnly: true,
-        secure: process.env.NODE_ENV === "production",
-        sameSite: "lax",
-        maxAge,
-        path: "/",
-      });
+      getSessionMaxAge();
+      mockCookiesAPI.set(cookieName, token);
     }),
     clearSessionCookie: jest.fn(() => {
       const cookieName = getSessionCookieName();
       mockCookiesAPI.delete(cookieName);
     }),
 
-    setAuthCookie: jest.fn(() => {}),
-    deleteSessionCookie: jest.fn(() => {}),
-    setCookieSafe: jest.fn(() => {}),
+    setAuthCookie: jest.fn(),
+    deleteSessionCookie: jest.fn(),
+    setCookieSafe: jest.fn(),
   };
 });

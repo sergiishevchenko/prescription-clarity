@@ -1,7 +1,7 @@
 import nextJest from "next/jest.js";
 const createJestConfig = nextJest({ dir: "./" });
 
-export default async () => {
+const createConfig = async () => {
   const base = {
     testPathIgnorePatterns: ["<rootDir>/.next/", "<rootDir>/node_modules/"],
     moduleNameMapper: { "^@/(.*)$": "<rootDir>/src/$1" },
@@ -39,3 +39,5 @@ export default async () => {
     },
   };
 };
+
+export default createConfig;

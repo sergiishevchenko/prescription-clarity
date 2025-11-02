@@ -1,15 +1,15 @@
-type Fn = jest.Mock<any, any>;
+type MockFn = jest.Mock<unknown, unknown[]>;
 
 const mockUser = {
-  findUnique: jest.fn() as Fn,
-  create: jest.fn() as Fn,
-  update: jest.fn() as Fn,
+  findUnique: jest.fn() as MockFn,
+  create: jest.fn() as MockFn,
+  update: jest.fn() as MockFn,
 };
 
 const mockSession = {
-  create: jest.fn() as Fn,
-  findUnique: jest.fn() as Fn,
-  deleteMany: jest.fn() as Fn,
+  create: jest.fn() as MockFn,
+  findUnique: jest.fn() as MockFn,
+  deleteMany: jest.fn() as MockFn,
 };
 
 jest.mock("@/lib/db", () => ({
