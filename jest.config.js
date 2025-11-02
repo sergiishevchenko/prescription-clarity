@@ -1,35 +1,41 @@
 import nextJest from "next/jest.js";
+const createJestConfig = nextJest({ dir: "./" });
 
-const createJestConfig = nextJest({
-  // Provide the path to your Next.js app to load next.config.js and .env files
-  dir: "./",
-});
+export default async () => {
+  const base = {
+    testPathIgnorePatterns: ["<rootDir>/.next/", "<rootDir>/node_modules/"],
+    moduleNameMapper: { "^@/(.*)$": "<rootDir>/src/$1" },
+  };
 
-// Add any custom config to be passed to Jest
-const customJestConfig = {
-  setupFilesAfterEnv: ["<rootDir>/jest.setup.js"],
-  testEnvironment: "jest-environment-jsdom",
-  testPathIgnorePatterns: ["<rootDir>/.next/", "<rootDir>/node_modules/"],
-  moduleNameMapper: {
-    "^@/(.*)$": "<rootDir>/src/$1",
-  },
-  collectCoverageFrom: [
-    // Focus coverage on the server auth logic which has tests
-    "src/lib/auth/**/*.{ts,tsx}",
-    // Exclude helpers without tests for now
-    "!src/lib/auth/cookies.ts",
-    // Optionally include other server libs as tests are added
-    // "src/lib/**/*.{ts,tsx}",
-  ],
-  coverageThreshold: {
-    global: {
-      branches: 70,
-      functions: 70,
-      lines: 70,
-      statements: 70,
+  const api = await createJestConfig({
+    ...base,
+    displayName: "api",
+    testEnvironment: "node",
+    setupFilesAfterEnv: ["<rootDir>/jest.setup.api.ts"],
+    testMatch: ["<rootDir>/src/__tests__/api/**/*.test.ts?(x)"],
+    collectCoverageFrom: [
+      "src/app/api/**/*.{ts,tsx}",
+      "src/lib/auth/**/*.{ts,tsx}",
+      "!src/lib/auth/cookies.ts",
+    ],
+  })();
+
+  const unit = await createJestConfig({
+    ...base,
+    displayName: "unit",
+    testEnvironment: "node",
+    setupFilesAfterEnv: ["<rootDir>/jest.setup.unit.ts"],
+    testMatch: ["<rootDir>/src/__tests__/unit/**/*.test.ts?(x)"],
+    collectCoverageFrom: [
+      "src/lib/**/*.{ts,tsx}",
+      "!src/lib/auth/cookies.ts",
+    ],
+  })();
+
+  return {
+    projects: [api, unit],
+    coverageThreshold: {
+      global: { branches: 70, functions: 70, lines: 70, statements: 70 },
     },
-  },
+  };
 };
-
-// createJestConfig is exported this way to ensure that next/jest can load the Next.js config which is async
-export default createJestConfig(customJestConfig);
