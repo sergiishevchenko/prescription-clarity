@@ -1,6 +1,7 @@
 import * as bcrypt from "bcryptjs";
 import * as RegisterRoute from "@/app/api/auth/register/route";
 import { prismaMock } from "../../../tests-setup/prisma.mock";
+import type { MockedFunction } from "jest-mock";
 
 type RegisterHandler = typeof RegisterRoute.POST;
 type RegisterRequest = Parameters<RegisterHandler>[0];
@@ -31,8 +32,10 @@ beforeEach(() => {
 });
 
 describe("POST /api/auth/register", () => {
+  const hashMock = bcrypt.hash as MockedFunction<typeof bcrypt.hash>;
+
   it("201 when new user", async () => {
-    jest.mocked(bcrypt.hash).mockResolvedValueOnce("mocked-hash");
+    hashMock.mockImplementationOnce(async () => "mocked-hash");
     prismaMock.user.findUnique.mockResolvedValueOnce(null);
     prismaMock.user.create.mockResolvedValueOnce({ id: "u1", email: "a@b.com" });
 

@@ -6,6 +6,7 @@ import {
   cookieStore,
   mockCookiesAPI,
 } from "../../../tests-setup/next-headers.mock";
+import type { MockedFunction } from "jest-mock";
 
 type LoginHandler = typeof LoginRoute.POST;
 type LoginRequest = Parameters<LoginHandler>[0];
@@ -36,13 +37,15 @@ beforeEach(() => {
 });
 
 describe("POST /api/auth/login", () => {
+  const compareMock = bcrypt.compare as MockedFunction<typeof bcrypt.compare>;
+
   it("200 + Set-Cookie on valid credentials", async () => {
     prismaMock.user.findUnique.mockResolvedValueOnce({
       id: "u1",
       email: "a@b.com",
       passwordHash: "mocked-hash",
     });
-    jest.mocked(bcrypt.compare).mockResolvedValueOnce(true);
+    compareMock.mockImplementationOnce(async () => true);
 
     const res = await LoginRoute.POST(makeReq({ email: "a@b.com", password: "Secret123" }));
     if (res.status === 500) {
@@ -78,7 +81,7 @@ describe("POST /api/auth/login", () => {
       email: "a@b.com",
       passwordHash: "mocked-hash",
     });
-    jest.mocked(bcrypt.compare).mockResolvedValueOnce(false);
+    compareMock.mockImplementationOnce(async () => false);
 
     const res = await LoginRoute.POST(makeReq({ email: "a@b.com", password: "bad" }));
     expect(res.status).toBe(401);

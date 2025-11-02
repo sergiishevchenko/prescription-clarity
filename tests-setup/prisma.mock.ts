@@ -1,15 +1,16 @@
-type MockFn = jest.Mock<unknown, unknown[]>;
+type AsyncMockFn<Args extends unknown[] = unknown[], Return = unknown> =
+  jest.Mock<Promise<Return>, Args>;
 
 const mockUser = {
-  findUnique: jest.fn() as MockFn,
-  create: jest.fn() as MockFn,
-  update: jest.fn() as MockFn,
+  findUnique: jest.fn() as AsyncMockFn<[unknown], unknown>,
+  create: jest.fn() as AsyncMockFn<[unknown], unknown>,
+  update: jest.fn() as AsyncMockFn<[unknown], unknown>,
 };
 
 const mockSession = {
-  create: jest.fn() as MockFn,
-  findUnique: jest.fn() as MockFn,
-  deleteMany: jest.fn() as MockFn,
+  create: jest.fn() as AsyncMockFn<[unknown], unknown>,
+  findUnique: jest.fn() as AsyncMockFn<[unknown], unknown>,
+  deleteMany: jest.fn() as AsyncMockFn<[unknown], unknown>,
 };
 
 jest.mock("@/lib/db", () => ({

@@ -124,7 +124,8 @@ export function extractTokenFromRequest(req: Request): string | null {
 
 /** Отримати користувача із cookie у Next.js Route Handler (через next/headers) */
 export async function getSessionUserFromCookies() {
-  const token = cookies().get(getSessionCookieName())?.value || "";
+  const cookieStore = await cookies();
+  const token = cookieStore.get(getSessionCookieName())?.value || "";
   return verifySession(token);
 }
 
