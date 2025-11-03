@@ -5,7 +5,7 @@ ENV NODE_ENV=development
 WORKDIR /app
 
 # Install OS deps
-RUN apk add --no-cache bash tini
+RUN apk add --no-cache bash tini postgresql-client
 
 # Use tini as PID 1
 ENTRYPOINT ["/sbin/tini", "--"]
@@ -27,11 +27,15 @@ ENV PORT=3000 HOSTNAME=0.0.0.0
 COPY --from=deps /app/node_modules /app/node_modules
 COPY . .
 
+# Copy and make entrypoint script executable
+COPY docker-entrypoint.sh /usr/local/bin/
+RUN chmod +x /usr/local/bin/docker-entrypoint.sh
+
 # Next.js caches to improve DX inside container
 RUN mkdir -p .next
 
 EXPOSE 3000
 
-CMD ["npm", "run", "dev"]
+CMD ["/usr/local/bin/docker-entrypoint.sh"]
 
 

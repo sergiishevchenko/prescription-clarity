@@ -1,18 +1,24 @@
+export const runtime = "nodejs";
+
 import { NextResponse } from "next/server";
 import { destroySession } from "@/lib/auth/session";
-import { getSessionCookie, clearSessionCookie } from "@/lib/auth/cookies";
+import { getSessionCookie, getSessionCookieKey } from "@/lib/auth/cookies";
 
 export async function POST() {
   try {
+    // 1) Читаем текущий токен
     const sessionToken = await getSessionCookie();
 
+    // 2) Удаляем сессию из базы
     if (sessionToken) {
       await destroySession(sessionToken);
     }
 
-    await clearSessionCookie();
+    // 3) Готовим ответ и очищаем cookie
+    const res = NextResponse.json({ success: true });
+    res.cookies.delete(getSessionCookieKey()); // <-- Удаление cookie здесь
 
-    return NextResponse.json({ success: true });
+    return res;
   } catch (error) {
     console.error("Logout error:", error);
 

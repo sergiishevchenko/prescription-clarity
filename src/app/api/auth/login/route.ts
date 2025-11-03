@@ -1,66 +1,68 @@
+export const runtime = "nodejs";
+
 import { NextRequest, NextResponse } from "next/server";
 import bcrypt from "bcryptjs";
+import { ZodError } from "zod";
+
 import { prisma } from "@/lib/db";
 import { loginSchema } from "@/lib/validators/auth";
 import { createSession, destroyAllUserSessions } from "@/lib/auth/session";
-import { setSessionCookie } from "@/lib/auth/cookies";
+import { buildSessionCookie } from "@/lib/auth/cookies";
 
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
-    const validatedData = loginSchema.parse(body);
 
-    const { email, password } = validatedData;
+    // Валідація вхідних даних
+    const { email, password } = loginSchema.parse(body);
 
-    // Find user
-    const user = await prisma.user.findUnique({
-      where: { email },
-    });
-
+    // Знайти користувача
+    const user = await prisma.user.findUnique({ where: { email } });
     if (!user) {
       return NextResponse.json(
         { error: "Invalid email or password" },
-        { status: 401 },
+        { status: 401 }
       );
     }
 
-    // Verify password
-    const isValidPassword = await bcrypt.compare(password, user.passwordHash);
-
-    if (!isValidPassword) {
+    // Перевірити пароль
+    const isValid = await bcrypt.compare(password, user.passwordHash);
+    if (!isValid) {
       return NextResponse.json(
         { error: "Invalid email or password" },
-        { status: 401 },
+        { status: 401 }
       );
     }
 
-    // Destroy all existing sessions for this user (optional: rotate sessions)
+    // (Опційно) ротація попередніх сесій
     await destroyAllUserSessions(user.id);
 
-    // Create new session
+    // Створити нову сесію і виставити cookie через NextResponse
     const sessionToken = await createSession(user.id);
-    await setSessionCookie(sessionToken);
 
-    return NextResponse.json({
-      user: {
-        id: user.id,
-        email: user.email,
-        name: user.name,
-      },
-    });
-  } catch (error) {
-    console.error("Login error:", error);
+    const res = NextResponse.json(
+      { user: { id: user.id, email: user.email, name: user.name } },
+      { status: 200 }
+    );
 
-    if (error instanceof Error && error.name === "ZodError") {
+    const cfg = buildSessionCookie(sessionToken);
+    res.cookies.set(cfg.name, cfg.value, cfg.options);
+
+    return res;
+  } catch (err: unknown) {
+    // Помилки валідації Zod
+    if (err instanceof ZodError) {
       return NextResponse.json(
-        { error: "Invalid input data" },
-        { status: 400 },
+        { error: "Invalid input data", details: err.flatten() },
+        { status: 400 }
       );
     }
 
+    // Інші помилки
+    console.error("Login error:", err);
     return NextResponse.json(
       { error: "Internal server error" },
-      { status: 500 },
+      { status: 500 }
     );
   }
 }

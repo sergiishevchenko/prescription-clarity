@@ -1,7 +1,8 @@
 import { prisma } from "@/lib/db";
+import { randomBytes, createHash } from "node:crypto";
 
 const SESSION_COOKIE_NAME = process.env.SESSION_COOKIE_NAME || "SESSION_ID";
-const SESSION_MAX_AGE = 30 * 24 * 60 * 60 * 1000; // 30 days
+const SESSION_MAX_AGE = 30 * 24 * 60 * 60 * 1000; // ms
 
 export interface SessionUser {
   id: string;
@@ -9,69 +10,42 @@ export interface SessionUser {
   name: string | null;
 }
 
+// — вспомогательные —
+function sha256Hex(str: string) {
+  return createHash("sha256").update(str, "utf8").digest("hex");
+}
+
+function generateTokenHex(bytes = 32) {
+  return randomBytes(bytes).toString("hex"); // 64-символьный hex
+}
+
+// — основное —
 export async function createSession(userId: string): Promise<string> {
-  // Generate random session token using Web Crypto API
-  const array = new Uint8Array(32);
-  crypto.getRandomValues(array);
-  const token = Array.from(array, (byte) =>
-    byte.toString(16).padStart(2, "0"),
-  ).join("");
+  const token = generateTokenHex(); // raw token для cookie
+  const tokenHash = sha256Hex(token); // хранить только хеш
 
-  // Hash token using Web Crypto API
-  const encoder = new TextEncoder();
-  const data = encoder.encode(token);
-  const hashBuffer = await crypto.subtle.digest("SHA-256", data);
-  const hashArray = Array.from(new Uint8Array(hashBuffer));
-  const tokenHash = hashArray
-    .map((b) => b.toString(16).padStart(2, "0"))
-    .join("");
-
-  // Calculate expiry date
   const expiresAt = new Date(Date.now() + SESSION_MAX_AGE);
 
-  // Store session in database
   await prisma.session.create({
-    data: {
-      userId,
-      tokenHash,
-      expiresAt,
-    },
+    data: { userId, tokenHash, expiresAt },
   });
 
   return token;
 }
 
-export async function verifySession(
-  token: string,
-): Promise<SessionUser | null> {
+export async function verifySession(token: string): Promise<SessionUser | null> {
   if (!token) return null;
 
-  // Hash token using Web Crypto API
-  const encoder = new TextEncoder();
-  const data = encoder.encode(token);
-  const hashBuffer = await crypto.subtle.digest("SHA-256", data);
-  const hashArray = Array.from(new Uint8Array(hashBuffer));
-  const tokenHash = hashArray
-    .map((b) => b.toString(16).padStart(2, "0"))
-    .join("");
+  const tokenHash = sha256Hex(token);
 
-  // Find session and include user data
   const session = await prisma.session.findUnique({
     where: { tokenHash },
     include: {
-      user: {
-        select: {
-          id: true,
-          email: true,
-          name: true,
-        },
-      },
+      user: { select: { id: true, email: true, name: true } },
     },
   });
 
-  if (!session || session.expiresAt < new Date()) {
-    return null;
-  }
+  if (!session || session.expiresAt < new Date()) return null;
 
   return {
     id: session.user.id,
@@ -82,25 +56,12 @@ export async function verifySession(
 
 export async function destroySession(token: string): Promise<void> {
   if (!token) return;
-
-  // Hash token using Web Crypto API
-  const encoder = new TextEncoder();
-  const data = encoder.encode(token);
-  const hashBuffer = await crypto.subtle.digest("SHA-256", data);
-  const hashArray = Array.from(new Uint8Array(hashBuffer));
-  const tokenHash = hashArray
-    .map((b) => b.toString(16).padStart(2, "0"))
-    .join("");
-
-  await prisma.session.deleteMany({
-    where: { tokenHash },
-  });
+  const tokenHash = sha256Hex(token);
+  await prisma.session.deleteMany({ where: { tokenHash } });
 }
 
 export async function destroyAllUserSessions(userId: string): Promise<void> {
-  await prisma.session.deleteMany({
-    where: { userId },
-  });
+  await prisma.session.deleteMany({ where: { userId } });
 }
 
 export function getSessionCookieName(): string {
@@ -108,5 +69,5 @@ export function getSessionCookieName(): string {
 }
 
 export function getSessionMaxAge(): number {
-  return SESSION_MAX_AGE;
+  return SESSION_MAX_AGE; // ms (используем для expiresAt, а в cookies.ts конвертим в секунды!)
 }

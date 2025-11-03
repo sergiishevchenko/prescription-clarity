@@ -1,4 +1,47 @@
+"use client";
+
+import { useRouter } from "next/navigation";
+import { useState } from "react";
+
 export default function RegisterPage() {
+  const router = useRouter();
+  const [loading, setLoading] = useState(false);
+  const [err, setErr] = useState<string | null>(null);
+
+  async function onSubmit(e: React.FormEvent<HTMLFormElement>) {
+    e.preventDefault();
+    setErr(null);
+    setLoading(true);
+
+    const fd = new FormData(e.currentTarget);
+    const payload = {
+      name: String(fd.get("name") || ""),
+      email: String(fd.get("email") || ""),
+      password: String(fd.get("password") || ""),
+    };
+
+    try {
+      const res = await fetch("/api/auth/register", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload),
+      });
+
+      if (res.ok) {
+        // cookie сессии уже установлено на сервере
+        router.replace("/dashboard");
+        return;
+      }
+
+      const data = await res.json().catch(() => ({}));
+      setErr(data?.error || "Registration failed");
+    } catch {
+      setErr("Network error");
+    } finally {
+      setLoading(false);
+    }
+  }
+
   return (
     <div className="flex min-h-screen items-center justify-center bg-gray-50">
       <div className="w-full max-w-md space-y-8">
@@ -7,12 +50,11 @@ export default function RegisterPage() {
             Create your account
           </h2>
         </div>
-        <form className="mt-8 space-y-6">
+
+        <form className="mt-8 space-y-6" onSubmit={onSubmit} noValidate>
           <div className="-space-y-px rounded-md shadow-sm">
             <div>
-              <label htmlFor="name" className="sr-only">
-                Full name
-              </label>
+              <label htmlFor="name" className="sr-only">Full name</label>
               <input
                 id="name"
                 name="name"
@@ -23,9 +65,7 @@ export default function RegisterPage() {
               />
             </div>
             <div>
-              <label htmlFor="email" className="sr-only">
-                Email address
-              </label>
+              <label htmlFor="email" className="sr-only">Email address</label>
               <input
                 id="email"
                 name="email"
@@ -37,9 +77,7 @@ export default function RegisterPage() {
               />
             </div>
             <div>
-              <label htmlFor="password" className="sr-only">
-                Password
-              </label>
+              <label htmlFor="password" className="sr-only">Password</label>
               <input
                 id="password"
                 name="password"
@@ -52,12 +90,17 @@ export default function RegisterPage() {
             </div>
           </div>
 
+          {err && (
+            <p className="text-sm text-red-600" role="alert">{err}</p>
+          )}
+
           <div>
             <button
               type="submit"
-              className="group relative flex w-full justify-center rounded-md border border-transparent bg-indigo-600 px-4 py-2 text-sm font-medium text-white hover:bg-indigo-700 focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 focus:outline-none"
+              disabled={loading}
+              className="group relative flex w-full justify-center rounded-md border border-transparent bg-indigo-600 px-4 py-2 text-sm font-medium text-white hover:bg-indigo-700 focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 focus:outline-none disabled:opacity-60"
             >
-              Create account
+              {loading ? "Creating..." : "Create account"}
             </button>
           </div>
         </form>
