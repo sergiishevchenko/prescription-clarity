@@ -14,11 +14,23 @@ export default function RegisterPage() {
     setLoading(true);
 
     const fd = new FormData(e.currentTarget);
+<<<<<<< Updated upstream
     const payload = {
       name: String(fd.get("name") || ""),
       email: String(fd.get("email") || ""),
       password: String(fd.get("password") || ""),
     };
+=======
+    const nameRaw = String(fd.get("name") ?? "").trim();
+    const email = String(fd.get("email") ?? "").trim();
+    const password = String(fd.get("password") ?? "");
+
+    const payload: { email: string; password: string; name?: string } = {
+      email,
+      password,
+    };
+    if (nameRaw) payload.name = nameRaw; // не відправляємо порожній name
+>>>>>>> Stashed changes
 
     try {
       const res = await fetch("/api/auth/register", {
@@ -28,13 +40,24 @@ export default function RegisterPage() {
       });
 
       if (res.ok) {
+<<<<<<< Updated upstream
         // cookie сессии уже установлено на сервере
+=======
+>>>>>>> Stashed changes
         router.replace("/dashboard");
         return;
       }
 
+<<<<<<< Updated upstream
       const data = await res.json().catch(() => ({}));
       setErr(data?.error || "Registration failed");
+=======
+      const data = await res.json().catch(() => ({} as any));
+      const firstZodError = data?.details?.fieldErrors
+        ? Object.values<any>(data.details.fieldErrors).flat()?.[0]
+        : undefined;
+      setErr(firstZodError || data?.error || "Registration failed");
+>>>>>>> Stashed changes
     } catch {
       setErr("Network error");
     } finally {
@@ -50,8 +73,12 @@ export default function RegisterPage() {
             Create your account
           </h2>
         </div>
+<<<<<<< Updated upstream
 
         <form className="mt-8 space-y-6" onSubmit={onSubmit} noValidate>
+=======
+        <form className="mt-8 space-y-6" method="post" onSubmit={onSubmit} noValidate>
+>>>>>>> Stashed changes
           <div className="-space-y-px rounded-md shadow-sm">
             <div>
               <label htmlFor="name" className="sr-only">Full name</label>
