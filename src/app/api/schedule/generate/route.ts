@@ -26,7 +26,10 @@ export async function POST(request: NextRequest) {
     });
 
     if (!medication) {
-      return NextResponse.json({ error: "Medication not found" }, { status: 404 });
+      return NextResponse.json(
+        { error: "Medication not found" },
+        { status: 404 },
+      );
     }
 
     const frequencyHours = medication.frequency;
@@ -37,13 +40,18 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const entries: { medicationId: string; userId: string; dateTime: Date }[] = [];
+    const entries: { medicationId: string; userId: string; dateTime: Date }[] =
+      [];
     const start = new Date(medication.startDate);
     const end = new Date(medication.endDate);
 
     let current = new Date(start);
     while (current <= end) {
-      entries.push({ medicationId: medication.id, userId: user.id, dateTime: new Date(current) });
+      entries.push({
+        medicationId: medication.id,
+        userId: user.id,
+        dateTime: new Date(current),
+      });
       current = new Date(current.getTime() + frequencyHours * 60 * 60 * 1000);
     }
 
@@ -59,7 +67,10 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ created: result.count });
   } catch (error) {
     if (error instanceof Error && error.name === "ZodError") {
-      return NextResponse.json({ error: "Invalid input data" }, { status: 400 });
+      return NextResponse.json(
+        { error: "Invalid input data" },
+        { status: 400 },
+      );
     }
     console.error("Generate schedule error:", error);
     return NextResponse.json(

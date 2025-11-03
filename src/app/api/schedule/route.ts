@@ -73,7 +73,10 @@ export async function GET(request: NextRequest) {
     return NextResponse.json({ items: result });
   } catch (error) {
     if (error instanceof Error && error.name === "ZodError") {
-      return NextResponse.json({ error: "Invalid input data" }, { status: 400 });
+      return NextResponse.json(
+        { error: "Invalid input data" },
+        { status: 400 },
+      );
     }
     console.error("List schedule error:", error);
     return NextResponse.json(

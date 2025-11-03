@@ -42,7 +42,10 @@ export async function PATCH(
     return NextResponse.json({ id: updated.id, status: updated.status });
   } catch (error) {
     if (error instanceof Error && error.name === "ZodError") {
-      return NextResponse.json({ error: "Invalid input data" }, { status: 400 });
+      return NextResponse.json(
+        { error: "Invalid input data" },
+        { status: 400 },
+      );
     }
     console.error("Update schedule status error:", error);
     return NextResponse.json(
