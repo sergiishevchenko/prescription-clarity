@@ -4,6 +4,8 @@ import { verifySession } from "@/lib/auth/session";
 import { getSessionCookie } from "@/lib/auth/cookies";
 import { updateProfileSchema } from "@/lib/validators/profile";
 
+export const runtime = "nodejs";
+
 export async function GET() {
   try {
     const sessionToken = await getSessionCookie();
