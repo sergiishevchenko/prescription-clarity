@@ -34,7 +34,9 @@ export async function createSession(userId: string): Promise<string> {
   return token;
 }
 
-export async function verifySession(token: string): Promise<SessionUser | null> {
+export async function verifySession(
+  token: string,
+): Promise<SessionUser | null> {
   if (!token) return null;
 
   const tokenHash = sha256Hex(token);

@@ -18,9 +18,7 @@ export default async function DashboardPage() {
           <LogoutButton />
         </div>
         <div className="px-4 py-2 sm:px-0">
-          <p className="mt-2 text-gray-600">
-            This is a protected route.
-          </p>
+          <p className="mt-2 text-gray-600">This is a protected route.</p>
         </div>
       </div>
     </div>

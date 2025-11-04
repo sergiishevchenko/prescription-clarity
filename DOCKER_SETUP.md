@@ -30,7 +30,6 @@ This project is configured to run in Docker with automatic database migrations.
    ```
 
 3. **Access the application:**
-
    - Application: http://localhost:3000
    - Database: localhost:5432 (user: postgres, password: postgres, database: goit)
 
@@ -59,7 +58,7 @@ If port 3000 or 5432 is already in use, you can modify the ports in `docker-comp
 
 ```yaml
 ports:
-  - "3001:3000"  # Change 3000 to 3001 (or any available port)
+  - "3001:3000" # Change 3000 to 3001 (or any available port)
 ```
 
 ### Database Connection Issues
@@ -88,5 +87,3 @@ docker compose up --build
 ```
 
 This will remove all volumes and start fresh.
-
-

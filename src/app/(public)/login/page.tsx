@@ -48,7 +48,12 @@ export default function LoginPage() {
             Sign in to your account
           </h2>
         </div>
-        <form className="mt-8 space-y-6" method="post" onSubmit={onSubmit} noValidate>
+        <form
+          className="mt-8 space-y-6"
+          method="post"
+          onSubmit={onSubmit}
+          noValidate
+        >
           <div className="-space-y-px rounded-md shadow-sm">
             <div>
               <label htmlFor="email" className="sr-only">
@@ -81,7 +86,9 @@ export default function LoginPage() {
           </div>
 
           {err && (
-            <p className="text-sm text-red-600" role="alert">{err}</p>
+            <p className="text-sm text-red-600" role="alert">
+              {err}
+            </p>
           )}
 
           <div>

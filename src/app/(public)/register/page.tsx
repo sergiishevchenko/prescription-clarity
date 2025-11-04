@@ -66,10 +66,17 @@ export default function RegisterPage() {
             Create your account
           </h2>
         </div>
-        <form className="mt-8 space-y-6" method="post" onSubmit={onSubmit} noValidate>
+        <form
+          className="mt-8 space-y-6"
+          method="post"
+          onSubmit={onSubmit}
+          noValidate
+        >
           <div className="-space-y-px rounded-md shadow-sm">
             <div>
-              <label htmlFor="name" className="sr-only">Full name</label>
+              <label htmlFor="name" className="sr-only">
+                Full name
+              </label>
               <input
                 id="name"
                 name="name"
@@ -80,7 +87,9 @@ export default function RegisterPage() {
               />
             </div>
             <div>
-              <label htmlFor="email" className="sr-only">Email address</label>
+              <label htmlFor="email" className="sr-only">
+                Email address
+              </label>
               <input
                 id="email"
                 name="email"
@@ -92,7 +101,9 @@ export default function RegisterPage() {
               />
             </div>
             <div>
-              <label htmlFor="password" className="sr-only">Password</label>
+              <label htmlFor="password" className="sr-only">
+                Password
+              </label>
               <input
                 id="password"
                 name="password"
@@ -106,7 +117,9 @@ export default function RegisterPage() {
           </div>
 
           {err && (
-            <p className="text-sm text-red-600" role="alert">{err}</p>
+            <p className="text-sm text-red-600" role="alert">
+              {err}
+            </p>
           )}
 
           <div>

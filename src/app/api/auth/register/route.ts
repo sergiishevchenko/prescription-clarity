@@ -1,4 +1,3 @@
-
 import { NextRequest, NextResponse } from "next/server";
 import bcrypt from "bcryptjs";
 import { PrismaClientKnownRequestError } from "@prisma/client/runtime/library";
@@ -21,7 +20,7 @@ export async function POST(request: NextRequest) {
     if (existing) {
       return NextResponse.json(
         { error: "User with this email already exists" },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
@@ -51,7 +50,7 @@ export async function POST(request: NextRequest) {
     ) {
       return NextResponse.json(
         { error: "User with this email already exists" },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
@@ -59,7 +58,7 @@ export async function POST(request: NextRequest) {
     if (err instanceof ZodError) {
       return NextResponse.json(
         { error: "Invalid input data", details: err.flatten() },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
@@ -67,7 +66,7 @@ export async function POST(request: NextRequest) {
     console.error("Register API error:", err);
     return NextResponse.json(
       { error: "Internal server error" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }
