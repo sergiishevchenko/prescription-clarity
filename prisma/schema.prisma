@@ -15,10 +15,10 @@ datasource db {
 }
 
 model User {
-  id           String   @id @default(cuid())
-  email        String   @unique
-  passwordHash String
-  name         String?
+  id           String   @id @default(cuid()) @db.VarChar(32)
+  email        String   @unique @db.VarChar(255)
+  passwordHash String   @db.VarChar(60)
+  name         String?  @db.VarChar(255)
   createdAt    DateTime @default(now())
   updatedAt    DateTime @updatedAt
 
@@ -28,9 +28,9 @@ model User {
 }
 
 model Session {
-  id         String   @id @default(cuid())
-  userId     String
-  tokenHash  String   @unique
+  id         String   @id @default(cuid()) @db.VarChar(32)
+  userId     String   @db.VarChar(32)
+  tokenHash  String   @unique @db.VarChar(64)
   expiresAt  DateTime
   createdAt  DateTime @default(now())
   updatedAt  DateTime @updatedAt
@@ -42,10 +42,10 @@ model Session {
 }
 
 model Medication {
-  id         String   @id @default(cuid())
-  userId     String
-  name       String
-  dose       String
+  id         String   @id @default(cuid()) @db.VarChar(32)
+  userId     String   @db.VarChar(32)
+  name       String   @db.VarChar(150)
+  dose       String   @db.VarChar(100)
   frequency  Int      // frequency in hours between doses
   startDate  DateTime // stored in UTC
   endDate    DateTime // stored in UTC
@@ -66,9 +66,9 @@ enum ScheduleStatus {
 }
 
 model ScheduleEntry {
-  id           String          @id @default(cuid())
-  medicationId String
-  userId       String
+  id           String          @id @default(cuid()) @db.VarChar(32)
+  medicationId String          @db.VarChar(32)
+  userId       String          @db.VarChar(32)
   dateTime     DateTime        // stored in UTC
   status       ScheduleStatus  @default(PLANNED)
   createdAt    DateTime        @default(now())
