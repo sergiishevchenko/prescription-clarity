@@ -9,6 +9,7 @@ This is a medication scheduling application built with Next.js 16, featuring sec
 ## Essential Commands
 
 ### Development
+
 ```bash
 npm run dev              # Start development server (auto-generates Prisma client)
 npm run docker:up        # Start Docker development environment (PostgreSQL + app)
@@ -16,6 +17,7 @@ npm run docker:down      # Stop Docker environment
 ```
 
 ### Database Operations
+
 ```bash
 npm run prisma:generate  # Generate Prisma client types
 npm run prisma:migrate   # Create and apply migrations (development)
@@ -24,6 +26,7 @@ npm run prisma:deploy    # Apply migrations in production
 ```
 
 ### Code Quality & Testing
+
 ```bash
 npm run lint             # Run ESLint
 npm run lint:fix         # Auto-fix ESLint errors
@@ -37,12 +40,14 @@ npm run test:coverage    # Run tests with coverage report
 ```
 
 ### Build & Deployment
+
 ```bash
 npm run build            # Build for production (generates Prisma client first)
 npm start                # Start production server
 ```
 
 ### Running Single Tests
+
 ```bash
 # Run specific test file
 npm test -- src/__tests__/api/auth.login.route.test.ts
@@ -70,11 +75,13 @@ The application uses a custom session-based authentication system:
 - **Password Security**: bcryptjs hashing for password storage
 
 **Key Files**:
+
 - `src/lib/auth/session.ts` - Core session management (create, verify, destroy)
 - `src/lib/auth/cookies.ts` - Cookie utilities for Next.js
 - `src/middleware.ts` - Route protection (redirects to `/login` if no session)
 
 **Session Flow**:
+
 1. User logs in → Password verified with bcrypt
 2. Generate random token → Hash with SHA-256 → Store hash in DB
 3. Set HTTP-only cookie with raw token
@@ -168,6 +175,7 @@ Coverage thresholds: 70% for branches, functions, lines, and statements.
 ### Environment Setup
 
 **Local Development**:
+
 1. Copy `.env.example` to `.env.local`
 2. Set `DATABASE_URL` to local PostgreSQL (default: `postgresql://postgres:postgres@localhost:5432/goit?schema=public`)
 3. Set `SESSION_SECRET` (minimum 32 characters, cryptographically secure)
@@ -176,6 +184,7 @@ Coverage thresholds: 70% for branches, functions, lines, and statements.
 6. Run `npm run dev`
 
 **Docker Development**:
+
 1. Copy `.env.example` to `.env.dev`
 2. Update `DATABASE_URL` to use Docker hostname: `postgresql://postgres:postgres@db:5432/goit?schema=public`
 3. Run `npm run docker:up`
@@ -193,12 +202,14 @@ Coverage thresholds: 70% for branches, functions, lines, and statements.
 ### Database Migrations
 
 **Development**:
+
 ```bash
 # After modifying prisma/schema.prisma
 npm run prisma:migrate  # Creates migration file and applies it
 ```
 
 **Production** (Vercel):
+
 - GitHub Action `db-migrate.yml` runs automatically on main branch
 - Uses `prisma migrate deploy` (non-interactive)
 
@@ -212,6 +223,7 @@ npm run prisma:migrate  # Creates migration file and applies it
 ### Code Quality Checks
 
 Before committing:
+
 ```bash
 npm run lint          # Must pass
 npm run typecheck     # Must pass
@@ -229,20 +241,22 @@ Two approaches depending on context:
 
 ```typescript
 // Next.js Route Handlers (using next/headers)
-import { getSessionUserFromCookies } from '@/lib/auth/session';
+import { getSessionUserFromCookies } from "@/lib/auth/session";
 
 export async function GET() {
   const user = await getSessionUserFromCookies();
-  if (!user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  if (!user)
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   // ... use user.id, user.email, user.name
 }
 
 // Standard Request objects
-import { getSessionUserFromRequest } from '@/lib/auth/session';
+import { getSessionUserFromRequest } from "@/lib/auth/session";
 
 export async function GET(req: Request) {
   const user = await getSessionUserFromRequest(req);
-  if (!user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  if (!user)
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 }
 ```
 
@@ -296,6 +310,7 @@ GitHub Actions workflow (`.github/workflows/ci.yml`):
 5. **Deploy Production**: Vercel production on main branch merges
 
 **Required GitHub Secrets**:
+
 - `VERCEL_TOKEN`
 - `VERCEL_ORG_ID`
 - `VERCEL_PROJECT_ID`
@@ -303,11 +318,13 @@ GitHub Actions workflow (`.github/workflows/ci.yml`):
 ## Troubleshooting
 
 ### Prisma Client Not Generated
+
 ```bash
 npm run prisma:generate
 ```
 
 ### Database Connection Failed (Docker)
+
 ```bash
 # Check if PostgreSQL is healthy
 docker compose ps
@@ -319,12 +336,14 @@ npm run docker:up
 ```
 
 ### Session Not Working
+
 - Verify `SESSION_SECRET` is set (minimum 32 characters)
 - Check `SESSION_COOKIE_NAME` matches in env and code
 - Ensure cookies are enabled in browser
 - For local development, ensure `localhost` domain compatibility
 
 ### Test Failures
+
 ```bash
 # Clear Jest cache
 npm test -- --clearCache
@@ -334,6 +353,7 @@ npm test -- --verbose --no-coverage [test-file]
 ```
 
 ### TypeScript Errors After Schema Changes
+
 ```bash
 npm run prisma:generate  # Regenerates Prisma types
 npm run typecheck        # Verify all type errors are resolved
