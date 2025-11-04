@@ -1,5 +1,6 @@
 import "server-only";
 import { cookies } from "next/headers";
+import { NextResponse } from "next/server";
 import { getSessionCookieName, getSessionMaxAge } from "./session";
 
 // Генерим конфиг cookie (используем в route handler'ах)
@@ -30,4 +31,9 @@ export async function getSessionCookie(): Promise<string | null> {
 // Имя cookie — пригодится для удаления в handler'ах
 export function getSessionCookieKey() {
   return getSessionCookieName();
+}
+
+// Очищення cookie сесії (для використання в route handlers і тестах)
+export function clearSessionCookie(res: NextResponse) {
+  res.cookies.delete(getSessionCookieName());
 }

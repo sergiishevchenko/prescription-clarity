@@ -1,8 +1,6 @@
-export const runtime = "nodejs";
-
 import { NextResponse } from "next/server";
 import { destroySession } from "@/lib/auth/session";
-import { getSessionCookie, getSessionCookieKey } from "@/lib/auth/cookies";
+import { getSessionCookie, clearSessionCookie } from "@/lib/auth/cookies";
 
 export async function POST() {
   try {
@@ -16,7 +14,7 @@ export async function POST() {
 
     // 3) Готовим ответ и очищаем cookie
     const res = NextResponse.json({ success: true });
-    res.cookies.delete(getSessionCookieKey()); // <-- Удаление cookie здесь
+    clearSessionCookie(res);
 
     return res;
   } catch (error) {
