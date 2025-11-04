@@ -3,8 +3,10 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
+    "predev": "prisma generate",
     "dev": "next dev",
     "build": "prisma generate && next build",
+    "vercel-build": "prisma generate && next build",
     "start": "next start",
     "lint": "eslint . --ext .ts,.tsx,.js,.jsx",
     "lint:fix": "eslint . --ext .ts,.tsx,.js,.jsx --fix",
@@ -17,6 +19,7 @@
     "prisma:generate": "prisma generate",
     "prisma:push": "prisma db push",
     "prisma:migrate": "prisma migrate dev",
+    "prisma:deploy": "prisma migrate deploy",
     "docker:up": "docker compose up --build",
     "docker:down": "docker compose down -v"
   },
@@ -51,5 +54,6 @@
     "prisma": "^6.18.0",
     "tailwindcss": "^4",
     "typescript": "^5"
-  }
+  },
+  "postinstall": "prisma generate"
 }

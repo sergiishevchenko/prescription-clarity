@@ -71,3 +71,24 @@ export function getSessionCookieName(): string {
 export function getSessionMaxAge(): number {
   return SESSION_MAX_AGE; // ms (используем для expiresAt, а в cookies.ts конвертим в секунды!)
 }
+
+/** Дістати значення SESSION cookie з заголовка Cookie: ... */
+export function extractTokenFromRequest(req: Request): string | null {
+  const name = getSessionCookieName();
+  const cookieHeader = req.headers.get("cookie") || "";
+  const m = cookieHeader.match(new RegExp(`${name}=([^;]+)`));
+  return m?.[1] ?? null;
+}
+
+/** Отримати користувача із cookie у Next.js Route Handler (через next/headers) */
+export async function getSessionUserFromCookies() {
+  const cookieStore = await cookies();
+  const token = cookieStore.get(getSessionCookieName())?.value || "";
+  return verifySession(token);
+}
+
+/** Отримати користувача, якщо маєш об’єкт Request */
+export async function getSessionUserFromRequest(req: Request) {
+  const token = extractTokenFromRequest(req) || "";
+  return verifySession(token);
+}

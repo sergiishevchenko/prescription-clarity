@@ -6,6 +6,7 @@
 
 generator client {
   provider = "prisma-client-js"
+  binaryTargets = ["native", "rhel-openssl-3.0.x"]
 }
 
 datasource db {
@@ -22,6 +23,8 @@ model User {
   updatedAt    DateTime @updatedAt
 
   sessions     Session[]
+  medications  Medication[]
+  scheduleEntries ScheduleEntry[]
 }
 
 model Session {
@@ -36,4 +39,44 @@ model Session {
 
   @@index([userId])
   @@index([expiresAt])
+}
+
+model Medication {
+  id         String   @id @default(cuid())
+  userId     String
+  name       String
+  dose       String
+  frequency  Int      // frequency in hours between doses
+  startDate  DateTime // stored in UTC
+  endDate    DateTime // stored in UTC
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  schedule   ScheduleEntry[]
+
+  @@index([userId])
+  @@index([startDate])
+  @@index([endDate])
+}
+
+enum ScheduleStatus {
+  PLANNED
+  DONE
+}
+
+model ScheduleEntry {
+  id           String          @id @default(cuid())
+  medicationId String
+  userId       String
+  dateTime     DateTime        // stored in UTC
+  status       ScheduleStatus  @default(PLANNED)
+  createdAt    DateTime        @default(now())
+  updatedAt    DateTime        @updatedAt
+
+  medication   Medication      @relation(fields: [medicationId], references: [id], onDelete: Cascade)
+  user         User            @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, dateTime])
+  @@unique([medicationId, dateTime])
 }
