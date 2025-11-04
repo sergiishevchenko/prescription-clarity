@@ -6,7 +6,7 @@ import { ZodError } from "zod";
 import { prisma } from "@/lib/db";
 import { loginSchema } from "@/lib/validators/auth";
 import { createSession, destroyAllUserSessions } from "@/lib/auth/session";
-import { buildSessionCookie } from "@/lib/auth/cookies";
+import { setSessionCookie } from "@/lib/auth/cookies";
 
 export const runtime = "nodejs";
 
@@ -46,8 +46,7 @@ export async function POST(request: NextRequest) {
       { status: 200 }
     );
 
-    const cfg = buildSessionCookie(sessionToken);
-    res.cookies.set(cfg.name, cfg.value, cfg.options);
+    setSessionCookie(res, sessionToken);
 
     return res;
   } catch (err: unknown) {

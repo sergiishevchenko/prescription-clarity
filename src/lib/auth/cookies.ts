@@ -37,3 +37,9 @@ export function getSessionCookieKey() {
 export function clearSessionCookie(res: NextResponse) {
   res.cookies.delete(getSessionCookieName());
 }
+
+// Встановлення cookie сесії на відповіді (зручно мокати в тестах)
+export function setSessionCookie(res: NextResponse, token: string) {
+  const cfg = buildSessionCookie(token);
+  res.cookies.set(cfg.name, cfg.value, cfg.options);
+}
