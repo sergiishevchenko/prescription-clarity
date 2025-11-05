@@ -14,7 +14,10 @@ export default async function DashboardPage() {
           <h1 className="text-3xl font-bold text-gray-900">
             Welcome, {user.name ?? user.email}
           </h1>
-          <p className="mt-2 text-gray-600">This is your dashboard. Here you can manage your prescriptions, medications, and supplements.</p>
+          <p className="mt-2 text-gray-600">
+            This is your dashboard. Here you can manage your prescriptions,
+            medications, and supplements.
+          </p>
         </div>
       </div>
     </div>

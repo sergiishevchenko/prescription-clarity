@@ -72,7 +72,7 @@ export default function ProfilePage() {
 
   return (
     <div className="min-h-[calc(100vh-4rem)] bg-gray-50">
-      <div className="mx-auto max-w-3xl py-6 px-4 sm:px-6 lg:px-8">
+      <div className="mx-auto max-w-3xl px-4 py-6 sm:px-6 lg:px-8">
         <h1 className="text-3xl font-bold text-gray-900">Profile</h1>
         <p className="mt-2 text-gray-600">
           Manage your account settings and personal information.
@@ -100,7 +100,7 @@ export default function ProfilePage() {
                       <input
                         type="text"
                         id="name"
-                        className="block w-full rounded-lg border border-gray-300 bg-white px-3.5 py-2.5 text-base text-gray-900 shadow-sm placeholder:text-gray-400 focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/50 sm:text-base"
+                        className="block w-full rounded-lg border border-gray-300 bg-white px-3.5 py-2.5 text-base text-gray-900 shadow-sm placeholder:text-gray-400 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/50 focus:outline-none sm:text-base"
                         value={name}
                         onChange={(e) => setName(e.target.value)}
                         disabled={saving}
@@ -119,7 +119,7 @@ export default function ProfilePage() {
                       <input
                         type="email"
                         id="email"
-                        className="block w-full rounded-lg border border-gray-300 bg-white px-3.5 py-2.5 text-base text-gray-900 shadow-sm placeholder:text-gray-400 focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/50 sm:text-base"
+                        className="block w-full rounded-lg border border-gray-300 bg-white px-3.5 py-2.5 text-base text-gray-900 shadow-sm placeholder:text-gray-400 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/50 focus:outline-none sm:text-base"
                         value={email}
                         onChange={(e) => setEmail(e.target.value)}
                         disabled={saving}

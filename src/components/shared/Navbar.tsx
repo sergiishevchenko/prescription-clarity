@@ -10,8 +10,10 @@ export const fetchCache = "force-no-store";
 export async function Navbar() {
   // Force re-evaluation by reading cookies
   const cookieStore = await cookies();
-  const sessionCookie = cookieStore.get(process.env.SESSION_COOKIE_NAME || "SESSION_ID");
-  
+  const sessionCookie = cookieStore.get(
+    process.env.SESSION_COOKIE_NAME || "SESSION_ID",
+  );
+
   const sessionUser = await getSessionUserFromCookies();
   const isLoggedIn = Boolean(sessionUser);
   const homeHref = isLoggedIn ? "/dashboard" : "/";
@@ -28,9 +30,9 @@ export async function Navbar() {
           <div className="flex items-center gap-3">
             {isLoggedIn ? (
               <>
-                <Link 
+                <Link
                   href="/profile"
-                  className="text-sm font-medium text-gray-700 hover:text-indigo-600 transition-colors"
+                  className="text-sm font-medium text-gray-700 transition-colors hover:text-indigo-600"
                 >
                   Profile
                 </Link>
@@ -39,7 +41,10 @@ export async function Navbar() {
             ) : (
               <>
                 <Link href="/login">
-                  <Button variant="outline" className="cursor-pointer border-indigo-600 text-indigo-600 hover:bg-indigo-50">
+                  <Button
+                    variant="outline"
+                    className="cursor-pointer border-indigo-600 text-indigo-600 hover:bg-indigo-50"
+                  >
                     Sign In
                   </Button>
                 </Link>

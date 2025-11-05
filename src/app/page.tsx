@@ -14,20 +14,20 @@ export default function HomePage() {
               Your digital adherence companion for medications and supplements.
               Never miss a dose again.
             </p>
-            <div className="mx-auto mt-5 max-w-md sm:flex sm:justify-center md:mt-8 gap-3">
+            <div className="mx-auto mt-5 max-w-md gap-3 sm:flex sm:justify-center md:mt-8">
               <Link href="/login">
-                <Button 
-                  variant="outline" 
-                  size="lg" 
-                  className="cursor-pointer border-indigo-600 text-indigo-600 hover:bg-indigo-50 w-full sm:w-auto"
+                <Button
+                  variant="outline"
+                  size="lg"
+                  className="w-full cursor-pointer border-indigo-600 text-indigo-600 hover:bg-indigo-50 sm:w-auto"
                 >
                   Get Started
                 </Button>
               </Link>
               <Link href="/register">
-                <Button 
-                  size="lg" 
-                  className="cursor-pointer bg-indigo-600 hover:bg-indigo-700 w-full sm:w-auto"
+                <Button
+                  size="lg"
+                  className="w-full cursor-pointer bg-indigo-600 hover:bg-indigo-700 sm:w-auto"
                 >
                   Create Account
                 </Button>

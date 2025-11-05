@@ -27,9 +27,9 @@ export function LogoutButton() {
   }
 
   return (
-    <Button 
-      variant="outline" 
-      size="sm" 
+    <Button
+      variant="outline"
+      size="sm"
       onClick={handleLogout}
       disabled={loading}
       className="cursor-pointer border-indigo-600 text-indigo-600 hover:bg-indigo-50 disabled:opacity-50"
@@ -38,4 +38,3 @@ export function LogoutButton() {
     </Button>
   );
 }
-
