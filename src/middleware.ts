@@ -21,7 +21,8 @@ export function middleware(request: NextRequest) {
   // Check for protected routes - just check if session cookie exists
   // Full session validation happens in the API routes
   if (pathname.startsWith("/dashboard") || pathname.startsWith("/profile")) {
-    const sessionToken = request.cookies.get("SESSION_ID")?.value;
+    const cookieName = process.env.SESSION_COOKIE_NAME || "SESSION_ID";
+    const sessionToken = request.cookies.get(cookieName)?.value;
 
     if (!sessionToken) {
       return NextResponse.redirect(new URL("/login", request.url));

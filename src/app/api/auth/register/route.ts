@@ -1,5 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
 import bcrypt from "bcryptjs";
+import { PrismaClientKnownRequestError } from "@prisma/client/runtime/library";
+import { ZodError } from "zod";
+
 import { prisma } from "@/lib/db";
 import { registerSchema } from "@/lib/validators/auth";
 import { createSession } from "@/lib/auth/session";
@@ -10,54 +13,57 @@ export const runtime = "nodejs";
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
-    const validatedData = registerSchema.parse(body);
+    const { email, password, name } = registerSchema.parse(body);
 
-    const { email, password, name } = validatedData;
-
-    // Check if user already exists
-    const existingUser = await prisma.user.findUnique({
-      where: { email },
-    });
-
-    if (existingUser) {
+    // Перевірка — чи існує користувач
+    const existing = await prisma.user.findUnique({ where: { email } });
+    if (existing) {
       return NextResponse.json(
         { error: "User with this email already exists" },
         { status: 400 },
       );
     }
 
-    // Hash password
+    // Хешування паролю
     const passwordHash = await bcrypt.hash(password, 12);
 
-    // Create user
+    // Створення нового користувача
     const user = await prisma.user.create({
-      data: {
-        email,
-        passwordHash,
-        name: name || null,
-      },
-      select: {
-        id: true,
-        email: true,
-        name: true,
-      },
+      data: { email, passwordHash, name: name || null },
+      select: { id: true, email: true, name: true },
     });
 
-    // Create session
+    // Створення сесії
     const sessionToken = await createSession(user.id);
-    await setSessionCookie(sessionToken);
+    const res = NextResponse.json({ user }, { status: 201 });
 
-    return NextResponse.json({ user }, { status: 201 });
-  } catch (error) {
-    console.error("Registration error:", error);
+    setSessionCookie(res, sessionToken);
 
-    if (error instanceof Error && error.name === "ZodError") {
+    return res;
+  } catch (err: unknown) {
+    // 1️⃣ Помилка Prisma — дубльований email
+    if (
+      err instanceof PrismaClientKnownRequestError &&
+      err.code === "P2002" &&
+      Array.isArray(err.meta?.target) &&
+      err.meta.target.includes("email")
+    ) {
       return NextResponse.json(
-        { error: "Invalid input data" },
+        { error: "User with this email already exists" },
         { status: 400 },
       );
     }
 
+    // 2️⃣ Помилка валідації (Zod)
+    if (err instanceof ZodError) {
+      return NextResponse.json(
+        { error: "Invalid input data", details: err.flatten() },
+        { status: 400 },
+      );
+    }
+
+    // 3️⃣ Інші помилки
+    console.error("Register API error:", err);
     return NextResponse.json(
       { error: "Internal server error" },
       { status: 500 },
