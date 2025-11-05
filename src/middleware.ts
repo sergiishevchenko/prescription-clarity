@@ -3,13 +3,21 @@ import type { NextRequest } from "next/server";
 
 export function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
+  const cookieName = process.env.SESSION_COOKIE_NAME || "SESSION_ID";
+  const sessionToken = request.cookies.get(cookieName)?.value;
 
-  // Skip auth check for public routes
+  // Public routes: if already logged in, redirect away from auth pages
   if (
     pathname === "/" ||
     pathname.startsWith("/login") ||
     pathname.startsWith("/register")
   ) {
+    if (
+      (pathname.startsWith("/login") || pathname.startsWith("/register")) &&
+      sessionToken
+    ) {
+      return NextResponse.redirect(new URL("/dashboard", request.url));
+    }
     return NextResponse.next();
   }
 
@@ -21,9 +29,6 @@ export function middleware(request: NextRequest) {
   // Check for protected routes - just check if session cookie exists
   // Full session validation happens in the API routes
   if (pathname.startsWith("/dashboard") || pathname.startsWith("/profile")) {
-    const cookieName = process.env.SESSION_COOKIE_NAME || "SESSION_ID";
-    const sessionToken = request.cookies.get(cookieName)?.value;
-
     if (!sessionToken) {
       return NextResponse.redirect(new URL("/login", request.url));
     }
