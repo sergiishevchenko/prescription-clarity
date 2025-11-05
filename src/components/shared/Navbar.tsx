@@ -1,73 +1,55 @@
-"use client";
-
 import Link from "next/link";
-import { usePathname } from "next/navigation";
 import { Button } from "@/components/ui/Button";
+import { getSessionUserFromCookies } from "@/lib/auth/session";
+import { LogoutButton } from "./LogoutButton";
+import { cookies } from "next/headers";
 
-export function Navbar() {
-  const pathname = usePathname();
+export const dynamic = "force-dynamic";
+export const fetchCache = "force-no-store";
 
-  const isLoggedIn = false; // TODO: Replace with actual auth state
-
-  if (!isLoggedIn) {
-    return (
-      <nav className="bg-white shadow">
-        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-          <div className="flex h-16 justify-between">
-            <div className="flex items-center">
-              <Link href="/" className="text-xl font-bold text-gray-900">
-                GoIT Capstone
-              </Link>
-            </div>
-            <div className="flex items-center space-x-4">
-              <Link href="/login">
-                <Button variant="ghost">Sign In</Button>
-              </Link>
-              <Link href="/register">
-                <Button>Sign Up</Button>
-              </Link>
-            </div>
-          </div>
-        </div>
-      </nav>
-    );
-  }
+export async function Navbar() {
+  // Force re-evaluation by reading cookies
+  const cookieStore = await cookies();
+  const sessionCookie = cookieStore.get(process.env.SESSION_COOKIE_NAME || "SESSION_ID");
+  
+  const sessionUser = await getSessionUserFromCookies();
+  const isLoggedIn = Boolean(sessionUser);
+  const homeHref = isLoggedIn ? "/dashboard" : "/";
 
   return (
     <nav className="bg-white shadow">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <div className="flex h-16 justify-between">
-          <div className="flex items-center space-x-8">
-            <Link href="/" className="text-xl font-bold text-gray-900">
-              GoIT Capstone
-            </Link>
-            <div className="hidden space-x-4 md:flex">
-              <Link
-                href="/dashboard"
-                className={`rounded-md px-3 py-2 text-sm font-medium ${
-                  pathname === "/dashboard"
-                    ? "bg-indigo-100 text-indigo-700"
-                    : "text-gray-500 hover:text-gray-700"
-                }`}
-              >
-                Dashboard
-              </Link>
-              <Link
-                href="/profile"
-                className={`rounded-md px-3 py-2 text-sm font-medium ${
-                  pathname === "/profile"
-                    ? "bg-indigo-100 text-indigo-700"
-                    : "text-gray-500 hover:text-gray-700"
-                }`}
-              >
-                Profile
-              </Link>
-            </div>
-          </div>
           <div className="flex items-center">
-            <Button variant="ghost" size="sm">
-              Logout
-            </Button>
+            <Link href={homeHref} className="text-xl font-bold text-gray-900">
+              Prescription Clarity
+            </Link>
+          </div>
+          <div className="flex items-center gap-3">
+            {isLoggedIn ? (
+              <>
+                <Link 
+                  href="/profile"
+                  className="text-sm font-medium text-gray-700 hover:text-indigo-600 transition-colors"
+                >
+                  Profile
+                </Link>
+                <LogoutButton />
+              </>
+            ) : (
+              <>
+                <Link href="/login">
+                  <Button variant="outline" className="cursor-pointer border-indigo-600 text-indigo-600 hover:bg-indigo-50">
+                    Sign In
+                  </Button>
+                </Link>
+                <Link href="/register">
+                  <Button className="cursor-pointer bg-indigo-600 hover:bg-indigo-700">
+                    Sign Up
+                  </Button>
+                </Link>
+              </>
+            )}
           </div>
         </div>
       </div>
