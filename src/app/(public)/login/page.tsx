@@ -28,8 +28,8 @@ export default function LoginPage() {
       });
 
       if (res.ok) {
-        router.push("/dashboard"); // Navigate and refresh
-        router.refresh(); // Force refresh
+        router.push("/dashboard");
+        router.refresh();
         return;
       }
 
