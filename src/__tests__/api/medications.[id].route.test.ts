@@ -8,7 +8,7 @@ type DeleteHandler = typeof MedicationIdRoute.DELETE;
 type GetRequest = Parameters<GetHandler>[0];
 type PatchRequest = Parameters<PatchHandler>[0];
 type DeleteRequest = Parameters<DeleteHandler>[0];
-type Params = { params: { id: string } };
+type Params = { params: Promise<{ id: string }> };
 
 const makeGetReq = (): GetRequest =>
   new Request("http://localhost/api/medications/med1") as unknown as GetRequest;
@@ -44,7 +44,7 @@ const mockMedication = {
   updatedAt: new Date(),
 };
 
-const params: Params = { params: { id: "med1" } };
+const params: Params = { params: Promise.resolve({ id: "med1" }) };
 
 beforeEach(() => {
   jest.clearAllMocks();

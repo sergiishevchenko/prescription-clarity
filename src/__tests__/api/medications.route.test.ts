@@ -80,23 +80,118 @@ describe("GET /api/medications", () => {
     );
   });
 
-  it("should filter by status query parameter", async () => {
+  it("should filter by status=ACTIVE query parameter", async () => {
     jest
       .spyOn(SessionModule, "getSessionUserFromRequest")
       .mockResolvedValueOnce(mockUser);
 
-    prismaMock.medication.findMany.mockResolvedValueOnce([]);
+    const mockActiveMedications = [
+      {
+        id: "med1",
+        userId: "user123",
+        name: "Aspirin",
+        dose: "100mg",
+        frequency: 24,
+        startDate: new Date("2025-01-01"),
+        endDate: new Date("2025-12-31"),
+        status: "ACTIVE" as const,
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      },
+    ];
+
+    prismaMock.medication.findMany.mockResolvedValueOnce(mockActiveMedications);
+
+    const res = await MedicationsRoute.GET(makeGetReq("?status=ACTIVE"));
+    const data = await res.json();
+
+    expect(res.status).toBe(200);
+    expect(data.medications).toHaveLength(1);
+    expect(data.medications[0].status).toBe("ACTIVE");
+    expect(prismaMock.medication.findMany).toHaveBeenCalledWith(
+      expect.objectContaining({
+        where: expect.objectContaining({
+          userId: "user123",
+          status: "ACTIVE",
+        }),
+      }),
+    );
+  });
+
+  it("should filter by status=DELETED query parameter", async () => {
+    jest
+      .spyOn(SessionModule, "getSessionUserFromRequest")
+      .mockResolvedValueOnce(mockUser);
+
+    const mockDeletedMedications = [
+      {
+        id: "med2",
+        userId: "user123",
+        name: "Old Medicine",
+        dose: "50mg",
+        frequency: 12,
+        startDate: new Date("2024-01-01"),
+        endDate: new Date("2024-12-31"),
+        status: "DELETED" as const,
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      },
+    ];
+
+    prismaMock.medication.findMany.mockResolvedValueOnce(
+      mockDeletedMedications,
+    );
 
     const res = await MedicationsRoute.GET(makeGetReq("?status=DELETED"));
     const data = await res.json();
 
     expect(res.status).toBe(200);
-    expect(data.medications).toEqual([]);
+    expect(data.medications).toHaveLength(1);
+    expect(data.medications[0].status).toBe("DELETED");
     expect(prismaMock.medication.findMany).toHaveBeenCalledWith(
       expect.objectContaining({
         where: expect.objectContaining({
           userId: "user123",
           status: "DELETED",
+        }),
+      }),
+    );
+  });
+
+  it("should only return ACTIVE medications when no status parameter is provided", async () => {
+    jest
+      .spyOn(SessionModule, "getSessionUserFromRequest")
+      .mockResolvedValueOnce(mockUser);
+
+    const mockActiveMedications = [
+      {
+        id: "med1",
+        userId: "user123",
+        name: "Aspirin",
+        dose: "100mg",
+        frequency: 24,
+        startDate: new Date("2025-01-01"),
+        endDate: new Date("2025-12-31"),
+        status: "ACTIVE" as const,
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      },
+    ];
+
+    prismaMock.medication.findMany.mockResolvedValueOnce(mockActiveMedications);
+
+    const res = await MedicationsRoute.GET(makeGetReq());
+    const data = await res.json();
+
+    expect(res.status).toBe(200);
+    expect(data.medications).toHaveLength(1);
+    expect(data.medications[0].status).toBe("ACTIVE");
+    // Verify that the where clause specifically filters for ACTIVE status
+    expect(prismaMock.medication.findMany).toHaveBeenCalledWith(
+      expect.objectContaining({
+        where: expect.objectContaining({
+          userId: "user123",
+          status: "ACTIVE",
         }),
       }),
     );
