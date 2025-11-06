@@ -41,21 +41,28 @@ model Session {
   @@index([expiresAt])
 }
 
-model Medication {
-  id         String   @id @default(cuid()) @db.VarChar(32)
-  userId     String   @db.VarChar(32)
-  name       String   @db.VarChar(150)
-  dose       String   @db.VarChar(100)
-  frequency  Int      // frequency in hours between doses
-  startDate  DateTime // stored in UTC
-  endDate    DateTime // stored in UTC
-  createdAt  DateTime @default(now())
-  updatedAt  DateTime @updatedAt
+enum MedicationStatus {
+  ACTIVE
+  DELETED
+}
 
-  user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+model Medication {
+  id         String           @id @default(cuid()) @db.VarChar(32)
+  userId     String           @db.VarChar(32)
+  name       String           @db.VarChar(150)
+  dose       String           @db.VarChar(100)
+  frequency  Int              // frequency in hours between doses
+  startDate  DateTime         // stored in UTC
+  endDate    DateTime         // stored in UTC
+  status     MedicationStatus @default(ACTIVE)
+  createdAt  DateTime         @default(now())
+  updatedAt  DateTime         @updatedAt
+
+  user       User             @relation(fields: [userId], references: [id], onDelete: Cascade)
   schedule   ScheduleEntry[]
 
   @@index([userId])
+  @@index([userId, status])
   @@index([startDate])
   @@index([endDate])
 }
