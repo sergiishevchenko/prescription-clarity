@@ -1,0 +1,92 @@
+case_id,title,suite,suite_id,assignee,time_spent_ms,status,finish_time,steps,steps_input_data,steps_expected_result,steps_status,steps_comments,comment,stacktrace,priority,severity,automation,type,tags,is_muted,case_parameter
+1,"Login with valid credentials","Sprint 1 – Auth & Profile Smoke",1,"Vladyslav Mazur",40249,Passed,"2025-11-06 18:50:52","1. Open `/login `page.
+2. Enter valid email & password.
+3. Click **Login**.
+","1. 
+2. 
+3. 
+","1. 
+2. 
+3. * Redirect to `/dashboard`
+* Cookie stored.
+","1. Passed
+2. Passed
+3. Passed
+","1. 
+2. 
+3. ",,,High,Major,Manual,Functional,,false,
+2,"Login with invalid credentials","Sprint 1 – Auth & Profile Smoke",1,"Vladyslav Mazur",11933,Passed,"2025-11-06 18:51:38","1. Enter incorrect credentials.
+2. Click **Login**.
+","1. 
+2. 
+","1. 
+2. * User remains on `/login`
+* Error “Invalid email or password”.
+","1. Untested
+2. Untested
+","1. 
+2. ",,,High,Major,Manual,Functional,,false,
+3,"Register new account (valid data)","Sprint 1 – Auth & Profile Smoke",1,"Vladyslav Mazur",98562,Passed,"2025-11-06 18:53:25","1. Enter name, new email, password.
+2. Click **Register**.
+","1. 
+2. 
+","1. 
+2. * Account created
+* user logged in
+* redirect to `/dashboard`.
+","1. Untested
+2. Untested
+","1. 
+2. ",,,High,Major,Manual,Functional,,false,
+4,"Register with existing email","Sprint 1 – Auth & Profile Smoke",1,"Vladyslav Mazur",194237,Passed,"2025-11-06 18:56:41","1. Enter existing email.
+2. Click **Register**.
+","1. 
+2. 
+","1. 
+2. Error “Email already in use”.
+","1. Passed
+2. Passed
+","1. 
+2. Dev tools > Network > Status Code
+400 Bad Request.
+
+Expected: 409",,,High,Major,Manual,Functional,,false,
+5,"Logout from dashboard","Sprint 1 – Auth & Profile Smoke",1,"Vladyslav Mazur",16265,Passed,"2025-11-06 18:51:22","1. Click **Logout**.
+","1. 
+","1. * Session terminated
+* redirect to `/login`
+* cookie cleared.
+","1. Untested
+","1. ",,,High,Major,Manual,Functional,,false,
+6,"Redirect guest from /dashboard to /login","Sprint 1 – Auth & Profile Smoke",1,"Vladyslav Mazur",14027,Passed,"2025-11-06 18:56:56","1. Enter `/dashboard` in browser.
+","1. 
+","1. Guest redirected to `/login`
+","1. Untested
+","1. ",,,High,Normal,Manual,Functional,,false,
+7,"View profile details","Sprint 1 – Auth & Profile Smoke",1,"Vladyslav Mazur",85139,Passed,"2025-11-06 18:58:23","1. Open `/profile`.
+","1. 
+","1. User details (name, email) displayed correctly.
+","1. Untested
+","1. ",,,Medium,Major,Manual,Functional,,false,
+8,"Update profile information","Sprint 1 – Auth & Profile Smoke",1,"Vladyslav Mazur",17584,Passed,"2025-11-06 18:58:41","1. * User logged in
+* `/profile` open
+2. Edit Name.
+3. Edit email.
+4. Click **Save**.
+","1. 
+2. 
+3. 
+4. 
+","1. 
+2. 
+3. 
+4. * Data updated
+* The text “Profile updated successfully.” appears.
+","1. Untested
+2. Untested
+3. Untested
+4. Untested
+","1. 
+2. 
+3. 
+4. ",,,High,Major,Manual,Functional,,false,
