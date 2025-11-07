@@ -1,0 +1,309 @@
+{
+  "suites": [
+    {
+      "id": 1,
+      "title": "Sprint 1 \u2013 Auth & Profile Smoke",
+      "description": "Auth & Profile Smoke",
+      "preconditions": "* QA environment is deployed and reachable (Vercel / Render).\n* Database migrated and contains `User` and `Session` tables.\n* API endpoints `/api/auth/*` and `/api/profile` are active.\n* Cookies and middleware redirects configured correctly.\n* Test user account exists in DB.\n* Browser cache and cookies cleared before each test.",
+      "suites": [],
+      "cases": [
+        {
+          "id": 1,
+          "title": "Login with valid credentials",
+          "description": null,
+          "preconditions": "* Test user exists in DB\n* `/login` page opened",
+          "postconditions": null,
+          "priority": "high",
+          "severity": "major",
+          "type": "functional",
+          "behavior": "positive",
+          "automation": "is-not-automated",
+          "status": "actual",
+          "is_flaky": "no",
+          "layer": "e2e",
+          "milestone": null,
+          "custom_fields": [],
+          "steps_type": "classic",
+          "steps": [
+            {
+              "position": 1,
+              "action": "Open `/login `page.",
+              "expected_result": "",
+              "data": "",
+              "steps": []
+            },
+            {
+              "position": 2,
+              "action": "Enter valid email & password.",
+              "expected_result": "",
+              "data": "",
+              "steps": []
+            },
+            {
+              "position": 3,
+              "action": "Click **Login**.",
+              "expected_result": "* Redirect to `/dashboard`\n* Cookie stored.",
+              "data": "",
+              "steps": []
+            }
+          ],
+          "tags": [],
+          "params": [],
+          "is_muted": "no"
+        },
+        {
+          "id": 2,
+          "title": "Login with invalid credentials",
+          "description": null,
+          "preconditions": "No active session",
+          "postconditions": null,
+          "priority": "high",
+          "severity": "major",
+          "type": "functional",
+          "behavior": "negative",
+          "automation": "is-not-automated",
+          "status": "actual",
+          "is_flaky": "no",
+          "layer": "e2e",
+          "milestone": null,
+          "custom_fields": [],
+          "steps_type": "classic",
+          "steps": [
+            {
+              "position": 1,
+              "action": "Enter incorrect credentials.",
+              "expected_result": "",
+              "data": "",
+              "steps": []
+            },
+            {
+              "position": 2,
+              "action": "Click **Login**.",
+              "expected_result": "* User remains on `/login`\n* Error \u201cInvalid email or password\u201d.",
+              "data": "",
+              "steps": []
+            }
+          ],
+          "tags": [],
+          "params": [],
+          "is_muted": "no"
+        },
+        {
+          "id": 3,
+          "title": "Register new account (valid data)",
+          "description": null,
+          "preconditions": "* `/register` page opened\n* unique email",
+          "postconditions": null,
+          "priority": "high",
+          "severity": "major",
+          "type": "functional",
+          "behavior": "positive",
+          "automation": "is-not-automated",
+          "status": "actual",
+          "is_flaky": "no",
+          "layer": "e2e",
+          "milestone": null,
+          "custom_fields": [],
+          "steps_type": "classic",
+          "steps": [
+            {
+              "position": 1,
+              "action": "Enter name, new email, password.",
+              "expected_result": "",
+              "data": "",
+              "steps": []
+            },
+            {
+              "position": 2,
+              "action": "Click **Register**.",
+              "expected_result": "* Account created\n* user logged in\n* redirect to `/dashboard`.",
+              "data": "",
+              "steps": []
+            }
+          ],
+          "tags": [],
+          "params": [],
+          "is_muted": "no"
+        },
+        {
+          "id": 4,
+          "title": "Register with existing email",
+          "description": null,
+          "preconditions": "Existing user with same email",
+          "postconditions": null,
+          "priority": "high",
+          "severity": "major",
+          "type": "functional",
+          "behavior": "negative",
+          "automation": "is-not-automated",
+          "status": "actual",
+          "is_flaky": "no",
+          "layer": "e2e",
+          "milestone": null,
+          "custom_fields": [],
+          "steps_type": "classic",
+          "steps": [
+            {
+              "position": 1,
+              "action": "Enter existing email.",
+              "expected_result": "",
+              "data": "",
+              "steps": []
+            },
+            {
+              "position": 2,
+              "action": "Click **Register**.",
+              "expected_result": "Error \u201cEmail already in use\u201d.",
+              "data": "",
+              "steps": []
+            }
+          ],
+          "tags": [],
+          "params": [],
+          "is_muted": "no"
+        },
+        {
+          "id": 5,
+          "title": "Logout from dashboard",
+          "description": null,
+          "preconditions": "* User logged in\n* `/dashboard` open",
+          "postconditions": null,
+          "priority": "high",
+          "severity": "major",
+          "type": "functional",
+          "behavior": "positive",
+          "automation": "is-not-automated",
+          "status": "actual",
+          "is_flaky": "no",
+          "layer": "e2e",
+          "milestone": null,
+          "custom_fields": [],
+          "steps_type": "classic",
+          "steps": [
+            {
+              "position": 1,
+              "action": "Click **Logout**.",
+              "expected_result": "* Session terminated\n* redirect to `/login`\n* cookie cleared.",
+              "data": "",
+              "steps": []
+            }
+          ],
+          "tags": [],
+          "params": [],
+          "is_muted": "no"
+        },
+        {
+          "id": 6,
+          "title": "Redirect guest from /dashboard to /login",
+          "description": null,
+          "preconditions": "* User logged out\n* no session",
+          "postconditions": null,
+          "priority": "high",
+          "severity": "normal",
+          "type": "functional",
+          "behavior": "positive",
+          "automation": "is-not-automated",
+          "status": "actual",
+          "is_flaky": "no",
+          "layer": "e2e",
+          "milestone": null,
+          "custom_fields": [],
+          "steps_type": "classic",
+          "steps": [
+            {
+              "position": 1,
+              "action": "Enter `/dashboard` in browser.",
+              "expected_result": "Guest redirected to `/login`",
+              "data": "",
+              "steps": []
+            }
+          ],
+          "tags": [],
+          "params": [],
+          "is_muted": "no"
+        },
+        {
+          "id": 7,
+          "title": "View profile details",
+          "description": null,
+          "preconditions": "User logged in",
+          "postconditions": null,
+          "priority": "medium",
+          "severity": "major",
+          "type": "functional",
+          "behavior": "positive",
+          "automation": "is-not-automated",
+          "status": "actual",
+          "is_flaky": "no",
+          "layer": "e2e",
+          "milestone": null,
+          "custom_fields": [],
+          "steps_type": "classic",
+          "steps": [
+            {
+              "position": 1,
+              "action": "Open `/profile`.",
+              "expected_result": "User details (name, email) displayed correctly.",
+              "data": "",
+              "steps": []
+            }
+          ],
+          "tags": [],
+          "params": [],
+          "is_muted": "no"
+        },
+        {
+          "id": 8,
+          "title": "Update profile information",
+          "description": null,
+          "preconditions": null,
+          "postconditions": null,
+          "priority": "high",
+          "severity": "major",
+          "type": "functional",
+          "behavior": "positive",
+          "automation": "is-not-automated",
+          "status": "actual",
+          "is_flaky": "no",
+          "layer": "e2e",
+          "milestone": null,
+          "custom_fields": [],
+          "steps_type": "classic",
+          "steps": [
+            {
+              "position": 1,
+              "action": "* User logged in\n* `/profile` open",
+              "expected_result": "",
+              "data": "",
+              "steps": []
+            },
+            {
+              "position": 2,
+              "action": "Edit Name.",
+              "expected_result": "",
+              "data": "",
+              "steps": []
+            },
+            {
+              "position": 3,
+              "action": "Edit email.",
+              "expected_result": "",
+              "data": "",
+              "steps": []
+            },
+            {
+              "position": 4,
+              "action": "Click **Save**.",
+              "expected_result": "* Data updated\n* The text \u201cProfile updated successfully.\u201d appears.",
+              "data": "",
+              "steps": []
+            }
+          ],
+          "tags": [],
+          "params": [],
+          "is_muted": "no"
+        }
+      ]
+    }
+  ]
+}

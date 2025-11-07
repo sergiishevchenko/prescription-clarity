@@ -1,0 +1,39 @@
+"id","title","test case id","author","assignee","actual result","status","milestone","severity","external issues","attachments","tags"
+"2","After successful login, refreshing a duplicated /login tab does not redirect the authorized user to /dashboard.","","Vladyslav Mazur","Unassigned","**Preconditions:**
+
+* User exists in the database (e.g., `user@example.com`).
+
+**Steps to Reproduce:**
+
+1. Open `/login` page in a browser.
+2. Duplicate the login tab (Ctrl + T → right-click → “Duplicate”).
+3. In the **first tab**, enter valid credentials and click **Login**.
+    → User successfully logs in and is redirected to `/dashboard`.
+4. Switch to the **duplicated** `/login` tab.
+5. Refresh the duplicated `/login` page.
+
+**Expected Result:**
+
+* Since the user already has a valid session (cookie set), the app should automatically redirect to `/dashboard`.
+* Login page should not be accessible for authorized users.
+
+**Actual Result:**
+
+* The duplicated `/login` page remains visible even after refresh.
+* Only after manually navigating to `/dashboard`, user is redirected correctly.","Resolved","","Minor","","",""
+"1","User registration with an already registered email returns status code 400 (Bad Request) instead of 409 (Conflict).","","Vladyslav Mazur","Unassigned","**Steps to Reproduce:**
+
+1. Navigate to `/register`.
+2. Enter an email that is already registered (`abolic@meta.com`).
+3. Fill in all required fields (name, password).
+4. Click **Register**.
+
+**Expected Result:**
+
+* The API should return HTTP **409 Conflict** with an error message:
+    `""Email already exists""`
+* User account should **not** be created again.
+
+**Actual Result:**
+
+* API returns HTTP **400 Bad Request**.","Open","","Normal","","",""
