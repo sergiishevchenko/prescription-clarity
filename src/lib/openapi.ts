@@ -10,6 +10,7 @@ export const openApiSpec = {
   tags: [
     { name: "Auth", description: "Authentication" },
     { name: "Profile", description: "User profile" },
+    { name: "Medications", description: "Medication management" },
   ],
   paths: {
     "/api/auth/register": {
@@ -177,6 +178,244 @@ export const openApiSpec = {
         },
       },
     },
+    "/api/medications": {
+      get: {
+        tags: ["Medications"],
+        summary: "Get all medications for the authenticated user",
+        parameters: [
+          {
+            name: "status",
+            in: "query",
+            description:
+              "Filter by medication status (ACTIVE or DELETED). Defaults to ACTIVE.",
+            required: false,
+            schema: {
+              type: "string",
+              enum: ["ACTIVE", "DELETED"],
+            },
+          },
+        ],
+        responses: {
+          200: {
+            description: "List of medications",
+            content: {
+              "application/json": {
+                schema: {
+                  type: "object",
+                  properties: {
+                    medications: {
+                      type: "array",
+                      items: { $ref: "#/components/schemas/Medication" },
+                    },
+                  },
+                },
+              },
+            },
+          },
+          401: {
+            description: "Unauthorized",
+            content: {
+              "application/json": {
+                schema: { $ref: "#/components/schemas/ErrorResponse" },
+              },
+            },
+          },
+        },
+      },
+      post: {
+        tags: ["Medications"],
+        summary: "Create a new medication",
+        requestBody: {
+          required: true,
+          content: {
+            "application/json": {
+              schema: { $ref: "#/components/schemas/CreateMedicationRequest" },
+            },
+          },
+        },
+        responses: {
+          201: {
+            description: "Medication created",
+            content: {
+              "application/json": {
+                schema: {
+                  type: "object",
+                  properties: {
+                    medication: { $ref: "#/components/schemas/Medication" },
+                  },
+                },
+              },
+            },
+          },
+          400: {
+            description: "Invalid input data",
+            content: {
+              "application/json": {
+                schema: { $ref: "#/components/schemas/ErrorResponse" },
+              },
+            },
+          },
+          401: {
+            description: "Unauthorized",
+            content: {
+              "application/json": {
+                schema: { $ref: "#/components/schemas/ErrorResponse" },
+              },
+            },
+          },
+        },
+      },
+    },
+    "/api/medications/{id}": {
+      get: {
+        tags: ["Medications"],
+        summary: "Get a single medication by ID",
+        parameters: [
+          {
+            name: "id",
+            in: "path",
+            description: "Medication ID",
+            required: true,
+            schema: { type: "string" },
+          },
+        ],
+        responses: {
+          200: {
+            description: "Medication details",
+            content: {
+              "application/json": {
+                schema: {
+                  type: "object",
+                  properties: {
+                    medication: { $ref: "#/components/schemas/Medication" },
+                  },
+                },
+              },
+            },
+          },
+          401: {
+            description: "Unauthorized",
+            content: {
+              "application/json": {
+                schema: { $ref: "#/components/schemas/ErrorResponse" },
+              },
+            },
+          },
+          404: {
+            description: "Medication not found",
+            content: {
+              "application/json": {
+                schema: { $ref: "#/components/schemas/ErrorResponse" },
+              },
+            },
+          },
+        },
+      },
+      patch: {
+        tags: ["Medications"],
+        summary: "Update a medication by ID",
+        parameters: [
+          {
+            name: "id",
+            in: "path",
+            description: "Medication ID",
+            required: true,
+            schema: { type: "string" },
+          },
+        ],
+        requestBody: {
+          required: true,
+          content: {
+            "application/json": {
+              schema: { $ref: "#/components/schemas/UpdateMedicationRequest" },
+            },
+          },
+        },
+        responses: {
+          200: {
+            description: "Medication updated",
+            content: {
+              "application/json": {
+                schema: {
+                  type: "object",
+                  properties: {
+                    medication: { $ref: "#/components/schemas/Medication" },
+                  },
+                },
+              },
+            },
+          },
+          400: {
+            description: "Invalid input data",
+            content: {
+              "application/json": {
+                schema: { $ref: "#/components/schemas/ErrorResponse" },
+              },
+            },
+          },
+          401: {
+            description: "Unauthorized",
+            content: {
+              "application/json": {
+                schema: { $ref: "#/components/schemas/ErrorResponse" },
+              },
+            },
+          },
+          404: {
+            description: "Medication not found",
+            content: {
+              "application/json": {
+                schema: { $ref: "#/components/schemas/ErrorResponse" },
+              },
+            },
+          },
+        },
+      },
+      delete: {
+        tags: ["Medications"],
+        summary: "Soft delete a medication by ID",
+        parameters: [
+          {
+            name: "id",
+            in: "path",
+            description: "Medication ID",
+            required: true,
+            schema: { type: "string" },
+          },
+        ],
+        responses: {
+          200: {
+            description: "Medication deleted successfully",
+            content: {
+              "application/json": {
+                schema: {
+                  type: "object",
+                  properties: {
+                    message: { type: "string" },
+                  },
+                },
+              },
+            },
+          },
+          401: {
+            description: "Unauthorized",
+            content: {
+              "application/json": {
+                schema: { $ref: "#/components/schemas/ErrorResponse" },
+              },
+            },
+          },
+          404: {
+            description: "Medication not found",
+            content: {
+              "application/json": {
+                schema: { $ref: "#/components/schemas/ErrorResponse" },
+              },
+            },
+          },
+        },
+      },
+    },
   },
   components: {
     schemas: {
@@ -228,6 +467,54 @@ export const openApiSpec = {
           error: { type: "string" },
           status: { type: "integer" },
         },
+      },
+      Medication: {
+        type: "object",
+        properties: {
+          id: { type: "string" },
+          name: { type: "string" },
+          dose: { type: "string" },
+          frequency: { type: "integer", description: "Hours between doses" },
+          startDate: { type: "string", format: "date-time" },
+          endDate: { type: "string", format: "date-time" },
+          status: {
+            type: "string",
+            enum: ["ACTIVE", "DELETED"],
+          },
+          createdAt: { type: "string", format: "date-time" },
+          updatedAt: { type: "string", format: "date-time" },
+        },
+        required: [
+          "id",
+          "name",
+          "dose",
+          "frequency",
+          "startDate",
+          "endDate",
+          "status",
+        ],
+      },
+      CreateMedicationRequest: {
+        type: "object",
+        properties: {
+          name: { type: "string", maxLength: 150 },
+          dose: { type: "string", maxLength: 100 },
+          frequency: { type: "integer", minimum: 1 },
+          startDate: { type: "string", format: "date-time" },
+          endDate: { type: "string", format: "date-time" },
+        },
+        required: ["name", "dose", "frequency", "startDate", "endDate"],
+      },
+      UpdateMedicationRequest: {
+        type: "object",
+        properties: {
+          name: { type: "string", maxLength: 150 },
+          dose: { type: "string", maxLength: 100 },
+          frequency: { type: "integer", minimum: 1 },
+          startDate: { type: "string", format: "date-time" },
+          endDate: { type: "string", format: "date-time" },
+        },
+        additionalProperties: false,
       },
     },
   },
