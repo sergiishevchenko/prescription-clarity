@@ -6,18 +6,13 @@ export function middleware(request: NextRequest) {
   const cookieName = process.env.SESSION_COOKIE_NAME || "SESSION_ID";
   const sessionToken = request.cookies.get(cookieName)?.value;
 
-  // Public routes: if already logged in, redirect away from auth pages
+  // Public routes: allow access; do NOT auto-redirect from /login if cookie exists
+  // to avoid loops when a stale/invalid session cookie is present.
   if (
     pathname === "/" ||
     pathname.startsWith("/login") ||
     pathname.startsWith("/register")
   ) {
-    if (
-      (pathname.startsWith("/login") || pathname.startsWith("/register")) &&
-      sessionToken
-    ) {
-      return NextResponse.redirect(new URL("/dashboard", request.url));
-    }
     return NextResponse.next();
   }
 
@@ -28,7 +23,11 @@ export function middleware(request: NextRequest) {
 
   // Check for protected routes - just check if session cookie exists
   // Full session validation happens in the API routes
-  if (pathname.startsWith("/dashboard") || pathname.startsWith("/profile")) {
+  if (
+    pathname.startsWith("/dashboard") ||
+    pathname.startsWith("/profile") ||
+    pathname.startsWith("/medications")
+  ) {
     if (!sessionToken) {
       return NextResponse.redirect(new URL("/login", request.url));
     }
