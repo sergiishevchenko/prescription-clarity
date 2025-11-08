@@ -13,11 +13,13 @@ import DaysOfWeekSelector from "./DaysOfWeekSelector";
 import DatesAndDuration from "./DatesAndDuration";
 import type { FormValues, TimeOfDay } from "@/lib/medicationTypes";
 import { DAY_LABELS } from "@/lib/medicationTypes";
+import { useToast } from "@/components/shared/ToastProvider";
 
 const PhotoUploader = dynamic(() => import("./PhotoUploader"), { ssr: false });
 
 export default function NewMedicationForm() {
   const router = useRouter();
+  const toast = useToast();
   const [timesOfDay, setTimesOfDay] = useState<TimeOfDay[]>(["morning"]);
   const [timeError, setTimeError] = useState<string>("");
   const [days, setDays] = useState<string[]>([...DAY_LABELS]);
@@ -89,7 +91,7 @@ export default function NewMedicationForm() {
     setDays((prev) => (prev.includes(label) ? prev.filter((d) => d !== label) : [...prev, label]));
   }
 
-  const onSubmit = (data: FormValues) => {
+  const onSubmit = async (data: FormValues) => {
     const expected = Number(data.frequency);
     if (timesOfDay.length !== expected) {
       setTimeError(
@@ -102,28 +104,47 @@ export default function NewMedicationForm() {
       return;
     }
 
-    const payload = {
-      name: data.name.trim(),
-      quantity: Number(data.quantity),
-      dosageMg: Number(data.dosageMg),
-      mealTiming: data.mealTiming,
-      frequency: Number(data.frequency),
-      timesOfDay: [...timesOfDay],
-      daysOfWeek: [...days],
-      durationDays: Number(data.durationDays),
-      startDate: data.startDate,
-      times: {
-        ...(timesOfDay.includes("morning") && { morning: data.morningTime }),
-        ...(timesOfDay.includes("afternoon") && { afternoon: data.afternoonTime }),
-        ...(timesOfDay.includes("evening") && { evening: data.eveningTime }),
-      },
-    };
-
-    if (process.env.NODE_ENV !== "production") {
-      // eslint-disable-next-line no-console
-      console.log("Medication form payload:", payload);
+    // Map form fields to API shape
+    const dose = `${Number(data.quantity)} x ${Number(data.dosageMg)} mg (${data.mealTiming})`;
+    const start = data.startDate;
+    // Ensure endDate exists: if ongoing or empty, synthesize from duration
+    const duration = Number(data.durationDays || 30);
+    let end = data.endDate;
+    if (!end || data.ongoing) {
+      const s = new Date(start + "T00:00:00");
+      const e = new Date(s);
+      e.setDate(s.getDate() + duration - 1);
+      end = e.toISOString().slice(0, 10);
     }
-    router.push("/dashboard");
+
+    try {
+      const res = await fetch("/api/medications", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          name: data.name.trim(),
+          dose,
+          frequency: Number(data.frequency),
+          startDate: new Date(start + "T00:00:00.000Z").toISOString(),
+          endDate: new Date(end + "T00:00:00.000Z").toISOString(),
+        }),
+      });
+      if (res.status === 401 || res.status === 403) {
+        router.push("/login");
+        return;
+      }
+      if (!res.ok) {
+        // eslint-disable-next-line no-console
+        console.error("Create medication failed", await res.text());
+        toast("Failed to save medication", { variant: "error" });
+        return;
+      }
+      toast("Medication saved", { variant: "success" });
+      router.push("/dashboard/medications");
+      router.refresh();
+    } catch {
+      toast("Network error", { variant: "error" });
+    }
   };
 
   return (

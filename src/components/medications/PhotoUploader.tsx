@@ -1,12 +1,15 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useFormContext } from "react-hook-form";
 import type { FormValues } from "@/lib/medicationTypes";
 
 export default function PhotoUploader() {
-  const { register } = useFormContext<FormValues>();
+  const { register, setValue, clearErrors } = useFormContext<FormValues>();
+  const inputRef = useRef<HTMLInputElement | null>(null);
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
+  const [dragOver, setDragOver] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     return () => {
@@ -14,43 +17,103 @@ export default function PhotoUploader() {
     };
   }, [previewUrl]);
 
-  const onSelectFile: React.ChangeEventHandler<HTMLInputElement> = (e) => {
-    const file = e.target.files?.[0];
+  function setFileIntoForm(file: File | null) {
     if (!file) {
-      setPreviewUrl(null);
+      setValue("photo", undefined as unknown as FileList, { shouldDirty: true });
       return;
     }
-    if (!/\.(png|jpg|jpeg)$/i.test(file.name)) {
-      // Light UX: just reset without blocking alerts
-      e.target.value = "";
-      setPreviewUrl(null);
+    const dt = new DataTransfer();
+    dt.items.add(file);
+    setValue("photo", dt.files as unknown as FileList, { shouldDirty: true });
+    clearErrors("photo");
+  }
+
+  function validateAndSet(file?: File) {
+    setError(null);
+    if (!file) {
+      setPreviewUrl((prev) => { if (prev) URL.revokeObjectURL(prev); return null; });
+      setFileIntoForm(null);
       return;
     }
-    if (file.size > 5 * 1024 * 1024) {
-      e.target.value = "";
-      setPreviewUrl(null);
+    const okType = /image\/(png|jpeg)/.test(file.type) || /\.(png|jpe?g)$/i.test(file.name);
+    const okSize = file.size <= 5 * 1024 * 1024;
+
+    if (!okType) {
+      setError("Only PNG or JPG images are allowed.");
+      setFileIntoForm(null);
+      setPreviewUrl((prev) => { if (prev) URL.revokeObjectURL(prev); return null; });
       return;
     }
+    if (!okSize) {
+      setError("Image too large. Max 5MB.");
+      setFileIntoForm(null);
+      setPreviewUrl((prev) => { if (prev) URL.revokeObjectURL(prev); return null; });
+      return;
+    }
+
+    setFileIntoForm(file);
     const url = URL.createObjectURL(file);
-    setPreviewUrl(url);
-  };
+    setPreviewUrl((prev) => { if (prev) URL.revokeObjectURL(prev); return url; });
+  }
+
+  const reg = register("photo");
 
   return (
     <div className="mt-4">
       <label className="block text-base font-medium text-gray-900">
         Medication Photo <span className="text-gray-500">(Optional)</span>
       </label>
-      <div className="mt-2 rounded-xl border-2 border-dashed border-gray-300 p-6 text-center">
-        <div className="mx-auto mb-3 grid h-10 w-10 place-items-center rounded-full bg-indigo-50 text-xl text-indigo-600">📷</div>
-        <p className="text-sm text-gray-600">Click to upload photo</p>
+
+      {/* СХОВАНЕ поле file (не відображається взагалі) */}
+      <input
+        type="file"
+        accept="image/png,image/jpeg"
+        hidden
+        tabIndex={-1}
+        {...reg}
+        ref={(el) => {
+          reg.ref(el);
+          inputRef.current = el;
+        }}
+        onChange={(e) => validateAndSet(e.target.files?.[0])}
+      />
+
+      {/* Клікабельна зона (вся область у штриховій рамці) */}
+      <div
+        role="button"
+        tabIndex={0}
+        aria-label="Upload medication photo"
+        onClick={() => inputRef.current?.click()}
+        onKeyDown={(e) => {
+          if (e.key === "Enter" || e.key === " ") {
+            e.preventDefault();
+            inputRef.current?.click();
+          }
+        }}
+        onDragOver={(e) => {
+          e.preventDefault();
+          setDragOver(true);
+        }}
+        onDragLeave={() => setDragOver(false)}
+        onDrop={(e) => {
+          e.preventDefault();
+          setDragOver(false);
+          const f = e.dataTransfer.files?.[0];
+          validateAndSet(f);
+        }}
+        className={[
+          "mt-2 block w-full rounded-xl border-2 border-dashed p-6 text-center transition cursor-pointer",
+          dragOver
+            ? "border-indigo-500 bg-indigo-50"
+            : "border-gray-300 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-indigo-500/50",
+        ].join(" ")}
+      >
+        <div className="mx-auto mb-3 grid h-12 w-12 place-items-center rounded-full bg-indigo-50 text-2xl text-indigo-600">
+          📷
+        </div>
+        <p className="text-sm text-gray-700">Click to upload photo</p>
         <p className="text-xs text-gray-500">PNG, JPG (MAX. 5MB)</p>
-        <input
-          type="file"
-          accept="image/png,image/jpeg"
-          className="mt-4 block w-full cursor-pointer rounded-md border border-gray-300 bg-white px-3 py-2 text-sm shadow-sm focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/50 focus:outline-none"
-          {...register("photo")}
-          onChange={onSelectFile}
-        />
+
         {previewUrl && (
           <div className="mt-4 flex justify-center">
             {/* eslint-disable-next-line @next/next/no-img-element */}
@@ -58,6 +121,8 @@ export default function PhotoUploader() {
           </div>
         )}
       </div>
+
+      {error && <p className="mt-2 text-sm text-red-600">{error}</p>}
     </div>
   );
 }

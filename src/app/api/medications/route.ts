@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
+import { revalidateTag } from "next/cache";
 import { prisma } from "@/lib/db";
 import { getSessionUserFromRequest } from "@/lib/auth/session";
 import {
@@ -118,6 +119,8 @@ export async function POST(request: NextRequest) {
       },
     });
 
+    // Revalidate medications data consumers
+    try { revalidateTag("medications"); } catch {}
     return NextResponse.json({ medication }, { status: 201 });
   } catch (error) {
     if (error instanceof Error && error.name === "ZodError") {

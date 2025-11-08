@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
+import { revalidateTag } from "next/cache";
 import { prisma } from "@/lib/db";
 import { getSessionUserFromRequest } from "@/lib/auth/session";
 import {
@@ -52,6 +53,7 @@ export async function GET(
       );
     }
 
+    try { revalidateTag("medications"); } catch {}
     return NextResponse.json({ medication }, { status: 200 });
   } catch (error) {
     console.error("GET /api/medications/[id] error:", error);
@@ -202,6 +204,7 @@ export async function DELETE(
       },
     });
 
+    try { revalidateTag("medications"); } catch {}
     return NextResponse.json(
       { message: "Medication deleted successfully" },
       { status: 200 },
