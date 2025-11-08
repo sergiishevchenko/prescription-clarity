@@ -52,8 +52,7 @@ describe("POST /api/auth/register", () => {
     expect(res.status).toBe(201);
   });
 
-  // 🔻 Відомий баг: API повертає 400 замість 409
-  it.failing("409 when email exists  [KNOWN BUG: returns 400 now", async () => {
+  it("409 when email exists", async () => {
     prismaMock.user.findUnique.mockResolvedValueOnce({ id: "u1" });
 
     const res = await RegisterRoute.POST(
@@ -63,6 +62,6 @@ describe("POST /api/auth/register", () => {
         name: "User2",
       }),
     );
-    expect(res.status).toBe(409); // коли бек виправлять -> тест пройде -> CI впаде (expected!)
+    expect(res.status).toBe(409);
   });
 });
