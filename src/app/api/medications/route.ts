@@ -120,7 +120,7 @@ export async function POST(request: NextRequest) {
     });
 
     // Revalidate medications data consumers
-    try { revalidateTag("medications"); } catch {}
+    try { revalidateTag("medications", "max"); } catch {}
     return NextResponse.json({ medication }, { status: 201 });
   } catch (error) {
     if (error instanceof Error && error.name === "ZodError") {

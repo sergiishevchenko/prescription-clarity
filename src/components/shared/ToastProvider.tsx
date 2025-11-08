@@ -29,11 +29,11 @@ export default function ToastProvider({ children }: { children: React.ReactNode 
   const idRef = useRef(1);
 
   const [open, setOpen] = useState(false);
-  const resolverRef = useRef<(v: boolean) => void>();
-  const confirmTextRef = useRef("Delete");
-  const cancelTextRef = useRef("Cancel");
-  const titleRef = useRef("Are you sure?");
-  const descRef = useRef<string | undefined>(undefined);
+  const resolverRef = useRef<((v: boolean) => void) | null>(null);
+  const [confirmText, setConfirmText] = useState("Delete");
+  const [cancelText, setCancelText] = useState("Cancel");
+  const [title, setTitle] = useState("Are you sure?");
+  const [description, setDescription] = useState<string | undefined>(undefined);
 
   const dismiss = useCallback((id: number) => {
     setToasts((prev) => prev.filter((t) => t.id !== id));
@@ -52,10 +52,10 @@ export default function ToastProvider({ children }: { children: React.ReactNode 
   }, [dismiss]);
 
   const confirm = useCallback<ToastContextValue["confirm"]>(({ title, description, confirmText, cancelText }) => {
-    titleRef.current = title || "Are you sure?";
-    descRef.current = description;
-    confirmTextRef.current = confirmText || "Confirm";
-    cancelTextRef.current = cancelText || "Cancel";
+    setTitle(title || "Are you sure?");
+    setDescription(description);
+    setConfirmText(confirmText || "Confirm");
+    setCancelText(cancelText || "Cancel");
     setOpen(true);
     return new Promise<boolean>((resolve) => {
       resolverRef.current = resolve;
@@ -111,14 +111,14 @@ export default function ToastProvider({ children }: { children: React.ReactNode 
         <div role="dialog" aria-modal="true" aria-labelledby="confirm-title" className="fixed inset-0 z-[70] flex items-center justify-center">
           <div className="absolute inset-0 bg-black/30" onClick={onCancel} />
           <div className="relative z-10 w-full max-w-md rounded-lg bg-white p-6 shadow-lg">
-            <h2 id="confirm-title" className="text-lg font-semibold text-gray-900">{titleRef.current}</h2>
-            {descRef.current && <p className="mt-2 text-sm text-gray-600">{descRef.current}</p>}
+            <h2 id="confirm-title" className="text-lg font-semibold text-gray-900">{title}</h2>
+            {description && <p className="mt-2 text-sm text-gray-600">{description}</p>}
             <div className="mt-6 flex justify-end gap-3">
               <button type="button" onClick={onCancel} className="rounded-md border border-gray-300 px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-indigo-500/50">
-                {cancelTextRef.current}
+                {cancelText}
               </button>
               <button type="button" onClick={onConfirm} className="rounded-md bg-red-600 px-4 py-2 text-sm font-medium text-white hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500/50">
-                {confirmTextRef.current}
+                {confirmText}
               </button>
             </div>
           </div>

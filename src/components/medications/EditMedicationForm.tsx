@@ -39,7 +39,7 @@ export default function EditMedicationForm({ medication }: { medication: Medicat
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<string | null>(null);
 
-  const { register, handleSubmit, formState } = useForm<FormShape>({
+  const { register, handleSubmit } = useForm<FormShape>({
     mode: "onBlur",
     defaultValues: {
       name: medication.name,
@@ -72,15 +72,15 @@ export default function EditMedicationForm({ medication }: { medication: Medicat
         return;
       }
       if (!res.ok) {
-        const data = await res.json().catch(() => ({} as any));
+        const data = await res.json().catch(() => ({} as { error?: string }));
         throw new Error(data?.error || "Failed to update");
       }
       setSuccess("Medication updated");
       toast("Medication updated", { variant: "success" });
       router.push("/dashboard/medications");
       router.refresh();
-    } catch (e: any) {
-      setError(e?.message || "Unexpected error");
+    } catch (e: unknown) {
+      setError(e instanceof Error ? e.message : "Unexpected error");
     } finally {
       setSaving(false);
     }

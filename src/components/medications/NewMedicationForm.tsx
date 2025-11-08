@@ -134,7 +134,6 @@ export default function NewMedicationForm() {
         return;
       }
       if (!res.ok) {
-        // eslint-disable-next-line no-console
         console.error("Create medication failed", await res.text());
         toast("Failed to save medication", { variant: "error" });
         return;
