@@ -15,7 +15,6 @@ export async function POST(request: NextRequest) {
     const body = await request.json();
     const { email, password, name } = registerSchema.parse(body);
 
-    // Перевірка — чи існує користувач
     const existing = await prisma.user.findUnique({ where: { email } });
     if (existing) {
       return NextResponse.json(
@@ -24,16 +23,13 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Хешування паролю
     const passwordHash = await bcrypt.hash(password, 12);
 
-    // Створення нового користувача
     const user = await prisma.user.create({
       data: { email, passwordHash, name: name || null },
       select: { id: true, email: true, name: true },
     });
 
-    // Створення сесії
     const sessionToken = await createSession(user.id);
     const res = NextResponse.json({ user }, { status: 201 });
 
@@ -41,7 +37,6 @@ export async function POST(request: NextRequest) {
 
     return res;
   } catch (err: unknown) {
-    // 1️⃣ Помилка Prisma — дубльований email
     if (
       err instanceof PrismaClientKnownRequestError &&
       err.code === "P2002" &&
@@ -54,7 +49,6 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // 2️⃣ Помилка валідації (Zod)
     if (err instanceof ZodError) {
       return NextResponse.json(
         { error: "Invalid input data", details: err.flatten() },
@@ -62,7 +56,6 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // 3️⃣ Інші помилки
     console.error("Register API error:", err);
     return NextResponse.json(
       { error: "Internal server error" },

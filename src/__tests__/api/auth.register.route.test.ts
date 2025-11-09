@@ -1,4 +1,5 @@
 import * as bcrypt from "bcryptjs";
+import { PrismaClientKnownRequestError } from "@prisma/client/runtime/library";
 import * as RegisterRoute from "@/app/api/auth/register/route";
 import { prismaMock } from "../../../tests-setup/prisma.mock";
 import type { MockedFunction } from "jest-mock";
@@ -63,5 +64,65 @@ describe("POST /api/auth/register", () => {
       }),
     );
     expect(res.status).toBe(409);
+  });
+
+  it("400 when payload violates schema", async () => {
+    const res = await RegisterRoute.POST(
+      makeReq({
+        email: "not-an-email",
+        password: "short",
+        name: "",
+      }),
+    );
+    expect(res.status).toBe(400);
+    const json = await res.json();
+    expect(json.error).toBe("Invalid input data");
+    expect(prismaMock.user.findUnique).not.toHaveBeenCalled();
+  });
+
+  it("409 when Prisma unique constraint error occurs during create", async () => {
+    hashMock.mockImplementationOnce(async () => "hash");
+    prismaMock.user.findUnique.mockResolvedValueOnce(null);
+    prismaMock.user.create.mockRejectedValueOnce(
+      new PrismaClientKnownRequestError("Unique constraint failed", {
+        code: "P2002",
+        clientVersion: "test",
+        meta: { target: ["email"] },
+      }),
+    );
+
+    const res = await RegisterRoute.POST(
+      makeReq({
+        email: "abcde@booble.com",
+        password: "Secret123",
+      }),
+    );
+
+    expect(res.status).toBe(409);
+    const json = await res.json();
+    expect(json.error).toMatch(/already exists/i);
+  });
+
+  it("500 when unexpected error bubbles up", async () => {
+    const consoleSpy = jest
+      .spyOn(console, "error")
+      .mockImplementation(() => {});
+
+    hashMock.mockImplementationOnce(async () => "hash");
+    prismaMock.user.findUnique.mockResolvedValueOnce(null);
+    prismaMock.user.create.mockRejectedValueOnce(new Error("boom"));
+
+    const res = await RegisterRoute.POST(
+      makeReq({
+        email: "abcde@booble.com",
+        password: "Secret123",
+      }),
+    );
+
+    expect(res.status).toBe(500);
+    const json = await res.json();
+    expect(json.error).toBe("Internal server error");
+    expect(consoleSpy).toHaveBeenCalled();
+    consoleSpy.mockRestore();
   });
 });
