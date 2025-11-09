@@ -20,7 +20,7 @@ export async function POST(request: NextRequest) {
     if (existing) {
       return NextResponse.json(
         { error: "User with this email already exists" },
-        { status: 400 },
+        { status: 409 },
       );
     }
 
@@ -50,7 +50,7 @@ export async function POST(request: NextRequest) {
     ) {
       return NextResponse.json(
         { error: "User with this email already exists" },
-        { status: 400 },
+        { status: 409 },
       );
     }
 
