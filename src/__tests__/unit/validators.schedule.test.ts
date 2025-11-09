@@ -12,9 +12,7 @@ describe("Schedule validators", () => {
   });
 
   it("rejects missing medicationId", () => {
-    expect(() =>
-      generateScheduleSchema.parse({ medicationId: "" }),
-    ).toThrow();
+    expect(() => generateScheduleSchema.parse({ medicationId: "" })).toThrow();
   });
 
   it("accepts valid schedule query with timezone", () => {
