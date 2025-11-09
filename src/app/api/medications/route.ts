@@ -6,7 +6,8 @@ import {
   createMedicationSchema,
   type CreateMedicationInput,
 } from "@/lib/validators/medication";
-import type { Prisma } from "@prisma/client";
+// Derive the exact where input type from the Prisma client
+type MedicationWhere = NonNullable<Parameters<typeof prisma.medication.findMany>[0]>["where"];
 
 export const runtime = "nodejs";
 
@@ -27,7 +28,7 @@ export async function GET(request: NextRequest) {
     const status = searchParams.get("status"); // optional: filter by ACTIVE/DELETED
 
     // Build where clause
-    const where: Prisma.MedicationWhereInput = {
+    const where: MedicationWhere = {
       userId: user.id,
     };
 

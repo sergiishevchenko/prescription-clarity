@@ -6,7 +6,8 @@ import {
   updateMedicationSchema,
   type UpdateMedicationInput,
 } from "@/lib/validators/medication";
-import type { Prisma } from "@prisma/client";
+// Derive the exact update input type from the Prisma client
+type MedicationUpdateData = Parameters<typeof prisma.medication.update>[0]["data"];
 
 export const runtime = "nodejs";
 
@@ -102,7 +103,7 @@ export async function PATCH(
       updateMedicationSchema.parse(body);
 
     // Build update data
-    const updateData: Prisma.MedicationUpdateInput = {};
+    const updateData: MedicationUpdateData = {} as MedicationUpdateData;
 
     if (validatedData.name !== undefined) {
       updateData.name = validatedData.name;
