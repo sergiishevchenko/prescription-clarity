@@ -15,7 +15,9 @@ export default function TimeInputs({ selected }: Props) {
     <>
       {selected.includes("morning") && (
         <div>
-          <label className="block text-base font-medium text-gray-900">Morning Time</label>
+          <label className="block text-base font-medium text-gray-900">
+            Morning Time
+          </label>
           <div className="mt-2">
             <Input type="time" step={60} {...register("morningTime")} />
           </div>
@@ -23,7 +25,9 @@ export default function TimeInputs({ selected }: Props) {
       )}
       {selected.includes("afternoon") && (
         <div>
-          <label className="block text-base font-medium text-gray-900">Afternoon Time</label>
+          <label className="block text-base font-medium text-gray-900">
+            Afternoon Time
+          </label>
           <div className="mt-2">
             <Input type="time" step={60} {...register("afternoonTime")} />
           </div>
@@ -31,7 +35,9 @@ export default function TimeInputs({ selected }: Props) {
       )}
       {selected.includes("evening") && (
         <div>
-          <label className="block text-base font-medium text-gray-900">Evening Time</label>
+          <label className="block text-base font-medium text-gray-900">
+            Evening Time
+          </label>
           <div className="mt-2">
             <Input type="time" step={60} {...register("eveningTime")} />
           </div>

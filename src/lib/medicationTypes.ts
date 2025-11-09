@@ -26,4 +26,3 @@ export type FormValues = {
   eveningTime?: string;
   photo?: FileList;
 };
-

@@ -1,13 +1,34 @@
 "use client";
 
-import { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState } from "react";
+import {
+  createContext,
+  useCallback,
+  useContext,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
 
 type ToastVariant = "success" | "error" | "info";
-type ToastItem = { id: number; message: string; variant: ToastVariant; duration: number };
+type ToastItem = {
+  id: number;
+  message: string;
+  variant: ToastVariant;
+  duration: number;
+};
 
 type ToastContextValue = {
-  showToast: (message: string, opts?: { variant?: ToastVariant; duration?: number }) => void;
-  confirm: (opts: { title?: string; description?: string; confirmText?: string; cancelText?: string }) => Promise<boolean>;
+  showToast: (
+    message: string,
+    opts?: { variant?: ToastVariant; duration?: number },
+  ) => void;
+  confirm: (opts: {
+    title?: string;
+    description?: string;
+    confirmText?: string;
+    cancelText?: string;
+  }) => Promise<boolean>;
 };
 
 const ToastCtx = createContext<ToastContextValue | null>(null);
@@ -24,7 +45,11 @@ export function useConfirm() {
   return ctx.confirm;
 }
 
-export default function ToastProvider({ children }: { children: React.ReactNode }) {
+export default function ToastProvider({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
   const [toasts, setToasts] = useState<ToastItem[]>([]);
   const idRef = useRef(1);
 
@@ -39,28 +64,34 @@ export default function ToastProvider({ children }: { children: React.ReactNode 
     setToasts((prev) => prev.filter((t) => t.id !== id));
   }, []);
 
-  const showToast = useCallback<ToastContextValue["showToast"]>((message, opts) => {
-    const id = idRef.current++;
-    const item: ToastItem = {
-      id,
-      message,
-      variant: opts?.variant ?? "info",
-      duration: opts?.duration ?? 3000,
-    };
-    setToasts((prev) => [...prev, item]);
-    window.setTimeout(() => dismiss(id), item.duration);
-  }, [dismiss]);
+  const showToast = useCallback<ToastContextValue["showToast"]>(
+    (message, opts) => {
+      const id = idRef.current++;
+      const item: ToastItem = {
+        id,
+        message,
+        variant: opts?.variant ?? "info",
+        duration: opts?.duration ?? 3000,
+      };
+      setToasts((prev) => [...prev, item]);
+      window.setTimeout(() => dismiss(id), item.duration);
+    },
+    [dismiss],
+  );
 
-  const confirm = useCallback<ToastContextValue["confirm"]>(({ title, description, confirmText, cancelText }) => {
-    setTitle(title || "Are you sure?");
-    setDescription(description);
-    setConfirmText(confirmText || "Confirm");
-    setCancelText(cancelText || "Cancel");
-    setOpen(true);
-    return new Promise<boolean>((resolve) => {
-      resolverRef.current = resolve;
-    });
-  }, []);
+  const confirm = useCallback<ToastContextValue["confirm"]>(
+    ({ title, description, confirmText, cancelText }) => {
+      setTitle(title || "Are you sure?");
+      setDescription(description);
+      setConfirmText(confirmText || "Confirm");
+      setCancelText(cancelText || "Cancel");
+      setOpen(true);
+      return new Promise<boolean>((resolve) => {
+        resolverRef.current = resolve;
+      });
+    },
+    [],
+  );
 
   const onConfirm = () => {
     setOpen(false);
@@ -82,22 +113,42 @@ export default function ToastProvider({ children }: { children: React.ReactNode 
     return () => window.removeEventListener("keydown", onKey);
   }, [open]);
 
-  const value = useMemo<ToastContextValue>(() => ({ showToast, confirm }), [showToast, confirm]);
+  const value = useMemo<ToastContextValue>(
+    () => ({ showToast, confirm }),
+    [showToast, confirm],
+  );
 
   return (
     <ToastCtx.Provider value={value}>
       {children}
       {/* Toast container */}
-      <div aria-live="polite" aria-atomic="true" className="pointer-events-none fixed inset-0 z-[60] flex items-start justify-end p-4 sm:p-6">
+      <div
+        aria-live="polite"
+        aria-atomic="true"
+        className="pointer-events-none fixed inset-0 z-[60] flex items-start justify-end p-4 sm:p-6"
+      >
         <div className="flex w-full max-w-sm flex-col gap-2">
           {toasts.map((t) => (
-            <div key={t.id} className={`pointer-events-auto overflow-hidden rounded-lg border shadow-md transition-all ${
-              t.variant === "success" ? "border-green-200 bg-white" : t.variant === "error" ? "border-red-200 bg-white" : "border-gray-200 bg-white"
-            }`}>
+            <div
+              key={t.id}
+              className={`pointer-events-auto overflow-hidden rounded-lg border shadow-md transition-all ${
+                t.variant === "success"
+                  ? "border-green-200 bg-white"
+                  : t.variant === "error"
+                    ? "border-red-200 bg-white"
+                    : "border-gray-200 bg-white"
+              }`}
+            >
               <div className="flex items-start gap-3 px-4 py-3">
-                <div className={`mt-1 h-2 w-2 flex-none rounded-full ${t.variant === "success" ? "bg-green-500" : t.variant === "error" ? "bg-red-500" : "bg-gray-400"}`} />
+                <div
+                  className={`mt-1 h-2 w-2 flex-none rounded-full ${t.variant === "success" ? "bg-green-500" : t.variant === "error" ? "bg-red-500" : "bg-gray-400"}`}
+                />
                 <div className="flex-1 text-sm text-gray-800">{t.message}</div>
-                <button onClick={() => dismiss(t.id)} className="rounded p-1 text-gray-400 hover:bg-gray-100 hover:text-gray-600" aria-label="Close">
+                <button
+                  onClick={() => dismiss(t.id)}
+                  className="rounded p-1 text-gray-400 hover:bg-gray-100 hover:text-gray-600"
+                  aria-label="Close"
+                >
                   ×
                 </button>
               </div>
@@ -108,16 +159,36 @@ export default function ToastProvider({ children }: { children: React.ReactNode 
 
       {/* Confirm dialog */}
       {open && (
-        <div role="dialog" aria-modal="true" aria-labelledby="confirm-title" className="fixed inset-0 z-[70] flex items-center justify-center">
+        <div
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="confirm-title"
+          className="fixed inset-0 z-[70] flex items-center justify-center"
+        >
           <div className="absolute inset-0 bg-black/30" onClick={onCancel} />
           <div className="relative z-10 w-full max-w-md rounded-lg bg-white p-6 shadow-lg">
-            <h2 id="confirm-title" className="text-lg font-semibold text-gray-900">{title}</h2>
-            {description && <p className="mt-2 text-sm text-gray-600">{description}</p>}
+            <h2
+              id="confirm-title"
+              className="text-lg font-semibold text-gray-900"
+            >
+              {title}
+            </h2>
+            {description && (
+              <p className="mt-2 text-sm text-gray-600">{description}</p>
+            )}
             <div className="mt-6 flex justify-end gap-3">
-              <button type="button" onClick={onCancel} className="rounded-md border border-gray-300 px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-indigo-500/50">
+              <button
+                type="button"
+                onClick={onCancel}
+                className="rounded-md border border-gray-300 px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50 focus:ring-2 focus:ring-indigo-500/50 focus:outline-none"
+              >
                 {cancelText}
               </button>
-              <button type="button" onClick={onConfirm} className="rounded-md bg-red-600 px-4 py-2 text-sm font-medium text-white hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500/50">
+              <button
+                type="button"
+                onClick={onConfirm}
+                className="rounded-md bg-red-600 px-4 py-2 text-sm font-medium text-white hover:bg-red-700 focus:ring-2 focus:ring-red-500/50 focus:outline-none"
+              >
                 {confirmText}
               </button>
             </div>
@@ -127,4 +198,3 @@ export default function ToastProvider({ children }: { children: React.ReactNode 
     </ToastCtx.Provider>
   );
 }
-

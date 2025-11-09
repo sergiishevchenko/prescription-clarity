@@ -8,4 +8,3 @@ export function absoluteUrl(pathname: string) {
   const path = pathname.startsWith("/") ? pathname : `/${pathname}`;
   return `${base}${path}`;
 }
-

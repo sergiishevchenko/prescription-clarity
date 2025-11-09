@@ -32,9 +32,15 @@ export default function DatesAndDuration() {
     <>
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
         <div>
-          <label className="block text-base font-medium text-gray-900">Start Date</label>
+          <label className="block text-base font-medium text-gray-900">
+            Start Date
+          </label>
           <div className="mt-2">
-            <Input type="date" disabled={ongoing} {...register("startDate", { required: true })} />
+            <Input
+              type="date"
+              disabled={ongoing}
+              {...register("startDate", { required: true })}
+            />
           </div>
           {errors.startDate && (
             <p className="mt-1 text-sm text-red-600">Start date is required</p>
@@ -42,9 +48,15 @@ export default function DatesAndDuration() {
         </div>
 
         <div>
-          <label className="block text-base font-medium text-gray-900">End Date</label>
+          <label className="block text-base font-medium text-gray-900">
+            End Date
+          </label>
           <div className="mt-2">
-            <Input type="date" disabled={ongoing} {...register("endDate", { required: true })} />
+            <Input
+              type="date"
+              disabled={ongoing}
+              {...register("endDate", { required: true })}
+            />
           </div>
           {errors.endDate && (
             <p className="mt-1 text-sm text-red-600">End date is required</p>
@@ -54,7 +66,9 @@ export default function DatesAndDuration() {
 
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
         <div>
-          <label className="block text-base font-medium text-gray-900">Duration (days)</label>
+          <label className="block text-base font-medium text-gray-900">
+            Duration (days)
+          </label>
           <div className="mt-2">
             <Input
               type="number"
@@ -68,14 +82,18 @@ export default function DatesAndDuration() {
             />
           </div>
           {errors.durationDays && (
-            <p className="mt-1 text-sm text-red-600">{errors.durationDays.message as string}</p>
+            <p className="mt-1 text-sm text-red-600">
+              {errors.durationDays.message as string}
+            </p>
           )}
         </div>
       </div>
 
       <label className="mt-1 inline-flex items-center gap-3">
         <input type="checkbox" className="h-4 w-4" {...register("ongoing")} />
-        <span className="text-sm text-gray-900">Ongoing medication (no end date)</span>
+        <span className="text-sm text-gray-900">
+          Ongoing medication (no end date)
+        </span>
       </label>
     </>
   );

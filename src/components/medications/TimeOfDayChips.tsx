@@ -27,13 +27,19 @@ export default function TimeOfDayChips({ selected, onToggle, error }: Props) {
       <div className="mt-2 grid grid-cols-1 gap-3 sm:grid-cols-3">
         {(["morning", "afternoon", "evening"] as TimeOfDay[]).map((slot) => {
           const active = selected.includes(slot);
-          const base = "rounded-xl border px-4 py-3 text-center text-base transition-colors";
+          const base =
+            "rounded-xl border px-4 py-3 text-center text-base transition-colors";
           const cls = active
             ? " border-indigo-600 bg-indigo-600 text-white"
             : " border-gray-300 bg-white text-gray-900 hover:bg-gray-50";
           const label = slot.charAt(0).toUpperCase() + slot.slice(1);
           return (
-            <button key={slot} type="button" onClick={() => onToggle(slot)} className={base + cls}>
+            <button
+              key={slot}
+              type="button"
+              onClick={() => onToggle(slot)}
+              className={base + cls}
+            >
               {label}
             </button>
           );
@@ -47,4 +53,3 @@ export default function TimeOfDayChips({ selected, onToggle, error }: Props) {
     </div>
   );
 }
-

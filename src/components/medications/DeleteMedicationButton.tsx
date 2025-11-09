@@ -5,7 +5,13 @@ import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/Button";
 import { useConfirm, useToast } from "@/components/shared/ToastProvider";
 
-export default function DeleteMedicationButton({ id, onDeleted }: { id: string; onDeleted?: () => void }) {
+export default function DeleteMedicationButton({
+  id,
+  onDeleted,
+}: {
+  id: string;
+  onDeleted?: () => void;
+}) {
   const router = useRouter();
   const [loading, setLoading] = useState(false);
   const confirm = useConfirm();
@@ -36,7 +42,13 @@ export default function DeleteMedicationButton({ id, onDeleted }: { id: string; 
   }
 
   return (
-    <Button type="button" variant="outline" className="cursor-pointer text-red-600 border-red-300 hover:bg-red-50" onClick={onDelete} disabled={loading}>
+    <Button
+      type="button"
+      variant="outline"
+      className="cursor-pointer border-red-300 text-red-600 hover:bg-red-50"
+      onClick={onDelete}
+      disabled={loading}
+    >
       {loading ? "Deleting..." : "Delete"}
     </Button>
   );

@@ -30,7 +30,11 @@ async function getMedication(id: string) {
 
 import EditMedicationForm from "@/components/medications/EditMedicationForm";
 
-export default async function EditMedicationPage({ params }: { params: Promise<{ id: string }> }) {
+export default async function EditMedicationPage({
+  params,
+}: {
+  params: Promise<{ id: string }>;
+}) {
   const { id } = await params;
   const medication = await getMedication(id);
   return <EditMedicationForm medication={medication} />;

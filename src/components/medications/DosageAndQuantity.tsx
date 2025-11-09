@@ -13,7 +13,9 @@ export default function DosageAndQuantity() {
   return (
     <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
       <div>
-        <label className="block text-base font-medium text-gray-900">Quantity</label>
+        <label className="block text-base font-medium text-gray-900">
+          Quantity
+        </label>
         <div className="mt-2">
           <Input
             type="number"
@@ -26,11 +28,15 @@ export default function DosageAndQuantity() {
           />
         </div>
         {errors.quantity && (
-          <p className="mt-1 text-sm text-red-600">{errors.quantity.message as string}</p>
+          <p className="mt-1 text-sm text-red-600">
+            {errors.quantity.message as string}
+          </p>
         )}
       </div>
       <div>
-        <label className="block text-base font-medium text-gray-900">Dosage (mg)</label>
+        <label className="block text-base font-medium text-gray-900">
+          Dosage (mg)
+        </label>
         <div className="mt-2">
           <Input
             type="number"
@@ -43,10 +49,11 @@ export default function DosageAndQuantity() {
           />
         </div>
         {errors.dosageMg && (
-          <p className="mt-1 text-sm text-red-600">{errors.dosageMg.message as string}</p>
+          <p className="mt-1 text-sm text-red-600">
+            {errors.dosageMg.message as string}
+          </p>
         )}
       </div>
     </div>
   );
 }
-

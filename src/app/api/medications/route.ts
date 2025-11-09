@@ -7,7 +7,9 @@ import {
   type CreateMedicationInput,
 } from "@/lib/validators/medication";
 // Derive the exact where input type from the Prisma client
-type MedicationWhere = NonNullable<Parameters<typeof prisma.medication.findMany>[0]>["where"];
+type MedicationWhere = NonNullable<
+  Parameters<typeof prisma.medication.findMany>[0]
+>["where"];
 
 export const runtime = "nodejs";
 
@@ -121,7 +123,9 @@ export async function POST(request: NextRequest) {
     });
 
     // Revalidate medications data consumers
-    try { revalidateTag("medications", "max"); } catch {}
+    try {
+      revalidateTag("medications", "max");
+    } catch {}
     return NextResponse.json({ medication }, { status: 201 });
   } catch (error) {
     if (error instanceof Error && error.name === "ZodError") {

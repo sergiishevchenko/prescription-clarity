@@ -19,7 +19,9 @@ export default function PhotoUploader() {
 
   function setFileIntoForm(file: File | null) {
     if (!file) {
-      setValue("photo", undefined as unknown as FileList, { shouldDirty: true });
+      setValue("photo", undefined as unknown as FileList, {
+        shouldDirty: true,
+      });
       return;
     }
     const dt = new DataTransfer();
@@ -31,29 +33,42 @@ export default function PhotoUploader() {
   function validateAndSet(file?: File) {
     setError(null);
     if (!file) {
-      setPreviewUrl((prev) => { if (prev) URL.revokeObjectURL(prev); return null; });
+      setPreviewUrl((prev) => {
+        if (prev) URL.revokeObjectURL(prev);
+        return null;
+      });
       setFileIntoForm(null);
       return;
     }
-    const okType = /image\/(png|jpeg)/.test(file.type) || /\.(png|jpe?g)$/i.test(file.name);
+    const okType =
+      /image\/(png|jpeg)/.test(file.type) || /\.(png|jpe?g)$/i.test(file.name);
     const okSize = file.size <= 5 * 1024 * 1024;
 
     if (!okType) {
       setError("Only PNG or JPG images are allowed.");
       setFileIntoForm(null);
-      setPreviewUrl((prev) => { if (prev) URL.revokeObjectURL(prev); return null; });
+      setPreviewUrl((prev) => {
+        if (prev) URL.revokeObjectURL(prev);
+        return null;
+      });
       return;
     }
     if (!okSize) {
       setError("Image too large. Max 5MB.");
       setFileIntoForm(null);
-      setPreviewUrl((prev) => { if (prev) URL.revokeObjectURL(prev); return null; });
+      setPreviewUrl((prev) => {
+        if (prev) URL.revokeObjectURL(prev);
+        return null;
+      });
       return;
     }
 
     setFileIntoForm(file);
     const url = URL.createObjectURL(file);
-    setPreviewUrl((prev) => { if (prev) URL.revokeObjectURL(prev); return url; });
+    setPreviewUrl((prev) => {
+      if (prev) URL.revokeObjectURL(prev);
+      return url;
+    });
   }
 
   const reg = register("photo");
@@ -102,10 +117,10 @@ export default function PhotoUploader() {
           validateAndSet(f);
         }}
         className={[
-          "mt-2 block w-full rounded-xl border-2 border-dashed p-6 text-center transition cursor-pointer",
+          "mt-2 block w-full cursor-pointer rounded-xl border-2 border-dashed p-6 text-center transition",
           dragOver
             ? "border-indigo-500 bg-indigo-50"
-            : "border-gray-300 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-indigo-500/50",
+            : "border-gray-300 hover:bg-gray-50 focus:ring-2 focus:ring-indigo-500/50 focus:outline-none",
         ].join(" ")}
       >
         <div className="mx-auto mb-3 grid h-12 w-12 place-items-center rounded-full bg-indigo-50 text-2xl text-indigo-600">
@@ -117,7 +132,11 @@ export default function PhotoUploader() {
         {previewUrl && (
           <div className="mt-4 flex justify-center">
             {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src={previewUrl} alt="Preview" className="max-h-48 rounded-md border" />
+            <img
+              src={previewUrl}
+              alt="Preview"
+              className="max-h-48 rounded-md border"
+            />
           </div>
         )}
       </div>

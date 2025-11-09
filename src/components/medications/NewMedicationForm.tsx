@@ -62,12 +62,14 @@ export default function NewMedicationForm() {
         required === 1
           ? "Please select a time of day."
           : required === 2
-          ? "Please select a second time of day for your twice-daily medication."
-          : "Please select all three times of day for your medication.",
+            ? "Please select a second time of day for your twice-daily medication."
+            : "Please select all three times of day for your medication.",
       );
     } else if (timesOfDay.length > required) {
       const order: TimeOfDay[] = ["morning", "afternoon", "evening"];
-      setTimesOfDay((prev) => order.filter((t) => prev.includes(t)).slice(0, required));
+      setTimesOfDay((prev) =>
+        order.filter((t) => prev.includes(t)).slice(0, required),
+      );
       setTimeError("");
     } else {
       setTimeError("");
@@ -88,7 +90,9 @@ export default function NewMedicationForm() {
   }
 
   function toggleDay(label: string) {
-    setDays((prev) => (prev.includes(label) ? prev.filter((d) => d !== label) : [...prev, label]));
+    setDays((prev) =>
+      prev.includes(label) ? prev.filter((d) => d !== label) : [...prev, label],
+    );
   }
 
   const onSubmit = async (data: FormValues) => {
@@ -98,8 +102,8 @@ export default function NewMedicationForm() {
         expected === 1
           ? "Please select a time of day."
           : expected === 2
-          ? "Please select two times of day for your twice-daily medication."
-          : "Please select three times of day for your medication.",
+            ? "Please select two times of day for your twice-daily medication."
+            : "Please select three times of day for your medication.",
       );
       return;
     }
@@ -150,16 +154,22 @@ export default function NewMedicationForm() {
     <div className="min-h-[calc(100vh-4rem)] bg-gray-50">
       <div className="mx-auto max-w-4xl px-4 py-6 sm:px-6 lg:px-8">
         <div className="rounded-lg bg-white px-6 py-8 shadow">
-          <h1 className="text-2xl font-semibold text-gray-900">Add Medication</h1>
+          <h1 className="text-2xl font-semibold text-gray-900">
+            Add Medication
+          </h1>
 
           <FormProvider {...methods}>
             <form className="mt-6 space-y-6" onSubmit={handleSubmit(onSubmit)}>
               <div>
-                <label className="block text-base font-medium text-gray-900">Medication Name</label>
+                <label className="block text-base font-medium text-gray-900">
+                  Medication Name
+                </label>
                 <div className="mt-2">
                   <Input
                     placeholder="e.g., Aspirin"
-                    {...register("name", { required: "Medication name is required" })}
+                    {...register("name", {
+                      required: "Medication name is required",
+                    })}
                   />
                 </div>
                 {methods.formState.errors.name && (
@@ -172,7 +182,9 @@ export default function NewMedicationForm() {
               <DosageAndQuantity />
 
               <div>
-                <label className="block text-base font-medium text-gray-900">Meal Timing</label>
+                <label className="block text-base font-medium text-gray-900">
+                  Meal Timing
+                </label>
                 <div className="mt-2">
                   <select
                     className="block w-full min-w-0 rounded-md border border-gray-300 bg-white px-3 py-2 text-sm text-gray-900 shadow-sm placeholder:text-gray-400 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/50 focus:outline-none"
@@ -187,7 +199,9 @@ export default function NewMedicationForm() {
               </div>
 
               <div>
-                <label className="block text-base font-medium text-gray-900">Times Per Day</label>
+                <label className="block text-base font-medium text-gray-900">
+                  Times Per Day
+                </label>
                 <div className="mt-2">
                   <select
                     className="block w-full min-w-0 rounded-md border border-gray-300 bg-white px-3 py-2 text-sm text-gray-900 shadow-sm focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/50 focus:outline-none"
@@ -200,7 +214,11 @@ export default function NewMedicationForm() {
                 </div>
               </div>
 
-              <TimeOfDayChips selected={timesOfDay} onToggle={toggleTime} error={timeError} />
+              <TimeOfDayChips
+                selected={timesOfDay}
+                onToggle={toggleTime}
+                error={timeError}
+              />
 
               <TimeInputs selected={timesOfDay} />
 
@@ -219,8 +237,13 @@ export default function NewMedicationForm() {
                 >
                   Cancel
                 </Button>
-                <Button type="submit" className="cursor-pointer bg-indigo-600 hover:bg-indigo-700">
-                  {methods.formState.isSubmitting ? "Adding..." : "Add Prescription"}
+                <Button
+                  type="submit"
+                  className="cursor-pointer bg-indigo-600 hover:bg-indigo-700"
+                >
+                  {methods.formState.isSubmitting
+                    ? "Adding..."
+                    : "Add Prescription"}
                 </Button>
               </div>
             </form>

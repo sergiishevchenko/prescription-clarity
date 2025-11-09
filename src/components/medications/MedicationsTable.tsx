@@ -13,7 +13,11 @@ type Medication = {
   endDate: string;
 };
 
-export default function MedicationsTable({ initial }: { initial: Medication[] }) {
+export default function MedicationsTable({
+  initial,
+}: {
+  initial: Medication[];
+}) {
   const [items, setItems] = useState(initial);
 
   return (
@@ -26,11 +30,21 @@ export default function MedicationsTable({ initial }: { initial: Medication[] })
         <table className="min-w-full divide-y divide-gray-200">
           <thead className="bg-gray-50">
             <tr>
-              <th className="px-4 py-3 text-left text-sm font-semibold text-gray-700">Name</th>
-              <th className="px-4 py-3 text-left text-sm font-semibold text-gray-700">Dose</th>
-              <th className="px-4 py-3 text-left text-sm font-semibold text-gray-700">Freq/day</th>
-              <th className="px-4 py-3 text-left text-sm font-semibold text-gray-700">Dates</th>
-              <th className="px-4 py-3 text-right text-sm font-semibold text-gray-700">Actions</th>
+              <th className="px-4 py-3 text-left text-sm font-semibold text-gray-700">
+                Name
+              </th>
+              <th className="px-4 py-3 text-left text-sm font-semibold text-gray-700">
+                Dose
+              </th>
+              <th className="px-4 py-3 text-left text-sm font-semibold text-gray-700">
+                Freq/day
+              </th>
+              <th className="px-4 py-3 text-left text-sm font-semibold text-gray-700">
+                Dates
+              </th>
+              <th className="px-4 py-3 text-right text-sm font-semibold text-gray-700">
+                Actions
+              </th>
             </tr>
           </thead>
           <tbody className="divide-y divide-gray-200 bg-white">
@@ -38,18 +52,26 @@ export default function MedicationsTable({ initial }: { initial: Medication[] })
               <tr key={m.id}>
                 <td className="px-4 py-3 text-sm text-gray-900">{m.name}</td>
                 <td className="px-4 py-3 text-sm text-gray-900">{m.dose}</td>
-                <td className="px-4 py-3 text-sm text-gray-900">{m.frequency}</td>
-                <td className="px-4 py-3 text-sm text-gray-500">
-                  {new Date(m.startDate).toLocaleDateString()} - {new Date(m.endDate).toLocaleDateString()}
+                <td className="px-4 py-3 text-sm text-gray-900">
+                  {m.frequency}
                 </td>
-                <td className="px-4 py-3 text-sm text-right">
+                <td className="px-4 py-3 text-sm text-gray-500">
+                  {new Date(m.startDate).toLocaleDateString()} -{" "}
+                  {new Date(m.endDate).toLocaleDateString()}
+                </td>
+                <td className="px-4 py-3 text-right text-sm">
                   <div className="flex items-center justify-end gap-2">
-                    <Link href={`/medications/${m.id}/edit`} className="text-indigo-600 hover:underline">
+                    <Link
+                      href={`/medications/${m.id}/edit`}
+                      className="text-indigo-600 hover:underline"
+                    >
                       Edit
                     </Link>
                     <DeleteMedicationButton
                       id={m.id}
-                      onDeleted={() => setItems((prev) => prev.filter((x) => x.id !== m.id))}
+                      onDeleted={() =>
+                        setItems((prev) => prev.filter((x) => x.id !== m.id))
+                      }
                     />
                   </div>
                 </td>
@@ -61,4 +83,3 @@ export default function MedicationsTable({ initial }: { initial: Medication[] })
     </div>
   );
 }
-

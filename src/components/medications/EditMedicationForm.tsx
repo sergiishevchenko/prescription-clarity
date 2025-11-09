@@ -32,7 +32,11 @@ function toDateOnly(iso: string) {
   }
 }
 
-export default function EditMedicationForm({ medication }: { medication: Medication }) {
+export default function EditMedicationForm({
+  medication,
+}: {
+  medication: Medication;
+}) {
   const router = useRouter();
   const toast = useToast();
   const [saving, setSaving] = useState(false);
@@ -58,8 +62,12 @@ export default function EditMedicationForm({ medication }: { medication: Medicat
       name: values.name.trim(),
       dose: values.dose.trim(),
       frequency: Number(values.frequency),
-      startDate: values.startDate ? new Date(values.startDate + "T00:00:00.000Z").toISOString() : undefined,
-      endDate: values.endDate ? new Date(values.endDate + "T00:00:00.000Z").toISOString() : undefined,
+      startDate: values.startDate
+        ? new Date(values.startDate + "T00:00:00.000Z").toISOString()
+        : undefined,
+      endDate: values.endDate
+        ? new Date(values.endDate + "T00:00:00.000Z").toISOString()
+        : undefined,
     };
     try {
       const res = await fetch(`/api/medications/${medication.id}`, {
@@ -72,7 +80,7 @@ export default function EditMedicationForm({ medication }: { medication: Medicat
         return;
       }
       if (!res.ok) {
-        const data = await res.json().catch(() => ({} as { error?: string }));
+        const data = await res.json().catch(() => ({}) as { error?: string });
         throw new Error(data?.error || "Failed to update");
       }
       setSuccess("Medication updated");
@@ -90,37 +98,67 @@ export default function EditMedicationForm({ medication }: { medication: Medicat
     <div className="min-h-[calc(100vh-4rem)] bg-gray-50">
       <div className="mx-auto max-w-3xl px-4 py-6 sm:px-6 lg:px-8">
         <div className="rounded-lg bg-white px-6 py-8 shadow">
-          <h1 className="text-2xl font-semibold text-gray-900">Edit Medication</h1>
+          <h1 className="text-2xl font-semibold text-gray-900">
+            Edit Medication
+          </h1>
           <form className="mt-6 space-y-6" onSubmit={handleSubmit(onSubmit)}>
             <div>
-              <label className="block text-base font-medium text-gray-900">Name</label>
+              <label className="block text-base font-medium text-gray-900">
+                Name
+              </label>
               <div className="mt-2">
                 <Input {...register("name", { required: true })} />
               </div>
             </div>
             <div>
-              <label className="block text-base font-medium text-gray-900">Dose</label>
+              <label className="block text-base font-medium text-gray-900">
+                Dose
+              </label>
               <div className="mt-2">
-                <Input placeholder="e.g., 500 mg" {...register("dose", { required: true })} />
+                <Input
+                  placeholder="e.g., 500 mg"
+                  {...register("dose", { required: true })}
+                />
               </div>
             </div>
             <div>
-              <label className="block text-base font-medium text-gray-900">Frequency (per day)</label>
+              <label className="block text-base font-medium text-gray-900">
+                Frequency (per day)
+              </label>
               <div className="mt-2">
-                <Input type="number" min={1} max={24} {...register("frequency", { valueAsNumber: true, required: true, min: 1 })} />
+                <Input
+                  type="number"
+                  min={1}
+                  max={24}
+                  {...register("frequency", {
+                    valueAsNumber: true,
+                    required: true,
+                    min: 1,
+                  })}
+                />
               </div>
             </div>
             <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
               <div>
-                <label className="block text-base font-medium text-gray-900">Start Date</label>
+                <label className="block text-base font-medium text-gray-900">
+                  Start Date
+                </label>
                 <div className="mt-2">
-                  <Input type="date" {...register("startDate", { required: true })} />
+                  <Input
+                    type="date"
+                    {...register("startDate", { required: true })}
+                  />
                 </div>
               </div>
               <div>
-                <label className="block text-base font-medium text-gray-900">End Date</label>
+                <label className="block text-base font-medium text-gray-900">
+                  End Date
+                </label>
                 <div className="mt-2">
-                  <Input type="date" {...register("endDate", { required: true })} />
+                  <Input
+                    type="date"
+                    {...register("endDate", { required: true })}
+                  />
                 </div>
               </div>
             </div>
@@ -129,10 +167,19 @@ export default function EditMedicationForm({ medication }: { medication: Medicat
             {success && <p className="text-sm text-green-600">{success}</p>}
 
             <div className="flex flex-col-reverse gap-3 sm:flex-row sm:justify-end">
-              <Button type="button" variant="outline" className="cursor-pointer border-indigo-600 text-indigo-600 hover:bg-indigo-50" onClick={() => router.back()}>
+              <Button
+                type="button"
+                variant="outline"
+                className="cursor-pointer border-indigo-600 text-indigo-600 hover:bg-indigo-50"
+                onClick={() => router.back()}
+              >
                 Cancel
               </Button>
-              <Button type="submit" className="cursor-pointer bg-indigo-600 hover:bg-indigo-700" disabled={saving}>
+              <Button
+                type="submit"
+                className="cursor-pointer bg-indigo-600 hover:bg-indigo-700"
+                disabled={saving}
+              >
                 {saving ? "Saving..." : "Save Changes"}
               </Button>
             </div>
