@@ -23,16 +23,34 @@ const mockMedication = {
   delete: jest.fn() as AsyncMockFn<[unknown], unknown>,
 };
 
+const mockScheduleEntry = {
+  findMany: jest.fn() as AsyncMockFn<[unknown], unknown>,
+  findFirst: jest.fn() as AsyncMockFn<[unknown], unknown>,
+  createMany: jest.fn() as AsyncMockFn<[unknown], unknown>,
+  update: jest.fn() as AsyncMockFn<[unknown], unknown>,
+};
+
 jest.mock("@/lib/db", () => ({
   __esModule: true,
-  prisma: { user: mockUser, session: mockSession, medication: mockMedication },
-  default: { user: mockUser, session: mockSession, medication: mockMedication },
+  prisma: {
+    user: mockUser,
+    session: mockSession,
+    medication: mockMedication,
+    scheduleEntry: mockScheduleEntry,
+  },
+  default: {
+    user: mockUser,
+    session: mockSession,
+    medication: mockMedication,
+    scheduleEntry: mockScheduleEntry,
+  },
 }));
 
 export const prismaMock = {
   user: mockUser,
   session: mockSession,
   medication: mockMedication,
+  scheduleEntry: mockScheduleEntry,
 };
 
 beforeEach(() => jest.clearAllMocks());

@@ -250,6 +250,44 @@ describe("PATCH /api/medications/[id]", () => {
     expect(data.error).toBe("End date must be after start date");
   });
 
+  it("should return 400 when only startDate pushes past endDate", async () => {
+    jest
+      .spyOn(SessionModule, "getSessionUserFromRequest")
+      .mockResolvedValueOnce(mockUser);
+
+    prismaMock.medication.findFirst.mockResolvedValueOnce(mockMedication);
+
+    const res = await MedicationIdRoute.PATCH(
+      makePatchReq({
+        startDate: "2026-01-01T00:00:00Z",
+      }),
+      params,
+    );
+    const data = await res.json();
+
+    expect(res.status).toBe(400);
+    expect(data.error).toBe("End date must be after start date");
+  });
+
+  it("should return 400 when only endDate precedes startDate", async () => {
+    jest
+      .spyOn(SessionModule, "getSessionUserFromRequest")
+      .mockResolvedValueOnce(mockUser);
+
+    prismaMock.medication.findFirst.mockResolvedValueOnce(mockMedication);
+
+    const res = await MedicationIdRoute.PATCH(
+      makePatchReq({
+        endDate: "2024-01-01T00:00:00Z",
+      }),
+      params,
+    );
+    const data = await res.json();
+
+    expect(res.status).toBe(400);
+    expect(data.error).toBe("End date must be after start date");
+  });
+
   it("should return 400 on invalid input data", async () => {
     jest
       .spyOn(SessionModule, "getSessionUserFromRequest")
