@@ -115,9 +115,7 @@ describe("GET /api/schedule", () => {
   it("returns 500 when database query fails", async () => {
     jest.mocked(getSessionCookie).mockResolvedValueOnce("token");
     jest.mocked(verifySession).mockResolvedValueOnce(mockUser);
-    prismaMock.scheduleEntry.findMany.mockRejectedValueOnce(
-      new Error("fail"),
-    );
+    prismaMock.scheduleEntry.findMany.mockRejectedValueOnce(new Error("fail"));
 
     const res = await ScheduleRoute.GET(makeGetRequest());
     expect(res.status).toBe(500);

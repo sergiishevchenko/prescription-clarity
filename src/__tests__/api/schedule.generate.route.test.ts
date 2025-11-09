@@ -23,7 +23,9 @@ describe("POST /api/schedule/generate", () => {
   it("returns 401 when no session cookie", async () => {
     jest.mocked(getSessionCookie).mockResolvedValueOnce(null);
 
-    const res = await GenerateRoute.POST(makePostRequest({ medicationId: "m1" }));
+    const res = await GenerateRoute.POST(
+      makePostRequest({ medicationId: "m1" }),
+    );
     expect(res.status).toBe(401);
     await expect(res.json()).resolves.toEqual(
       expect.objectContaining({ error: "Unauthorized" }),
@@ -34,7 +36,9 @@ describe("POST /api/schedule/generate", () => {
     jest.mocked(getSessionCookie).mockResolvedValueOnce("invalid");
     jest.mocked(verifySession).mockResolvedValueOnce(null);
 
-    const res = await GenerateRoute.POST(makePostRequest({ medicationId: "m1" }));
+    const res = await GenerateRoute.POST(
+      makePostRequest({ medicationId: "m1" }),
+    );
     expect(res.status).toBe(401);
     await expect(res.json()).resolves.toEqual(
       expect.objectContaining({ error: "Invalid session" }),
@@ -59,7 +63,9 @@ describe("POST /api/schedule/generate", () => {
 
     prismaMock.medication.findFirst.mockResolvedValueOnce(null);
 
-    const res = await GenerateRoute.POST(makePostRequest({ medicationId: "m1" }));
+    const res = await GenerateRoute.POST(
+      makePostRequest({ medicationId: "m1" }),
+    );
     expect(res.status).toBe(404);
     await expect(res.json()).resolves.toEqual(
       expect.objectContaining({ error: "Medication not found" }),
@@ -78,7 +84,9 @@ describe("POST /api/schedule/generate", () => {
       endDate: new Date("2025-02-02T00:00:00.000Z"),
     });
 
-    const res = await GenerateRoute.POST(makePostRequest({ medicationId: "m1" }));
+    const res = await GenerateRoute.POST(
+      makePostRequest({ medicationId: "m1" }),
+    );
     expect(res.status).toBe(400);
     await expect(res.json()).resolves.toEqual(
       expect.objectContaining({
@@ -102,7 +110,9 @@ describe("POST /api/schedule/generate", () => {
 
     prismaMock.scheduleEntry.createMany.mockResolvedValueOnce({ count: 3 });
 
-    const res = await GenerateRoute.POST(makePostRequest({ medicationId: "m1" }));
+    const res = await GenerateRoute.POST(
+      makePostRequest({ medicationId: "m1" }),
+    );
     expect(res.status).toBe(200);
     const json = await res.json();
     expect(json.created).toBe(3);
@@ -131,7 +141,9 @@ describe("POST /api/schedule/generate", () => {
       endDate: new Date("2025-02-01T00:00:00.000Z"),
     });
 
-    const res = await GenerateRoute.POST(makePostRequest({ medicationId: "m1" }));
+    const res = await GenerateRoute.POST(
+      makePostRequest({ medicationId: "m1" }),
+    );
     expect(res.status).toBe(200);
     await expect(res.json()).resolves.toEqual({ created: 0, skipped: 0 });
     expect(prismaMock.scheduleEntry.createMany).not.toHaveBeenCalled();

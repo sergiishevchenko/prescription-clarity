@@ -24,7 +24,10 @@ describe("PATCH /api/schedule/[id]", () => {
   it("returns 401 when no session cookie", async () => {
     jest.mocked(getSessionCookie).mockResolvedValueOnce(null);
 
-    const res = await ScheduleIdRoute.PATCH(makePatchRequest({ status: "DONE" }), params);
+    const res = await ScheduleIdRoute.PATCH(
+      makePatchRequest({ status: "DONE" }),
+      params,
+    );
     expect(res.status).toBe(401);
     await expect(res.json()).resolves.toEqual(
       expect.objectContaining({ error: "Unauthorized" }),
@@ -35,7 +38,10 @@ describe("PATCH /api/schedule/[id]", () => {
     jest.mocked(getSessionCookie).mockResolvedValueOnce("invalid");
     jest.mocked(verifySession).mockResolvedValueOnce(null);
 
-    const res = await ScheduleIdRoute.PATCH(makePatchRequest({ status: "DONE" }), params);
+    const res = await ScheduleIdRoute.PATCH(
+      makePatchRequest({ status: "DONE" }),
+      params,
+    );
     expect(res.status).toBe(401);
     await expect(res.json()).resolves.toEqual(
       expect.objectContaining({ error: "Invalid session" }),
@@ -45,7 +51,10 @@ describe("PATCH /api/schedule/[id]", () => {
   it("returns 400 on invalid payload", async () => {
     jest.mocked(getSessionCookie).mockResolvedValueOnce("token");
 
-    const res = await ScheduleIdRoute.PATCH(makePatchRequest({ status: "SKIPPED" }), params);
+    const res = await ScheduleIdRoute.PATCH(
+      makePatchRequest({ status: "SKIPPED" }),
+      params,
+    );
     expect(res.status).toBe(400);
     await expect(res.json()).resolves.toEqual(
       expect.objectContaining({ error: "Invalid input data" }),
@@ -58,7 +67,10 @@ describe("PATCH /api/schedule/[id]", () => {
 
     prismaMock.scheduleEntry.findFirst.mockResolvedValueOnce(null);
 
-    const res = await ScheduleIdRoute.PATCH(makePatchRequest({ status: "DONE" }), params);
+    const res = await ScheduleIdRoute.PATCH(
+      makePatchRequest({ status: "DONE" }),
+      params,
+    );
     expect(res.status).toBe(404);
     await expect(res.json()).resolves.toEqual(
       expect.objectContaining({ error: "Not found" }),
@@ -68,13 +80,19 @@ describe("PATCH /api/schedule/[id]", () => {
   it("updates status when entry exists", async () => {
     jest.mocked(getSessionCookie).mockResolvedValueOnce("token");
 
-    prismaMock.scheduleEntry.findFirst.mockResolvedValueOnce({ id: "se1", userId: "u1" });
+    prismaMock.scheduleEntry.findFirst.mockResolvedValueOnce({
+      id: "se1",
+      userId: "u1",
+    });
     prismaMock.scheduleEntry.update.mockResolvedValueOnce({
       id: "se1",
       status: "DONE",
     });
 
-    const res = await ScheduleIdRoute.PATCH(makePatchRequest({ status: "DONE" }), params);
+    const res = await ScheduleIdRoute.PATCH(
+      makePatchRequest({ status: "DONE" }),
+      params,
+    );
     expect(res.status).toBe(200);
     await expect(res.json()).resolves.toEqual(
       expect.objectContaining({ id: "se1", status: "DONE" }),
