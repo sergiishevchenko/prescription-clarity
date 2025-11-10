@@ -155,7 +155,8 @@ export default function EditMedicationForm({
               </div>
               {errors.frequency && (
                 <p className="mt-1 text-sm text-red-600">
-                  {(errors.frequency.message as string) || "Frequency is required"}
+                  {(errors.frequency.message as string) ||
+                    "Frequency is required"}
                 </p>
               )}
             </div>
@@ -167,11 +168,15 @@ export default function EditMedicationForm({
                 <div className="mt-2">
                   <Input
                     type="date"
-                    {...register("startDate", { required: "Start date is required" })}
+                    {...register("startDate", {
+                      required: "Start date is required",
+                    })}
                   />
                 </div>
                 {errors.startDate && (
-                  <p className="mt-1 text-sm text-red-600">Start date is required</p>
+                  <p className="mt-1 text-sm text-red-600">
+                    Start date is required
+                  </p>
                 )}
               </div>
               <div>
@@ -181,11 +186,15 @@ export default function EditMedicationForm({
                 <div className="mt-2">
                   <Input
                     type="date"
-                    {...register("endDate", { required: "End date is required" })}
+                    {...register("endDate", {
+                      required: "End date is required",
+                    })}
                   />
                 </div>
                 {errors.endDate && (
-                  <p className="mt-1 text-sm text-red-600">End date is required</p>
+                  <p className="mt-1 text-sm text-red-600">
+                    End date is required
+                  </p>
                 )}
               </div>
             </div>

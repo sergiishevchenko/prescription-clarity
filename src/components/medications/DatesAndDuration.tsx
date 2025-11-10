@@ -36,11 +36,11 @@ export default function DatesAndDuration() {
             Start Date
           </label>
           <div className="mt-2">
-          <Input
-            type="date"
-            disabled={ongoing}
-            {...register("startDate", { required: "Start date is required" })}
-          />
+            <Input
+              type="date"
+              disabled={ongoing}
+              {...register("startDate", { required: "Start date is required" })}
+            />
           </div>
           {errors.startDate && (
             <p className="mt-1 text-sm text-red-600">Start date is required</p>
@@ -52,11 +52,11 @@ export default function DatesAndDuration() {
             End Date
           </label>
           <div className="mt-2">
-          <Input
-            type="date"
-            disabled={ongoing}
-            {...register("endDate", { required: "End date is required" })}
-          />
+            <Input
+              type="date"
+              disabled={ongoing}
+              {...register("endDate", { required: "End date is required" })}
+            />
           </div>
           {errors.endDate && (
             <p className="mt-1 text-sm text-red-600">End date is required</p>
@@ -70,16 +70,16 @@ export default function DatesAndDuration() {
             Duration (days)
           </label>
           <div className="mt-2">
-          <Input
-            type="number"
-            min={1}
-            disabled={ongoing}
-            {...register("durationDays", {
-              valueAsNumber: true,
-              min: { value: 1, message: "Must be at least 1" },
-              required: "Duration is required",
-            })}
-          />
+            <Input
+              type="number"
+              min={1}
+              disabled={ongoing}
+              {...register("durationDays", {
+                valueAsNumber: true,
+                min: { value: 1, message: "Must be at least 1" },
+                required: "Duration is required",
+              })}
+            />
           </div>
           {errors.durationDays && (
             <p className="mt-1 text-sm text-red-600">
