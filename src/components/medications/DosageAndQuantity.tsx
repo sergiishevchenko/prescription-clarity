@@ -22,7 +22,7 @@ export default function DosageAndQuantity() {
             min={1}
             {...register("quantity", {
               valueAsNumber: true,
-              required: true,
+              required: "Quantity is required",
               min: { value: 1, message: "Must be at least 1" },
             })}
           />
@@ -43,7 +43,7 @@ export default function DosageAndQuantity() {
             min={1}
             {...register("dosageMg", {
               valueAsNumber: true,
-              required: true,
+              required: "Dosage is required",
               min: { value: 1, message: "Must be at least 1" },
             })}
           />

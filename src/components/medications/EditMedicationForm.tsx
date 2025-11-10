@@ -43,7 +43,11 @@ export default function EditMedicationForm({
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<string | null>(null);
 
-  const { register, handleSubmit } = useForm<FormShape>({
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+  } = useForm<FormShape>({
     mode: "onBlur",
     defaultValues: {
       name: medication.name,
@@ -101,14 +105,23 @@ export default function EditMedicationForm({
           <h1 className="text-2xl font-semibold text-gray-900">
             Edit Medication
           </h1>
-          <form className="mt-6 space-y-6" onSubmit={handleSubmit(onSubmit)}>
+          <form
+            className="mt-6 space-y-6"
+            onSubmit={handleSubmit(onSubmit)}
+            noValidate
+          >
             <div>
               <label className="block text-base font-medium text-gray-900">
                 Name
               </label>
               <div className="mt-2">
-                <Input {...register("name", { required: true })} />
+                <Input
+                  {...register("name", { required: "Name is required" })}
+                />
               </div>
+              {errors.name && (
+                <p className="mt-1 text-sm text-red-600">Name is required</p>
+              )}
             </div>
             <div>
               <label className="block text-base font-medium text-gray-900">
@@ -117,9 +130,12 @@ export default function EditMedicationForm({
               <div className="mt-2">
                 <Input
                   placeholder="e.g., 500 mg"
-                  {...register("dose", { required: true })}
+                  {...register("dose", { required: "Dose is required" })}
                 />
               </div>
+              {errors.dose && (
+                <p className="mt-1 text-sm text-red-600">Dose is required</p>
+              )}
             </div>
             <div>
               <label className="block text-base font-medium text-gray-900">
@@ -132,11 +148,16 @@ export default function EditMedicationForm({
                   max={24}
                   {...register("frequency", {
                     valueAsNumber: true,
-                    required: true,
-                    min: 1,
+                    required: "Frequency is required",
+                    min: { value: 1, message: "Must be at least 1" },
                   })}
                 />
               </div>
+              {errors.frequency && (
+                <p className="mt-1 text-sm text-red-600">
+                  {(errors.frequency.message as string) || "Frequency is required"}
+                </p>
+              )}
             </div>
             <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
               <div>
@@ -146,9 +167,12 @@ export default function EditMedicationForm({
                 <div className="mt-2">
                   <Input
                     type="date"
-                    {...register("startDate", { required: true })}
+                    {...register("startDate", { required: "Start date is required" })}
                   />
                 </div>
+                {errors.startDate && (
+                  <p className="mt-1 text-sm text-red-600">Start date is required</p>
+                )}
               </div>
               <div>
                 <label className="block text-base font-medium text-gray-900">
@@ -157,9 +181,12 @@ export default function EditMedicationForm({
                 <div className="mt-2">
                   <Input
                     type="date"
-                    {...register("endDate", { required: true })}
+                    {...register("endDate", { required: "End date is required" })}
                   />
                 </div>
+                {errors.endDate && (
+                  <p className="mt-1 text-sm text-red-600">End date is required</p>
+                )}
               </div>
             </div>
 

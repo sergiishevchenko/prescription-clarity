@@ -159,7 +159,11 @@ export default function NewMedicationForm() {
           </h1>
 
           <FormProvider {...methods}>
-            <form className="mt-6 space-y-6" onSubmit={handleSubmit(onSubmit)}>
+            <form
+              className="mt-6 space-y-6"
+              onSubmit={handleSubmit(onSubmit)}
+              noValidate
+            >
               <div>
                 <label className="block text-base font-medium text-gray-900">
                   Medication Name
