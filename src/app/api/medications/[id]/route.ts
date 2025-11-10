@@ -1,11 +1,15 @@
 import { NextRequest, NextResponse } from "next/server";
+import { revalidateTag } from "next/cache";
 import { prisma } from "@/lib/db";
 import { getSessionUserFromRequest } from "@/lib/auth/session";
 import {
   updateMedicationSchema,
   type UpdateMedicationInput,
 } from "@/lib/validators/medication";
-import type { Prisma } from "@prisma/client";
+// Derive the exact update input type from the Prisma client
+type MedicationUpdateData = Parameters<
+  typeof prisma.medication.update
+>[0]["data"];
 
 export const runtime = "nodejs";
 
@@ -52,6 +56,9 @@ export async function GET(
       );
     }
 
+    try {
+      revalidateTag("medications", "max");
+    } catch {}
     return NextResponse.json({ medication }, { status: 200 });
   } catch (error) {
     console.error("GET /api/medications/[id] error:", error);
@@ -100,7 +107,7 @@ export async function PATCH(
       updateMedicationSchema.parse(body);
 
     // Build update data
-    const updateData: Prisma.MedicationUpdateInput = {};
+    const updateData: MedicationUpdateData = {} as MedicationUpdateData;
 
     if (validatedData.name !== undefined) {
       updateData.name = validatedData.name;
@@ -202,6 +209,9 @@ export async function DELETE(
       },
     });
 
+    try {
+      revalidateTag("medications", "max");
+    } catch {}
     return NextResponse.json(
       { message: "Medication deleted successfully" },
       { status: 200 },

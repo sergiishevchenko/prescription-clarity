@@ -1,11 +1,15 @@
 import { NextRequest, NextResponse } from "next/server";
+import { revalidateTag } from "next/cache";
 import { prisma } from "@/lib/db";
 import { getSessionUserFromRequest } from "@/lib/auth/session";
 import {
   createMedicationSchema,
   type CreateMedicationInput,
 } from "@/lib/validators/medication";
-import type { Prisma } from "@prisma/client";
+// Derive the exact where input type from the Prisma client
+type MedicationWhere = NonNullable<
+  Parameters<typeof prisma.medication.findMany>[0]
+>["where"];
 
 export const runtime = "nodejs";
 
@@ -26,7 +30,7 @@ export async function GET(request: NextRequest) {
     const status = searchParams.get("status"); // optional: filter by ACTIVE/DELETED
 
     // Build where clause
-    const where: Prisma.MedicationWhereInput = {
+    const where: MedicationWhere = {
       userId: user.id,
     };
 
@@ -118,6 +122,10 @@ export async function POST(request: NextRequest) {
       },
     });
 
+    // Revalidate medications data consumers
+    try {
+      revalidateTag("medications", "max");
+    } catch {}
     return NextResponse.json({ medication }, { status: 201 });
   } catch (error) {
     if (error instanceof Error && error.name === "ZodError") {
