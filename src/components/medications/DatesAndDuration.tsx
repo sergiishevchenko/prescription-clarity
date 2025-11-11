@@ -39,7 +39,7 @@ export default function DatesAndDuration() {
             <Input
               type="date"
               disabled={ongoing}
-              {...register("startDate", { required: true })}
+              {...register("startDate", { required: "Start date is required" })}
             />
           </div>
           {errors.startDate && (
@@ -55,7 +55,7 @@ export default function DatesAndDuration() {
             <Input
               type="date"
               disabled={ongoing}
-              {...register("endDate", { required: true })}
+              {...register("endDate", { required: "End date is required" })}
             />
           </div>
           {errors.endDate && (
@@ -77,7 +77,7 @@ export default function DatesAndDuration() {
               {...register("durationDays", {
                 valueAsNumber: true,
                 min: { value: 1, message: "Must be at least 1" },
-                required: true,
+                required: "Duration is required",
               })}
             />
           </div>

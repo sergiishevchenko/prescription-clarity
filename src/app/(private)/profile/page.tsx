@@ -87,7 +87,7 @@ export default function ProfilePage() {
             {loading ? (
               <p className="mt-6 text-gray-600">Loading...</p>
             ) : (
-              <form className="mt-6" onSubmit={onSubmit}>
+              <form className="mt-6" onSubmit={onSubmit} noValidate>
                 <div className="grid grid-cols-1 gap-x-4 gap-y-6 sm:grid-cols-6">
                   <div className="sm:col-span-3">
                     <label
