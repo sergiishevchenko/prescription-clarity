@@ -22,19 +22,79 @@ type CalendarDay = {
 };
 
 const activeSchedule: ScheduleItem[] = [
-  { id: "omeprazole", name: "Omeprazole", dose: "20 mg", time: "07:30", context: "before" },
-  { id: "aspirin", name: "Aspirin", dose: "75 mg", time: "08:00", context: "with" },
-  { id: "lisinopril", name: "Lisinopril", dose: "10 mg", time: "08:00", context: "anytime" },
-  { id: "metformin", name: "Metformin", dose: "500 mg", time: "08:00", context: "with" },
-  { id: "calcium", name: "Calcium Carbonate", dose: "600 mg", time: "12:00", context: "with" },
-  { id: "vitd3", name: "Vitamin D3", dose: "2000 IU", time: "12:00", context: "with" },
-  { id: "amlodipine", name: "Amlodipine", dose: "5 mg", time: "16:00", context: "anytime" },
-  { id: "atorvastatin", name: "Atorvastatin", dose: "20 mg", time: "19:00", context: "after" },
+  {
+    id: "omeprazole",
+    name: "Omeprazole",
+    dose: "20 mg",
+    time: "07:30",
+    context: "before",
+  },
+  {
+    id: "aspirin",
+    name: "Aspirin",
+    dose: "75 mg",
+    time: "08:00",
+    context: "with",
+  },
+  {
+    id: "lisinopril",
+    name: "Lisinopril",
+    dose: "10 mg",
+    time: "08:00",
+    context: "anytime",
+  },
+  {
+    id: "metformin",
+    name: "Metformin",
+    dose: "500 mg",
+    time: "08:00",
+    context: "with",
+  },
+  {
+    id: "calcium",
+    name: "Calcium Carbonate",
+    dose: "600 mg",
+    time: "12:00",
+    context: "with",
+  },
+  {
+    id: "vitd3",
+    name: "Vitamin D3",
+    dose: "2000 IU",
+    time: "12:00",
+    context: "with",
+  },
+  {
+    id: "amlodipine",
+    name: "Amlodipine",
+    dose: "5 mg",
+    time: "16:00",
+    context: "anytime",
+  },
+  {
+    id: "atorvastatin",
+    name: "Atorvastatin",
+    dose: "20 mg",
+    time: "19:00",
+    context: "after",
+  },
 ];
 
 const completedSchedule: ScheduleItem[] = [
-  { id: "simvastatin", name: "Simvastatin", dose: "20 mg", time: "20:00", context: "taken" },
-  { id: "melatonin", name: "Melatonin", dose: "3 mg", time: "21:30", context: "taken" },
+  {
+    id: "simvastatin",
+    name: "Simvastatin",
+    dose: "20 mg",
+    time: "20:00",
+    context: "taken",
+  },
+  {
+    id: "melatonin",
+    name: "Melatonin",
+    dose: "3 mg",
+    time: "21:30",
+    context: "taken",
+  },
 ];
 
 const calendarDays: CalendarDay[] = Array.from({ length: 30 }, (_, index) => {
@@ -86,8 +146,13 @@ const legendItems = [
 ];
 
 function formatDateParts(date: Date) {
-  const short = new Intl.DateTimeFormat("en-US", { month: "short", day: "numeric" }).format(date);
-  const weekday = new Intl.DateTimeFormat("en-US", { weekday: "long" }).format(date);
+  const short = new Intl.DateTimeFormat("en-US", {
+    month: "short",
+    day: "numeric",
+  }).format(date);
+  const weekday = new Intl.DateTimeFormat("en-US", { weekday: "long" }).format(
+    date,
+  );
   const full = new Intl.DateTimeFormat("en-US", {
     month: "short",
     day: "numeric",
@@ -132,10 +197,18 @@ export default async function TodayPage() {
               <span className={styles.profileDate}>{full}</span>
             </div>
             <div className={styles.headerButtons}>
-              <button type="button" className={clsx(styles.iconButton, styles.iconButtonPrimary)} aria-label="Print week schedule">
+              <button
+                type="button"
+                className={clsx(styles.iconButton, styles.iconButtonPrimary)}
+                aria-label="Print week schedule"
+              >
                 <PrintIcon className={styles.iconButtonIcon} />
               </button>
-              <button type="button" className={styles.iconButton} aria-label="Toggle dark mode">
+              <button
+                type="button"
+                className={styles.iconButton}
+                aria-label="Toggle dark mode"
+              >
                 <MoonIcon className={styles.iconButtonIcon} />
               </button>
             </div>
@@ -148,7 +221,8 @@ export default async function TodayPage() {
               <div className={styles.sectionHeading}>
                 <h2 className={styles.sectionTitle}>Today&apos;s Schedule</h2>
                 <p className={styles.sectionSubtitle}>
-                  {formatPendingMessage(pendingCount)} · {completedCount} completed
+                  {formatPendingMessage(pendingCount)} · {completedCount}{" "}
+                  completed
                 </p>
               </div>
               <button type="button" className={styles.markAllButton}>
@@ -160,7 +234,11 @@ export default async function TodayPage() {
             <ul className={styles.scheduleList}>
               {activeSchedule.map((item) => (
                 <li key={item.id} className={styles.listItem}>
-                  <button type="button" className={styles.statusButton} aria-label={`Mark ${item.name} as taken`}>
+                  <button
+                    type="button"
+                    className={styles.statusButton}
+                    aria-label={`Mark ${item.name} as taken`}
+                  >
                     <CheckIcon className={styles.statusIcon} />
                   </button>
                   <div className={styles.itemContent}>
@@ -183,7 +261,11 @@ export default async function TodayPage() {
                       </span>
                     </div>
                   </div>
-                  <button type="button" className={styles.moreButton} aria-label="More actions">
+                  <button
+                    type="button"
+                    className={styles.moreButton}
+                    aria-label="More actions"
+                  >
                     <MoreIcon className={styles.moreIcon} />
                   </button>
                 </li>
@@ -200,7 +282,10 @@ export default async function TodayPage() {
                 <li key={item.id} className={styles.listItem}>
                   <button
                     type="button"
-                    className={clsx(styles.statusButton, styles.statusButtonCompleted)}
+                    className={clsx(
+                      styles.statusButton,
+                      styles.statusButtonCompleted,
+                    )}
                     aria-label={`Mark ${item.name} as not taken`}
                   >
                     <UndoIcon className={styles.statusIcon} />
@@ -213,12 +298,21 @@ export default async function TodayPage() {
                         {item.time}
                       </span>
                       <span className={styles.metaDot}>•</span>
-                      <span className={clsx(styles.contextTag, contextClassMap[item.context])}>
+                      <span
+                        className={clsx(
+                          styles.contextTag,
+                          contextClassMap[item.context],
+                        )}
+                      >
                         {contextLabels[item.context]}
                       </span>
                     </div>
                   </div>
-                  <button type="button" className={styles.moreButton} aria-label="More actions">
+                  <button
+                    type="button"
+                    className={styles.moreButton}
+                    aria-label="More actions"
+                  >
                     <MoreIcon className={styles.moreIcon} />
                   </button>
                 </li>
@@ -227,25 +321,44 @@ export default async function TodayPage() {
           </section>
 
           <nav className={styles.dayControls} aria-label="Day selector">
-            <button type="button" className={styles.navArrow} aria-label="Previous day">
+            <button
+              type="button"
+              className={styles.navArrow}
+              aria-label="Previous day"
+            >
               <ArrowLeftIcon className={styles.navIcon} />
             </button>
             <button type="button" className={styles.dateButton}>
               <span className={styles.datePrimary}>{short}</span>
               <span className={styles.dateSecondary}>{weekday}</span>
             </button>
-            <button type="button" className={styles.navArrow} aria-label="Next day">
+            <button
+              type="button"
+              className={styles.navArrow}
+              aria-label="Next day"
+            >
               <ArrowRightIcon className={styles.navIcon} />
             </button>
           </nav>
 
-          <section className={styles.calendarSection} aria-label="Monthly overview">
+          <section
+            className={styles.calendarSection}
+            aria-label="Monthly overview"
+          >
             <div className={styles.calendarHeader}>
-              <button type="button" className={styles.calendarNav} aria-label="Previous month">
+              <button
+                type="button"
+                className={styles.calendarNav}
+                aria-label="Previous month"
+              >
                 <ArrowLeftIcon className={styles.navIcon} />
               </button>
               <h4 className={styles.calendarTitle}>November 2025</h4>
-              <button type="button" className={styles.calendarNav} aria-label="Next month">
+              <button
+                type="button"
+                className={styles.calendarNav}
+                aria-label="Next month"
+              >
                 <ArrowRightIcon className={styles.navIcon} />
               </button>
             </div>
@@ -363,7 +476,13 @@ function PrintIcon({ className }: IconProps) {
 
 function MoonIcon({ className }: IconProps) {
   return (
-    <svg className={className} viewBox="0 0 24 24" fill="currentColor" stroke="none" aria-hidden="true">
+    <svg
+      className={className}
+      viewBox="0 0 24 24"
+      fill="currentColor"
+      stroke="none"
+      aria-hidden="true"
+    >
       <path d="M21 12.79A9 9 0 1 1 11.21 3a7 7 0 1 0 9.79 9.79z" />
     </svg>
   );
@@ -420,4 +539,3 @@ function ArrowRightIcon({ className }: IconProps) {
     </svg>
   );
 }
-

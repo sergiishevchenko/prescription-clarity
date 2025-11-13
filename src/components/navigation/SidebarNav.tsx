@@ -523,4 +523,3 @@ function LogOutIcon({ className }: IconProps) {
     </svg>
   );
 }
-

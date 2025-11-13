@@ -25,13 +25,8 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body
-        suppressHydrationWarning
-        className="font-sans antialiased"
-      >
-        <ToastProvider>
-          {children}
-        </ToastProvider>
+      <body suppressHydrationWarning className="font-sans antialiased">
+        <ToastProvider>{children}</ToastProvider>
       </body>
     </html>
   );
