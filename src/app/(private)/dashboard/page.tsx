@@ -1,7 +1,5 @@
 import { getCurrentUser } from "@/lib/auth/current-user";
 import { redirect } from "next/navigation";
-import Link from "next/link";
-import { Button } from "@/components/ui/Button";
 
 export default async function DashboardPage() {
   const user = await getCurrentUser();
@@ -20,14 +18,6 @@ export default async function DashboardPage() {
             This is your dashboard. Here you can manage your prescriptions,
             medications, and supplements.
           </p>
-
-          <div className="mt-8">
-            <Link href="/medications/new">
-              <Button className="cursor-pointer bg-indigo-600 hover:bg-indigo-700">
-                Add Prescription
-              </Button>
-            </Link>
-          </div>
         </div>
       </div>
     </div>

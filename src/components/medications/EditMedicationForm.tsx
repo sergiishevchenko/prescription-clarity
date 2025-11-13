@@ -89,7 +89,7 @@ export default function EditMedicationForm({
       }
       setSuccess("Medication updated");
       toast("Medication updated", { variant: "success" });
-      router.push("/dashboard/medications");
+      router.push("/medications");
       router.refresh();
     } catch (e: unknown) {
       setError(e instanceof Error ? e.message : "Unexpected error");

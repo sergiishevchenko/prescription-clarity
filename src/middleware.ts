@@ -25,8 +25,12 @@ export function middleware(request: NextRequest) {
   // Full session validation happens in the API routes
   if (
     pathname.startsWith("/dashboard") ||
+    pathname.startsWith("/today") ||
+    pathname.startsWith("/week") ||
+    pathname.startsWith("/schedule") ||
     pathname.startsWith("/profile") ||
-    pathname.startsWith("/medications")
+    pathname.startsWith("/medications") ||
+    pathname.startsWith("/support")
   ) {
     if (!sessionToken) {
       return NextResponse.redirect(new URL("/login", request.url));
