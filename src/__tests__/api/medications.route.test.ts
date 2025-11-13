@@ -284,6 +284,9 @@ describe("POST /api/medications", () => {
       .spyOn(SessionModule, "getSessionUserFromRequest")
       .mockResolvedValueOnce(mockUser);
 
+    // No existing medication found
+    prismaMock.medication.findFirst.mockResolvedValueOnce(null);
+
     const mockCreatedMedication = {
       id: "med1",
       userId: "user123",
@@ -362,6 +365,225 @@ describe("POST /api/medications", () => {
 
     expect(res.status).toBe(400);
     expect(data.error).toBe("Invalid input data");
+  });
+
+  it("should return 409 if medication with same name and dose already exists", async () => {
+    jest
+      .spyOn(SessionModule, "getSessionUserFromRequest")
+      .mockResolvedValueOnce(mockUser);
+
+    const existingMedication = {
+      id: "med1",
+      userId: "user123",
+      name: "Aspirin",
+      dose: "100mg",
+      frequency: 24,
+      startDate: new Date("2025-01-01"),
+      endDate: new Date("2025-12-31"),
+      status: "ACTIVE" as const,
+      createdAt: new Date(),
+      updatedAt: new Date(),
+    };
+
+    prismaMock.medication.findFirst.mockResolvedValueOnce(existingMedication);
+
+    const res = await MedicationsRoute.POST(
+      makePostReq({
+        name: "Aspirin",
+        dose: "100mg",
+        frequency: 12,
+        startDate: "2025-02-01T00:00:00Z",
+        endDate: "2025-12-31T00:00:00Z",
+      }),
+    );
+    const data = await res.json();
+
+    expect(res.status).toBe(409);
+    expect(data.error).toBe("Medication with this name and dose already exists");
+    expect(prismaMock.medication.findFirst).toHaveBeenCalledWith({
+      where: {
+        userId: "user123",
+        name: {
+          equals: "Aspirin",
+          mode: "insensitive",
+        },
+        dose: {
+          equals: "100mg",
+          mode: "insensitive",
+        },
+        status: "ACTIVE",
+      },
+    });
+    expect(prismaMock.medication.create).not.toHaveBeenCalled();
+  });
+
+  it("should allow creating medication with same name but different dose", async () => {
+    jest
+      .spyOn(SessionModule, "getSessionUserFromRequest")
+      .mockResolvedValueOnce(mockUser);
+
+    // No existing medication found
+    prismaMock.medication.findFirst.mockResolvedValueOnce(null);
+
+    const mockCreatedMedication = {
+      id: "med2",
+      userId: "user123",
+      name: "Aspirin",
+      dose: "200mg",
+      frequency: 12,
+      startDate: new Date("2025-01-01"),
+      endDate: new Date("2025-12-31"),
+      status: "ACTIVE" as const,
+      createdAt: new Date(),
+      updatedAt: new Date(),
+    };
+
+    prismaMock.medication.create.mockResolvedValueOnce(mockCreatedMedication);
+
+    const res = await MedicationsRoute.POST(
+      makePostReq({
+        name: "Aspirin",
+        dose: "200mg",
+        frequency: 12,
+        startDate: "2025-01-01T00:00:00Z",
+        endDate: "2025-12-31T00:00:00Z",
+      }),
+    );
+    const data = await res.json();
+
+    expect(res.status).toBe(201);
+    expect(data.medication.name).toBe("Aspirin");
+    expect(data.medication.dose).toBe("200mg");
+    expect(prismaMock.medication.create).toHaveBeenCalled();
+  });
+
+  it("should allow creating medication with same dose but different name", async () => {
+    jest
+      .spyOn(SessionModule, "getSessionUserFromRequest")
+      .mockResolvedValueOnce(mockUser);
+
+    // No existing medication found
+    prismaMock.medication.findFirst.mockResolvedValueOnce(null);
+
+    const mockCreatedMedication = {
+      id: "med3",
+      userId: "user123",
+      name: "Ibuprofen",
+      dose: "100mg",
+      frequency: 12,
+      startDate: new Date("2025-01-01"),
+      endDate: new Date("2025-12-31"),
+      status: "ACTIVE" as const,
+      createdAt: new Date(),
+      updatedAt: new Date(),
+    };
+
+    prismaMock.medication.create.mockResolvedValueOnce(mockCreatedMedication);
+
+    const res = await MedicationsRoute.POST(
+      makePostReq({
+        name: "Ibuprofen",
+        dose: "100mg",
+        frequency: 12,
+        startDate: "2025-01-01T00:00:00Z",
+        endDate: "2025-12-31T00:00:00Z",
+      }),
+    );
+    const data = await res.json();
+
+    expect(res.status).toBe(201);
+    expect(data.medication.name).toBe("Ibuprofen");
+    expect(data.medication.dose).toBe("100mg");
+    expect(prismaMock.medication.create).toHaveBeenCalled();
+  });
+
+  it("should perform case-insensitive duplicate check", async () => {
+    jest
+      .spyOn(SessionModule, "getSessionUserFromRequest")
+      .mockResolvedValueOnce(mockUser);
+
+    const existingMedication = {
+      id: "med1",
+      userId: "user123",
+      name: "aspirin",
+      dose: "100mg",
+      frequency: 24,
+      startDate: new Date("2025-01-01"),
+      endDate: new Date("2025-12-31"),
+      status: "ACTIVE" as const,
+      createdAt: new Date(),
+      updatedAt: new Date(),
+    };
+
+    prismaMock.medication.findFirst.mockResolvedValueOnce(existingMedication);
+
+    const res = await MedicationsRoute.POST(
+      makePostReq({
+        name: "ASPIRIN",
+        dose: "100MG",
+        frequency: 12,
+        startDate: "2025-02-01T00:00:00Z",
+        endDate: "2025-12-31T00:00:00Z",
+      }),
+    );
+    const data = await res.json();
+
+    expect(res.status).toBe(409);
+    expect(data.error).toBe("Medication with this name and dose already exists");
+    expect(prismaMock.medication.findFirst).toHaveBeenCalledWith({
+      where: {
+        userId: "user123",
+        name: {
+          equals: "ASPIRIN",
+          mode: "insensitive",
+        },
+        dose: {
+          equals: "100MG",
+          mode: "insensitive",
+        },
+        status: "ACTIVE",
+      },
+    });
+  });
+
+  it("should allow creating medication if same name and dose exists but status is DELETED", async () => {
+    jest
+      .spyOn(SessionModule, "getSessionUserFromRequest")
+      .mockResolvedValueOnce(mockUser);
+
+    // No ACTIVE medication found (only DELETED ones exist)
+    prismaMock.medication.findFirst.mockResolvedValueOnce(null);
+
+    const mockCreatedMedication = {
+      id: "med4",
+      userId: "user123",
+      name: "Aspirin",
+      dose: "100mg",
+      frequency: 24,
+      startDate: new Date("2025-01-01"),
+      endDate: new Date("2025-12-31"),
+      status: "ACTIVE" as const,
+      createdAt: new Date(),
+      updatedAt: new Date(),
+    };
+
+    prismaMock.medication.create.mockResolvedValueOnce(mockCreatedMedication);
+
+    const res = await MedicationsRoute.POST(
+      makePostReq({
+        name: "Aspirin",
+        dose: "100mg",
+        frequency: 24,
+        startDate: "2025-01-01T00:00:00Z",
+        endDate: "2025-12-31T00:00:00Z",
+      }),
+    );
+    const data = await res.json();
+
+    expect(res.status).toBe(201);
+    expect(data.medication.name).toBe("Aspirin");
+    expect(data.medication.dose).toBe("100mg");
+    expect(prismaMock.medication.create).toHaveBeenCalled();
   });
 
   it("should return 500 on database error", async () => {
