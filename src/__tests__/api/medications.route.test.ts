@@ -399,7 +399,9 @@ describe("POST /api/medications", () => {
     const data = await res.json();
 
     expect(res.status).toBe(409);
-    expect(data.error).toBe("Medication with this name and dose already exists");
+    expect(data.error).toBe(
+      "Medication with this name and dose already exists",
+    );
     expect(prismaMock.medication.findFirst).toHaveBeenCalledWith({
       where: {
         userId: "user123",
@@ -529,7 +531,9 @@ describe("POST /api/medications", () => {
     const data = await res.json();
 
     expect(res.status).toBe(409);
-    expect(data.error).toBe("Medication with this name and dose already exists");
+    expect(data.error).toBe(
+      "Medication with this name and dose already exists",
+    );
     expect(prismaMock.medication.findFirst).toHaveBeenCalledWith({
       where: {
         userId: "user123",
