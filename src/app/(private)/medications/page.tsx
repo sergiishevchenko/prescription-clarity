@@ -1,4 +1,6 @@
 import { cookies } from "next/headers";
+import Link from "next/link";
+import MedicationsTable from "@/components/medications/MedicationsTable";
 import { absoluteUrl } from "@/lib/url";
 
 type Medication = {
@@ -11,7 +13,6 @@ type Medication = {
 };
 
 async function getMedications() {
-  // Forward cookies explicitly (cookies().toString() is not available)
   const store = await cookies();
   const cookieHeader = store
     .getAll()
@@ -22,16 +23,12 @@ async function getMedications() {
     cache: "no-store",
   });
   if (res.status === 401 || res.status === 403) {
-    // Let client redirect via protected group/middleware; render empty
     return [] as Medication[];
   }
   if (!res.ok) throw new Error("Failed to load medications");
   const data = (await res.json()) as { medications: Medication[] };
   return data.medications;
 }
-
-import MedicationsTable from "@/components/medications/MedicationsTable";
-import Link from "next/link";
 
 export default async function MedicationsListPage() {
   const medications = await getMedications();
@@ -54,3 +51,4 @@ export default async function MedicationsListPage() {
     </div>
   );
 }
+

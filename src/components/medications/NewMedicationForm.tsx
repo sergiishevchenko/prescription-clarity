@@ -143,7 +143,7 @@ export default function NewMedicationForm() {
         return;
       }
       toast("Medication saved", { variant: "success" });
-      router.push("/dashboard/medications");
+      router.push("/medications");
       router.refresh();
     } catch {
       toast("Network error", { variant: "error" });

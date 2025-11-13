@@ -1,0 +1,597 @@
+.page {
+  min-height: 100vh;
+  background-color: #e8f4f8;
+}
+
+.outer {
+  min-height: 100vh;
+  padding-bottom: 5rem;
+}
+
+.stickyHeader {
+  position: sticky;
+  top: 0;
+  z-index: 15;
+  background-color: #ffffff;
+  padding: 0.75rem 1rem;
+  box-shadow: 0 1px 3px rgba(15, 23, 42, 0.1), 0 1px 2px -1px rgba(15, 23, 42, 0.1);
+}
+
+.headerInner {
+  /*max-width: 56rem;*/
+  margin: 0 auto;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.profileBlock {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.profileName {
+  font-size: 1.15rem;
+  font-weight: 700;
+  color: #0f172a;
+}
+
+.profileDate {
+  font-size: 0.95rem;
+  color: #475569;
+}
+
+.headerButtons {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.iconButton {
+  width: 56px;
+  height: 56px;
+  border-radius: 999px;
+  border: 2px solid transparent;
+  background-color: #f1f5f9;
+  color: #475569;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: background-color 0.2s ease, transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.iconButton:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 10px 18px -16px rgba(15, 23, 42, 0.35);
+}
+
+.iconButtonPrimary {
+  background-color: #eff6ff;
+  border-color: #dbeafe;
+  color: #1d4ed8;
+}
+
+.iconButtonIcon {
+  width: 1.35rem;
+  height: 1.35rem;
+}
+
+.content {
+  padding: 1rem 1.25rem;
+}
+
+.scheduleSection {
+  /*max-width: 56rem;*/
+  margin: 0 auto;
+}
+
+.sectionHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-bottom: 0.75rem;
+}
+
+.sectionHeading {
+  display: flex;
+  flex-direction: column;
+}
+
+.sectionTitle {
+  margin: 0;
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #0f172a;
+}
+
+.sectionSubtitle {
+  margin: 0.25rem 0 0;
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: #64748b;
+}
+
+.markAllButton {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  padding: 0.55rem 0.9rem;
+  border-radius: 0.85rem;
+  border: 2px solid #bbf7d0;
+  background-color: #ecfdf5;
+  color: #15803d;
+  font-size: 0.95rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: transform 0.2s ease, box-shadow 0.2s ease, background-color 0.2s ease;
+}
+
+.markAllButton:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 12px 20px -16px rgba(22, 163, 74, 0.35);
+  background-color: #d1fae5;
+}
+
+.markAllIcon {
+  width: 1.05rem;
+  height: 1.05rem;
+}
+
+.scheduleList {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.listItem {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 1.25rem;
+  border-radius: 1.2rem;
+  border: 2px solid #e2e8f0;
+  background-color: #ffffff;
+  box-shadow: 0 1px 3px rgba(15, 23, 42, 0.1), 0 1px 2px -1px rgba(15, 23, 42, 0.1);
+}
+
+.statusButton {
+  width: 60px;
+  height: 60px;
+  border-radius: 999px;
+  border: 3px solid #22c55e;
+  background-color: #ffffff;
+  color: #15803d;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: transform 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.statusButton:hover {
+  transform: translateY(-1px);
+  border-color: #16a34a;
+  box-shadow: 0 10px 18px -16px rgba(22, 163, 74, 0.45);
+}
+
+.statusButtonCompleted {
+  background-color: #2196f3;
+  border-color: #2196f3;
+  color: #ffffff;
+}
+
+.statusIcon {
+  width: 1.1rem;
+  height: 1.1rem;
+}
+
+.itemContent {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+
+.itemTitle {
+  margin: 0;
+  font-size: 1.6rem;
+  font-weight: 700;
+  color: #0f172a;
+}
+
+.itemMeta {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: #475569;
+}
+
+.dose {
+  color: #475569;
+}
+
+.metaDot {
+  color: #94a3b8;
+}
+
+.timeChip {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  color: #2196f3;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.metaIcon {
+  width: 1rem;
+  height: 1rem;
+}
+
+.contextTag {
+  text-transform: uppercase;
+  font-size: 0.75rem;
+  letter-spacing: 0.08em;
+  font-weight: 700;
+}
+
+.contextBefore {
+  color: #fb923c;
+}
+
+.contextWith {
+  color: #16a34a;
+}
+
+.contextAnytime {
+  color: #6366f1;
+}
+
+.contextAfter {
+  color: #f97316;
+}
+
+.contextTaken {
+  color: #15803d;
+}
+
+.moreButton {
+  width: 56px;
+  height: 56px;
+  border-radius: 0.9rem;
+  border: none;
+  background-color: transparent;
+  color: #475569;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: background-color 0.2s ease, color 0.2s ease, transform 0.2s ease;
+}
+
+.moreButton:hover {
+  background-color: #f1f5f9;
+  color: #1f2937;
+  transform: translateY(-1px);
+}
+
+.moreIcon {
+  width: 1.2rem;
+  height: 1.2rem;
+}
+
+.sectionDivider {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin: 1.5rem 0 0.75rem;
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  font-weight: 700;
+  color: #94a3b8;
+}
+
+.dividerLine {
+  flex: 1;
+  height: 1px;
+  background: linear-gradient(90deg, rgba(148, 163, 184, 0.35), rgba(148, 163, 184, 0));
+}
+
+.completedList .listItem {
+  border-color: #d1fae5;
+  background-color: #ecfdf5;
+}
+
+.dayControls {
+  margin: 1.75rem auto 0;
+  /*max-width: 56rem;*/
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  width: 100%;
+}
+
+.navArrow {
+  width: 48px;
+  height: 48px;
+  border-radius: 999px;
+  border: 1px solid #cbd5f5;
+  background-color: #ffffff;
+  color: #1d4ed8;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.navArrow:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 12px 20px -16px rgba(29, 78, 216, 0.35);
+}
+
+.navIcon {
+  width: 1.1rem;
+  height: 1.1rem;
+}
+
+.dateButton {
+  padding: 0.8rem 2.6rem;
+  border-radius: 1rem;
+  border: 1px solid #dbeafe;
+  background-color: #eff6ff;
+  color: #1e3a8a;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.2rem;
+  cursor: pointer;
+  transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
+}
+
+.dateButton:hover {
+  transform: translateY(-1px);
+  border-color: #bfdbfe;
+  box-shadow: 0 18px 30px -24px rgba(29, 78, 216, 0.35);
+}
+
+.datePrimary {
+  font-size: 1rem;
+  font-weight: 700;
+}
+
+.dateSecondary {
+  font-size: 0.8rem;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: rgba(30, 64, 175, 0.75);
+}
+
+.calendarSection {
+  margin: 2rem auto 0;
+  /*max-width: 56rem;*/
+  background-color: #ffffff;
+  border-radius: 1.5rem;
+  padding: 1.5rem;
+  box-shadow: 0 1px 3px rgba(15, 23, 42, 0.1), 0 1px 2px -1px rgba(15, 23, 42, 0.1);
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+}
+
+.calendarHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.calendarTitle {
+  margin: 0;
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: #0f172a;
+}
+
+.calendarNav {
+  width: 40px;
+  height: 40px;
+  border-radius: 999px;
+  border: none;
+  background-color: #eff6ff;
+  color: #1d4ed8;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.calendarNav:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 12px 20px -16px rgba(29, 78, 216, 0.35);
+}
+
+.weekdays {
+  display: grid;
+  grid-template-columns: repeat(7, minmax(0, 1fr));
+  gap: 0.5rem;
+  text-align: center;
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: #94a3b8;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.calendarGrid {
+  display: grid;
+  grid-template-columns: repeat(7, minmax(0, 1fr));
+  gap: 0.5rem;
+}
+
+.calendarDay {
+  height: 48px;
+  border-radius: 1rem;
+  border: 1px solid transparent;
+  background-color: #f8fafc;
+  color: #1f2937;
+  font-size: 0.95rem;
+  font-weight: 600;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
+}
+
+.calendarDay:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 12px 20px -16px rgba(15, 23, 42, 0.35);
+}
+
+.calendarDayToday {
+  background-color: #1d4ed8;
+  border-color: #1d4ed8;
+  color: #ffffff;
+}
+
+.calendarDayAllTaken {
+  background-color: #dcfce7;
+  border-color: #bbf7d0;
+  color: #166534;
+}
+
+.calendarDayPartial {
+  background-color: #fef3c7;
+  border-color: #fde68a;
+  color: #92400e;
+}
+
+.calendarDayScheduled {
+  background-color: #e0f2fe;
+  border-color: #bae6fd;
+  color: #1d4ed8;
+}
+
+.calendarDayMissed {
+  background-color: #fee2e2;
+  border-color: #fecaca;
+  color: #b91c1c;
+}
+
+.calendarLegend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  font-size: 0.85rem;
+  color: #475569;
+}
+
+.legendItem {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.legendSwatch {
+  width: 12px;
+  height: 12px;
+  border-radius: 999px;
+  border: 1px solid transparent;
+}
+
+.legendSwatchSuccess {
+  background-color: #22c55e;
+  border-color: #16a34a;
+}
+
+.legendSwatchWarning {
+  background-color: #f97316;
+  border-color: #ea580c;
+}
+
+.legendSwatchInfo {
+  background-color: #3b82f6;
+  border-color: #2563eb;
+}
+
+.legendSwatchDanger {
+  background-color: #ef4444;
+  border-color: #dc2626;
+}
+
+@media (max-width: 768px) {
+  .headerInner {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.75rem;
+  }
+
+  .headerButtons {
+    align-self: stretch;
+    justify-content: flex-start;
+  }
+
+  .sectionHeader {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .markAllButton span {
+    display: none;
+  }
+
+  .listItem {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .statusButton {
+    align-self: flex-start;
+  }
+
+  .moreButton {
+    align-self: flex-end;
+  }
+
+  .dayControls {
+    gap: 0.75rem;
+  }
+
+  .calendarSection {
+    padding: 1.25rem;
+  }
+}
+
+@media (max-width: 520px) {
+  .content {
+    padding-inline: 0.75rem;
+  }
+
+  .calendarGrid,
+  .weekdays {
+    gap: 0.35rem;
+  }
+
+  .calendarDay {
+    height: 42px;
+  }
+}
+
