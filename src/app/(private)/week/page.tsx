@@ -36,7 +36,12 @@ const MOCK_WEEK_DATA: Record<string, TimeSlot[]> = {
     {
       time: "12:00",
       medications: [
-        { id: "5", name: "Calcium Carbonate", dose: "600mg", mealTiming: "with" },
+        {
+          id: "5",
+          name: "Calcium Carbonate",
+          dose: "600mg",
+          mealTiming: "with",
+        },
         { id: "6", name: "Vitamin D3", dose: "2000 IU", mealTiming: "with" },
       ],
     },
@@ -49,7 +54,12 @@ const MOCK_WEEK_DATA: Record<string, TimeSlot[]> = {
     {
       time: "19:00",
       medications: [
-        { id: "8", name: "Calcium Carbonate", dose: "600mg", mealTiming: "with" },
+        {
+          id: "8",
+          name: "Calcium Carbonate",
+          dose: "600mg",
+          mealTiming: "with",
+        },
         { id: "9", name: "Atorvastatin", dose: "20mg", mealTiming: "after" },
       ],
     },
@@ -138,9 +148,15 @@ function getWeekDays(date: Date): Date[] {
   return days;
 }
 
-function formatDate(date: Date, format: "MMM d" | "EEE" | "d" | "yyyy-MM-dd"): string {
+function formatDate(
+  date: Date,
+  format: "MMM d" | "EEE" | "d" | "yyyy-MM-dd",
+): string {
   if (format === "MMM d") {
-    return new Intl.DateTimeFormat("en-US", { month: "short", day: "numeric" }).format(date);
+    return new Intl.DateTimeFormat("en-US", {
+      month: "short",
+      day: "numeric",
+    }).format(date);
   }
   if (format === "EEE") {
     return new Intl.DateTimeFormat("en-US", { weekday: "short" }).format(date);
@@ -183,30 +199,49 @@ export default async function WeekPage() {
           <div className={styles.headerTop}>
             <h1 className={styles.title}>Week View</h1>
             <div className={styles.headerButtons}>
-              <button type="button" className={styles.printButton} aria-label="Print week schedule">
+              <button
+                type="button"
+                className={styles.printButton}
+                aria-label="Print week schedule"
+              >
                 <PrintIcon className={styles.printIcon} />
                 <span className={styles.printText}>Print</span>
               </button>
-              <button type="button" className={styles.todayButton} aria-label="Go to today">
+              <button
+                type="button"
+                className={styles.todayButton}
+                aria-label="Go to today"
+              >
                 <CalendarIcon className={styles.calendarIcon} />
                 <span>Today</span>
               </button>
             </div>
           </div>
           <div className={styles.weekNavigation}>
-            <button type="button" className={styles.navButton} aria-label="Previous week">
+            <button
+              type="button"
+              className={styles.navButton}
+              aria-label="Previous week"
+            >
               <ChevronLeftIcon className={styles.navIcon} />
               <span className={styles.navText}>Previous</span>
             </button>
             <div className={styles.weekRange}>{weekRange}</div>
-            <button type="button" className={styles.navButton} aria-label="Next week">
+            <button
+              type="button"
+              className={styles.navButton}
+              aria-label="Next week"
+            >
               <span className={styles.navText}>Next</span>
               <ChevronRightIcon className={styles.navIcon} />
             </button>
           </div>
           <div className={styles.filters}>
             <div className={styles.filterGroup}>
-              <button type="button" className={clsx(styles.filterButton, styles.filterButtonActive)}>
+              <button
+                type="button"
+                className={clsx(styles.filterButton, styles.filterButtonActive)}
+              >
                 All
               </button>
               <button type="button" className={styles.filterButton}>
@@ -218,7 +253,10 @@ export default async function WeekPage() {
             </div>
             <div className={styles.filterDivider}></div>
             <div className={styles.filterGroup}>
-              <button type="button" className={clsx(styles.filterButton, styles.filterButtonActive)}>
+              <button
+                type="button"
+                className={clsx(styles.filterButton, styles.filterButtonActive)}
+              >
                 All Meals
               </button>
               <button type="button" className={styles.filterButton}>
@@ -249,10 +287,20 @@ export default async function WeekPage() {
                     return (
                       <th
                         key={dayKey}
-                        className={clsx(styles.dayHeader, isToday && styles.dayHeaderToday)}
+                        className={clsx(
+                          styles.dayHeader,
+                          isToday && styles.dayHeaderToday,
+                        )}
                       >
-                        <div className={styles.dayName}>{formatDate(day, "EEE")}</div>
-                        <div className={clsx(styles.dayNumber, isToday && styles.dayNumberToday)}>
+                        <div className={styles.dayName}>
+                          {formatDate(day, "EEE")}
+                        </div>
+                        <div
+                          className={clsx(
+                            styles.dayNumber,
+                            isToday && styles.dayNumberToday,
+                          )}
+                        >
                           {formatDate(day, "d")}
                         </div>
                       </th>
@@ -273,7 +321,10 @@ export default async function WeekPage() {
                       const medications = slot?.medications || [];
 
                       return (
-                        <td key={`${dayKey}-${time}`} className={styles.dayCell}>
+                        <td
+                          key={`${dayKey}-${time}`}
+                          className={styles.dayCell}
+                        >
                           <div className={styles.medicationsList}>
                             {medications.map((med) => (
                               <div key={med.id} className={styles.medCard}>
@@ -285,12 +336,16 @@ export default async function WeekPage() {
                                   )}
                                   aria-label={`Mark ${med.name} as ${med.isTaken ? "not taken" : "taken"}`}
                                 >
-                                  {med.isTaken && <CheckIcon className={styles.checkIcon} />}
+                                  {med.isTaken && (
+                                    <CheckIcon className={styles.checkIcon} />
+                                  )}
                                 </button>
                                 <div className={styles.medInfo}>
                                   <p className={styles.medName}>{med.name}</p>
                                   <p className={styles.medDose}>{med.dose}</p>
-                                  <p className={styles.medTiming}>{med.mealTiming}</p>
+                                  <p className={styles.medTiming}>
+                                    {med.mealTiming}
+                                  </p>
                                 </div>
                               </div>
                             ))}
@@ -310,17 +365,29 @@ export default async function WeekPage() {
           <div className={styles.quickGuideContent}>
             <div className={styles.quickGuideItem}>
               <div className={styles.quickGuideTodayIndicator}></div>
-              <span className={styles.quickGuideLabel}>Today&apos;s column</span>
+              <span className={styles.quickGuideLabel}>
+                Today&apos;s column
+              </span>
             </div>
             <div className={styles.quickGuideItem}>
-              <div className={clsx(styles.checkbox, styles.checkboxChecked, styles.checkboxSmall)}>
+              <div
+                className={clsx(
+                  styles.checkbox,
+                  styles.checkboxChecked,
+                  styles.checkboxSmall,
+                )}
+              >
                 <CheckIcon className={styles.checkIcon} />
               </div>
               <span className={styles.quickGuideLabel}>Taken medication</span>
             </div>
             <div className={styles.quickGuideItem}>
-              <div className={clsx(styles.checkbox, styles.checkboxSmall)}></div>
-              <span className={styles.quickGuideLabel}>Click checkbox to mark as taken</span>
+              <div
+                className={clsx(styles.checkbox, styles.checkboxSmall)}
+              ></div>
+              <span className={styles.quickGuideLabel}>
+                Click checkbox to mark as taken
+              </span>
             </div>
           </div>
         </div>
