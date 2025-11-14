@@ -36,6 +36,7 @@ const mockMedication = {
   userId: "user123",
   name: "Aspirin",
   dose: "100mg",
+  units: "tablets",
   frequency: 24,
   startDate: new Date("2025-01-01"),
   endDate: new Date("2025-12-31"),

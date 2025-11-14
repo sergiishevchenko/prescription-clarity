@@ -52,9 +52,10 @@ model Medication {
   userId     String           @db.VarChar(32)
   name       String           @db.VarChar(150)
   dose       String           @db.VarChar(100)
-  frequency  Int
-  startDate  DateTime
-  endDate    DateTime
+  units      String           @db.VarChar(50)
+  frequency  Int              // frequency in hours between doses
+  startDate  DateTime         // stored in UTC
+  endDate    DateTime         // stored in UTC
   status     MedicationStatus @default(ACTIVE)
   createdAt  DateTime         @default(now())
   updatedAt  DateTime         @updatedAt
