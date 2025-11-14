@@ -40,6 +40,7 @@ export async function GET(
         id: true,
         name: true,
         dose: true,
+        units: true,
         frequency: true,
         startDate: true,
         endDate: true,
@@ -115,6 +116,9 @@ export async function PATCH(
     if (validatedData.dose !== undefined) {
       updateData.dose = validatedData.dose;
     }
+    if (validatedData.units !== undefined) {
+      updateData.units = validatedData.units;
+    }
     if (validatedData.frequency !== undefined) {
       updateData.frequency = validatedData.frequency;
     }
@@ -144,6 +148,7 @@ export async function PATCH(
         id: true,
         name: true,
         dose: true,
+        units: true,
         frequency: true,
         startDate: true,
         endDate: true,
