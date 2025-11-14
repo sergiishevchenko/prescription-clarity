@@ -3,7 +3,11 @@ import { prisma } from "@/lib/db";
 import { getSessionCookie } from "@/lib/auth/cookies";
 import { verifySession } from "@/lib/auth/session";
 import { getSessionUserFromRequest } from "@/lib/auth/session";
-import { scheduleQuerySchema, createScheduleSchema, type CreateScheduleInput } from "@/lib/validators/schedule";
+import {
+  scheduleQuerySchema,
+  createScheduleSchema,
+  type CreateScheduleInput,
+} from "@/lib/validators/schedule";
 import { generateScheduleEntries } from "@/app/api/schedule/generate/route";
 
 export const runtime = "nodejs";
@@ -100,7 +104,7 @@ export async function POST(request: NextRequest) {
 
     const dateStart = new Date(validatedData.dateStart + "T00:00:00.000Z");
     let dateEnd: Date | null = null;
-    
+
     if (validatedData.durationDays > 0) {
       dateEnd = new Date(dateStart);
       dateEnd.setDate(dateEnd.getDate() + validatedData.durationDays);
