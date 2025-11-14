@@ -37,7 +37,7 @@ export async function generateScheduleEntries(
   const frequencyDays = schedule.frequencyDays as number[];
   const timeOfDay = schedule.timeOfDay as string[];
 
-  let current = new Date(start);
+  const current = new Date(start);
   current.setHours(0, 0, 0, 0);
 
   while (current <= end) {
