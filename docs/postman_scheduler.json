@@ -1,0 +1,157 @@
+{
+  "info": {
+    "name": "Schedule API Test Data",
+    "description": "Test data for medication schedule API"
+  },
+  "requests": [
+    {
+      "name": "1. POST /api/schedule - Create Schedule - Daily, 3 times per day",
+      "method": "POST",
+      "url": "http://localhost:3000/api/schedule",
+      "headers": {
+        "Content-Type": "application/json",
+        "Cookie": "SESSION_ID=your_session_token_here"
+      },
+      "body": {
+        "medicineId": "med123",
+        "quantity": 1,
+        "units": "pill",
+        "frequencyDays": [1, 2, 3, 4, 5, 6, 7],
+        "durationDays": 30,
+        "dateStart": "2025-11-15",
+        "timeOfDay": ["08:00", "13:00", "18:00"],
+        "mealTiming": "before"
+      }
+    },
+    {
+      "name": "2. POST /api/schedule - Create Schedule - Weekdays only (Mon-Fri)",
+      "method": "POST",
+      "url": "http://localhost:3000/api/schedule",
+      "headers": {
+        "Content-Type": "application/json",
+        "Cookie": "SESSION_ID=your_session_token_here"
+      },
+      "body": {
+        "medicineId": "med456",
+        "quantity": 2,
+        "units": "tablet",
+        "frequencyDays": [1, 2, 3, 4, 5],
+        "durationDays": 14,
+        "dateStart": "2025-11-15",
+        "timeOfDay": ["09:00", "21:00"],
+        "mealTiming": "with"
+      }
+    },
+    {
+      "name": "3. POST /api/schedule - Create Schedule - Weekends only (Sat-Sun)",
+      "method": "POST",
+      "url": "http://localhost:3000/api/schedule",
+      "headers": {
+        "Content-Type": "application/json",
+        "Cookie": "SESSION_ID=your_session_token_here"
+      },
+      "body": {
+        "medicineId": "med789",
+        "quantity": 1,
+        "units": "pill",
+        "frequencyDays": [6, 7],
+        "durationDays": 60,
+        "dateStart": "2025-11-15",
+        "timeOfDay": ["10:00"],
+        "mealTiming": "anytime"
+      }
+    },
+    {
+      "name": "4. POST /api/schedule - Create Schedule - No end date (durationDays: 0)",
+      "method": "POST",
+      "url": "http://localhost:3000/api/schedule",
+      "headers": {
+        "Content-Type": "application/json",
+        "Cookie": "SESSION_ID=your_session_token_here"
+      },
+      "body": {
+        "medicineId": "med999",
+        "quantity": 1,
+        "units": "pill",
+        "frequencyDays": [1, 2, 3, 4, 5, 6, 7],
+        "durationDays": 0,
+        "dateStart": "2025-11-15",
+        "timeOfDay": ["08:00", "20:00"],
+        "mealTiming": "after"
+      }
+    },
+    {
+      "name": "5. POST /api/schedule - Create Schedule - Once per day",
+      "method": "POST",
+      "url": "http://localhost:3000/api/schedule",
+      "headers": {
+        "Content-Type": "application/json",
+        "Cookie": "SESSION_ID=your_session_token_here"
+      },
+      "body": {
+        "medicineId": "med111",
+        "quantity": 1,
+        "units": "pill",
+        "frequencyDays": [1, 2, 3, 4, 5, 6, 7],
+        "durationDays": 7,
+        "dateStart": "2025-11-15",
+        "timeOfDay": ["07:30"],
+        "mealTiming": "before"
+      }
+    },
+    {
+      "name": "6. GET /api/schedule - Get Schedule Entries for period",
+      "method": "GET",
+      "url": "http://localhost:3000/api/schedule?from=2025-11-15T00:00:00Z&to=2025-11-30T23:59:59Z&tz=Europe/Kyiv",
+      "headers": {
+        "Cookie": "SESSION_ID=your_session_token_here"
+      }
+    },
+    {
+      "name": "7. PATCH /api/schedule/[id] - Update Schedule Entry Status",
+      "method": "PATCH",
+      "url": "http://localhost:3000/api/schedule/schedule_entry_id_here",
+      "headers": {
+        "Content-Type": "application/json",
+        "Cookie": "SESSION_ID=your_session_token_here"
+      },
+      "body": {
+        "status": "DONE"
+      }
+    },
+    {
+      "name": "8. POST /api/schedule/generate - Generate by scheduleId (new approach)",
+      "method": "POST",
+      "url": "http://localhost:3000/api/schedule/generate",
+      "headers": {
+        "Content-Type": "application/json",
+        "Cookie": "SESSION_ID=your_session_token_here"
+      },
+      "body": {
+        "scheduleId": "schedule_id_from_previous_response"
+      },
+      "note": "Use schedule.id from POST /api/schedule response. Generates entries based on frequencyDays and timeOfDay from Schedule model."
+    },
+    {
+      "name": "9. POST /api/schedule/generate - Generate by medicationId (legacy approach)",
+      "method": "POST",
+      "url": "http://localhost:3000/api/schedule/generate",
+      "headers": {
+        "Content-Type": "application/json",
+        "Cookie": "SESSION_ID=your_session_token_here"
+      },
+      "body": {
+        "medicationId": "medication_id_here"
+      },
+      "note": "Legacy approach: generates entries based on Medication.frequency (hours between doses) and date range from Medication.startDate to Medication.endDate"
+    }
+  ],
+  "fieldReference": {
+    "frequencyDays": "Array of numbers 1-7: 1=Monday, 2=Tuesday, 3=Wednesday, 4=Thursday, 5=Friday, 6=Saturday, 7=Sunday",
+    "mealTiming": "Enum: 'before', 'with', 'after', 'anytime'",
+    "durationDays": "0 = no end date, 1-30 = days, 31-335 = months, 365 = 1 year",
+    "timeOfDay": "Array of time strings in HH:MM format (24-hour), e.g. ['08:00', '13:00', '18:00']",
+    "dateStart": "Format YYYY-MM-DD, must be today or in the future",
+    "authentication": "First login via POST /api/auth/login and use the SESSION_ID cookie value"
+  }
+}
