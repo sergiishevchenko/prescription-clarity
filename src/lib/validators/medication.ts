@@ -64,5 +64,13 @@ export const updateMedicationSchema = z.object({
   endDate: z.string().datetime().optional(),
 });
 
+export const searchMedicationSchema = z.object({
+  name: z
+    .string()
+    .min(3, "Search query must be at least 3 characters")
+    .max(150, "Search query must not exceed 150 characters"),
+});
+
 export type CreateMedicationInput = z.infer<typeof createMedicationSchema>;
 export type UpdateMedicationInput = z.infer<typeof updateMedicationSchema>;
+export type SearchMedicationInput = z.infer<typeof searchMedicationSchema>;
