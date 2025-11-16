@@ -1,3 +1,7 @@
+"use client";
+
+import { useEffect, useRef } from "react";
+
 import styles from "./WizardLayout.module.css";
 
 type WizardLayoutProps = {
@@ -34,10 +38,20 @@ export function WizardLayout({
   actionButtons,
 }: WizardLayoutProps) {
   const progress = (step / totalSteps) * 100;
+  const containerRef = useRef<HTMLDivElement | null>(null);
+
+  useEffect(() => {
+    if (containerRef.current) {
+      containerRef.current.scrollIntoView({
+        behavior: "smooth",
+        block: "start",
+      });
+    }
+  }, [step]);
 
   return (
     <div className={styles.wizard}>
-      <div className={styles.container}>
+      <div className={styles.container} ref={containerRef}>
         {/* Back Button */}
         {onBack && (
           <button type="button" onClick={onBack} className={styles.backButton}>

@@ -1,6 +1,6 @@
 "use client";
 
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 
 import { WizardLayout } from "@/components/medications/WizardLayout";
@@ -8,14 +8,24 @@ import NewMedicationForm from "@/components/medications/NewMedicationForm";
 import MedicationWizardStep1 from "@/components/medications/MedicationWizardStep1";
 import { useToast } from "@/components/shared/ToastProvider";
 import styles from "@/components/medications/WizardLayout.module.css";
+import {
+  persistWizardStep,
+  readWizardStep,
+} from "@/lib/medicationWizardStorage";
 
 export default function NewMedicationFormPage() {
   const router = useRouter();
   const toast = useToast();
-  const [step, setStep] = useState(1);
-  const [isStepValid, setIsStepValid] = useState(false);
-  const validateStepRef = useRef<(() => Promise<boolean>) | null>(null);
   const totalSteps = 5;
+  const [step, setStep] = useState(() => readWizardStep(totalSteps));
+  const [isStepValid, setIsStepValid] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const validateStepRef = useRef<(() => Promise<boolean>) | null>(null);
+  const submitFormRef = useRef<(() => Promise<void> | void) | null>(null);
+
+  useEffect(() => {
+    persistWizardStep(step);
+  }, [step]);
 
   const handleNext = async () => {
     if (step >= totalSteps) return;
@@ -118,6 +128,9 @@ export default function NewMedicationFormPage() {
 
   const getActionButtons = () => {
     if (step !== 5) return undefined;
+    const handleAddMedication = () => {
+      submitFormRef.current?.();
+    };
     return (
       <div className={styles.buttonGroup}>
         <button
@@ -137,9 +150,10 @@ export default function NewMedicationFormPage() {
           Previous
         </button>
         <button
-          type="submit"
-          form="new-medication-form"
+          type="button"
+          onClick={handleAddMedication}
           className={`${styles.button} ${styles.buttonSuccess}`}
+          disabled={isSubmitting}
         >
           <svg
             className={styles.buttonIcon}
@@ -150,7 +164,7 @@ export default function NewMedicationFormPage() {
           >
             <path d="M9 12l2 2 4-4" strokeLinecap="round" strokeLinejoin="round" />
           </svg>
-          Add Medication
+          {isSubmitting ? "Saving..." : "Add Medication"}
         </button>
       </div>
     );
@@ -177,6 +191,8 @@ export default function NewMedicationFormPage() {
         stepOneComponent={<MedicationWizardStep1 />}
         onValidate={setIsStepValid}
         validateStepRef={validateStepRef}
+        submitFormRef={submitFormRef}
+        onSubmittingChange={setIsSubmitting}
       />
     </WizardLayout>
   );

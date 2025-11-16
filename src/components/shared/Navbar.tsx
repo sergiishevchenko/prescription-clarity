@@ -9,10 +9,7 @@ export const fetchCache = "force-no-store";
 
 export async function Navbar() {
   // Force re-evaluation by reading cookies
-  const cookieStore = await cookies();
-  const sessionCookie = cookieStore.get(
-    process.env.SESSION_COOKIE_NAME || "SESSION_ID",
-  );
+  await cookies();
 
   const sessionUser = await getSessionUserFromCookies();
   const isLoggedIn = Boolean(sessionUser);

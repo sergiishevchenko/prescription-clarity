@@ -4,7 +4,7 @@ import dynamic from "next/dynamic";
 import type { ReactNode } from "react";
 import { useFormContext } from "react-hook-form";
 
-import { Tooltip } from "@/components/ui/Tooltip";
+import { HelpTooltip } from "@/components/shared/HelpTooltip";
 import type { FormValues } from "@/lib/medicationTypes";
 import styles from "./MedicationWizardStep1.module.css";
 
@@ -105,6 +105,7 @@ type FieldLabelProps = {
   required?: boolean;
   optionalText?: string;
   tooltip?: ReactNode;
+  tooltipPlacement?: "top" | "bottom";
 };
 
 function FieldLabel({
@@ -113,6 +114,7 @@ function FieldLabel({
   required,
   optionalText,
   tooltip,
+  tooltipPlacement = "top",
 }: FieldLabelProps) {
   return (
     <div className={styles.labelRow}>
@@ -121,11 +123,7 @@ function FieldLabel({
       </label>
       {required && <span className={styles.required}>*</span>}
       {optionalText && <span className={styles.optional}>{optionalText}</span>}
-      {tooltip && (
-        <Tooltip content={tooltip}>
-          <span className={styles.tooltipIcon}>?</span>
-        </Tooltip>
-      )}
+      {tooltip && <HelpTooltip placement={tooltipPlacement}>{tooltip}</HelpTooltip>}
     </div>
   );
 }
@@ -146,6 +144,7 @@ export default function MedicationWizardStep1() {
               label="Medication Name"
               required
               tooltip={medicationNameTooltip}
+              tooltipPlacement="bottom"
             />
             <input
               id="medication-name"
@@ -171,6 +170,7 @@ export default function MedicationWizardStep1() {
                 label="Quantity"
                 required
                 tooltip={quantityTooltip}
+                tooltipPlacement="bottom"
               />
               <input
                 id="medication-quantity"
@@ -202,6 +202,7 @@ export default function MedicationWizardStep1() {
                 label="Dosage (mg)"
                 required
                 tooltip={dosageTooltip}
+                tooltipPlacement="bottom"
               />
               <input
                 id="medication-dosage"
@@ -233,6 +234,7 @@ export default function MedicationWizardStep1() {
                 label="Units"
                 required
                 tooltip={unitTooltip}
+                tooltipPlacement="bottom"
               />
               <div className={styles.selectWrapper}>
                 <select
@@ -278,6 +280,7 @@ export default function MedicationWizardStep1() {
               label="Medication Photo"
               optionalText="(Optional)"
               tooltip={photoTooltip}
+              tooltipPlacement="bottom"
             />
             <div className={styles.photoContent}>
               <PhotoUploader />

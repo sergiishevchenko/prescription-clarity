@@ -9,7 +9,6 @@ type Profile = {
 };
 
 export default function ProfilePage() {
-  const [profile, setProfile] = useState<Profile | null>(null);
   const [name, setName] = useState<string>("");
   const [email, setEmail] = useState<string>("");
   const [loading, setLoading] = useState<boolean>(true);
@@ -29,10 +28,9 @@ export default function ProfilePage() {
         }
         const data = (await res.json()) as { user: Profile };
         if (!isMounted) return;
-        setProfile(data.user);
         setName(data.user.name ?? "");
         setEmail(data.user.email);
-      } catch (e) {
+      } catch {
         if (!isMounted) return;
         setError("Unable to load profile. Please try again.");
       } finally {
@@ -60,8 +58,7 @@ export default function ProfilePage() {
         const body = await res.json().catch(() => ({}));
         throw new Error(body?.error || "Failed to save changes");
       }
-      const data = (await res.json()) as { user: Profile };
-      setProfile(data.user);
+      await res.json();
       setMessage("Profile updated successfully.");
     } catch (e) {
       setError(e instanceof Error ? e.message : "Failed to save changes");

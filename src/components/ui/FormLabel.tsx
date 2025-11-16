@@ -1,11 +1,12 @@
 "use client";
 
-import { Tooltip } from "./Tooltip";
+import { HelpTooltip } from "@/components/shared/HelpTooltip";
 
 type FormLabelProps = {
   htmlFor?: string;
   required?: boolean;
   tooltip?: React.ReactNode;
+  tooltipPlacement?: "top" | "bottom";
   children: React.ReactNode;
 };
 
@@ -13,6 +14,7 @@ export function FormLabel({
   htmlFor,
   required = false,
   tooltip,
+  tooltipPlacement = "top",
   children,
 }: FormLabelProps) {
   return (
@@ -28,11 +30,7 @@ export function FormLabel({
           </span>
         )}
         {tooltip && (
-          <Tooltip content={tooltip}>
-            <span className="w-4 h-4 rounded-full bg-gray-200 text-gray-600 flex items-center justify-center text-xs hover:bg-gray-300 transition-colors cursor-help">
-              ?
-            </span>
-          </Tooltip>
+          <HelpTooltip placement={tooltipPlacement}>{tooltip}</HelpTooltip>
         )}
       </span>
     </label>

@@ -233,6 +233,14 @@
   background-color: #f3f4f6;
 }
 
+.button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  pointer-events: none;
+  box-shadow: none;
+  transform: none;
+}
+
 .buttonIcon {
   width: 1.25rem;
   height: 1.25rem;

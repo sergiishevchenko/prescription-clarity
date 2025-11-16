@@ -152,6 +152,57 @@
   margin-top: 1rem;
 }
 
+.helperText {
+  font-size: 0.95rem;
+  color: #6b7694;
+  line-height: 1.5;
+  margin: 0.15rem 0 0;
+}
+
+.statusRow {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  font-size: 0.9rem;
+  font-weight: 600;
+}
+
+.statusCentered {
+  width: 100%;
+  justify-content: center;
+  margin-top: 0.35rem;
+}
+
+.statusSuccess {
+  color: #0f9d58;
+}
+
+.statusWarning {
+  color: #c05621;
+}
+
+.cardTitle {
+  font-size: 1.2rem;
+  font-weight: 600;
+  color: #0f172a;
+}
+
+.cardDescription {
+  font-size: 0.95rem;
+  color: #6b7694;
+  line-height: 1.4;
+  margin-top: 0.35rem;
+  display: block;
+}
+
+.cardTitleActive {
+  color: #1479ff;
+}
+
+.cardDescriptionActive {
+  color: #1479ff;
+}
+
 @media (max-width: 1024px) {
   .surface {
     padding: 2rem 1.75rem;
