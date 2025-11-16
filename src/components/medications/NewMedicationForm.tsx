@@ -200,8 +200,8 @@ export default function NewMedicationForm({
         required === 1
           ? "Please select a time of day."
           : required === 2
-          ? "Please select a second time of day for your twice-daily medication."
-          : "Please select all three times of day for your medication.",
+            ? "Please select a second time of day for your twice-daily medication."
+            : "Please select all three times of day for your medication.",
       );
     } else if (timesOfDay.length > required) {
       const order: TimeOfDay[] = ["morning", "afternoon", "evening"];
@@ -395,7 +395,8 @@ export default function NewMedicationForm({
                     </span>
                     <span className={stepStyles.required}>*</span>
                     <HelpTooltip>
-                      Set how many reminders you need per day for this medication.
+                      Set how many reminders you need per day for this
+                      medication.
                     </HelpTooltip>
                   </div>
                   <p className={stepStyles.helperText}>
@@ -420,14 +421,16 @@ export default function NewMedicationForm({
                           key={value}
                           type="button"
                           onClick={() => setValue("frequency", value)}
-                          className={`rounded-[20px] border-2 px-5 py-4 text-left transition focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-[#1479FF]/20 ${
+                          className={`rounded-[20px] border-2 px-5 py-4 text-left transition focus-visible:ring-4 focus-visible:ring-[#1479FF]/20 focus-visible:outline-none ${
                             isActive
                               ? "border-[#1479FF] bg-[#F0F7FF] shadow-[0_18px_35px_rgba(20,121,255,0.2)]"
                               : "border-[#E5E7EB] bg-white hover:border-[#BFD9FF] hover:bg-[#F8FAFF]"
                           }`}
                         >
                           <span className={titleClass}>{label}</span>
-                          <span className={descriptionClass}>{description}</span>
+                          <span className={descriptionClass}>
+                            {description}
+                          </span>
                         </button>
                       );
                     })}
@@ -453,7 +456,8 @@ export default function NewMedicationForm({
                     <span className={stepStyles.labelText}>Meal Timing</span>
                     <span className={stepStyles.required}>*</span>
                     <HelpTooltip>
-                      Tell us when you usually take this medication relative to meals.
+                      Tell us when you usually take this medication relative to
+                      meals.
                     </HelpTooltip>
                   </div>
                   <p className={stepStyles.helperText}>
@@ -465,30 +469,34 @@ export default function NewMedicationForm({
                     {...register("mealTiming")}
                   />
                   <div className="mt-4 grid grid-cols-1 gap-4 md:grid-cols-2">
-                    {MEAL_TIMING_OPTIONS.map(({ value, label, description }) => {
-                      const isActive = mealTiming === value;
-                      const titleClass = `${stepStyles.cardTitle} ${
-                        isActive ? stepStyles.cardTitleActive : ""
-                      }`;
-                      const descriptionClass = `${stepStyles.cardDescription} ${
-                        isActive ? stepStyles.cardDescriptionActive : ""
-                      }`;
-                      return (
-                        <button
-                          key={value}
-                          type="button"
-                          onClick={() => setValue("mealTiming", value)}
-                          className={`rounded-[20px] border-2 px-5 py-4 text-left transition focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-[#1479FF]/20 ${
-                            isActive
-                              ? "border-[#1479FF] bg-[#F0F7FF] shadow-[0_18px_35px_rgba(20,121,255,0.2)]"
-                              : "border-[#E5E7EB] bg-white hover:border-[#BFD9FF] hover:bg-[#F8FAFF]"
-                          }`}
-                        >
-                          <span className={titleClass}>{label}</span>
-                          <span className={descriptionClass}>{description}</span>
-                        </button>
-                      );
-                    })}
+                    {MEAL_TIMING_OPTIONS.map(
+                      ({ value, label, description }) => {
+                        const isActive = mealTiming === value;
+                        const titleClass = `${stepStyles.cardTitle} ${
+                          isActive ? stepStyles.cardTitleActive : ""
+                        }`;
+                        const descriptionClass = `${stepStyles.cardDescription} ${
+                          isActive ? stepStyles.cardDescriptionActive : ""
+                        }`;
+                        return (
+                          <button
+                            key={value}
+                            type="button"
+                            onClick={() => setValue("mealTiming", value)}
+                            className={`rounded-[20px] border-2 px-5 py-4 text-left transition focus-visible:ring-4 focus-visible:ring-[#1479FF]/20 focus-visible:outline-none ${
+                              isActive
+                                ? "border-[#1479FF] bg-[#F0F7FF] shadow-[0_18px_35px_rgba(20,121,255,0.2)]"
+                                : "border-[#E5E7EB] bg-white hover:border-[#BFD9FF] hover:bg-[#F8FAFF]"
+                            }`}
+                          >
+                            <span className={titleClass}>{label}</span>
+                            <span className={descriptionClass}>
+                              {description}
+                            </span>
+                          </button>
+                        );
+                      },
+                    )}
                   </div>
                 </div>
               </div>
@@ -509,7 +517,9 @@ export default function NewMedicationForm({
                         Choose which days you need to take this medication.
                       </p>
                       <div>
-                        <p className="text-sm font-semibold text-white">Quick options:</p>
+                        <p className="text-sm font-semibold text-white">
+                          Quick options:
+                        </p>
                         <ul className="mt-1 list-disc space-y-1 pl-4 text-sm text-white/80">
                           <li>
                             <strong>All Days:</strong> Every day of the week
@@ -528,8 +538,8 @@ export default function NewMedicationForm({
                       <p className="flex items-start gap-2 text-sm text-[#FBBF24]">
                         <span aria-hidden="true">💡</span>
                         <span>
-                          Some medications are only needed on specific days (e.g., weekly supplements on
-                          Sundays).
+                          Some medications are only needed on specific days
+                          (e.g., weekly supplements on Sundays).
                         </span>
                       </p>
                     </div>
@@ -547,7 +557,7 @@ export default function NewMedicationForm({
 
         {step === 4 && <DatesAndDuration />}
 
-        {step === 5 && (
+        {step === 5 &&
           (() => {
             const slotOrder: TimeOfDay[] = ["morning", "afternoon", "evening"];
             const selectedSlots = slotOrder.filter((slot) =>
@@ -561,7 +571,7 @@ export default function NewMedicationForm({
                 <div className={stepStyles.surface}>
                   <div className="space-y-6">
                     <div className="rounded-[24px] border border-[#E5E7EB] bg-white px-6 py-6 shadow-[0_18px_40px_rgba(15,23,42,0.07)]">
-                      <p className="text-[13px] font-medium uppercase tracking-wide text-gray-500">
+                      <p className="text-[13px] font-medium tracking-wide text-gray-500 uppercase">
                         Medication
                       </p>
                       <h3 className="mt-1 text-[22px] font-semibold text-[#111827]">
@@ -586,11 +596,10 @@ export default function NewMedicationForm({
                         </div>
                         <div className="mt-4 space-y-3">
                           {displayedSlots.map((slot) => {
-                            const key =
-                              `${slot}Time` as
-                                | "morningTime"
-                                | "afternoonTime"
-                                | "eveningTime";
+                            const key = `${slot}Time` as
+                              | "morningTime"
+                              | "afternoonTime"
+                              | "eveningTime";
                             const value = allValues[key];
                             return (
                               <div
@@ -623,7 +632,8 @@ export default function NewMedicationForm({
                         </div>
                         {selectedSlots.length === 0 && (
                           <p className="mt-3 text-[12px] text-[#D97706]">
-                            Choose a time of day on Step 2 to finish your schedule.
+                            Choose a time of day on Step 2 to finish your
+                            schedule.
                           </p>
                         )}
                       </div>
@@ -677,8 +687,7 @@ export default function NewMedicationForm({
                 </div>
               </section>
             );
-          })()
-        )}
+          })()}
       </form>
     </FormProvider>
   );

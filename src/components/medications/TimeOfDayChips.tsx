@@ -51,9 +51,7 @@ export default function TimeOfDayChips({ selected, onToggle, error }: Props) {
 
   const required = Number(freq || 1) || 1;
   const label =
-    required === 1
-      ? "Select 1 Time of Day"
-      : `Select ${required} Times of Day`;
+    required === 1 ? "Select 1 Time of Day" : `Select ${required} Times of Day`;
   const selectedCount = Math.min(selected.length, required);
   const isComplete = selectedCount === required;
   const statusClass = isComplete
@@ -103,8 +101,8 @@ export default function TimeOfDayChips({ selected, onToggle, error }: Props) {
             slot === "morning"
               ? morningTime
               : slot === "afternoon"
-              ? afternoonTime
-              : eveningTime;
+                ? afternoonTime
+                : eveningTime;
           const helper = timeValue
             ? formatTimeValue(timeValue)
             : SLOT_META[slot].helper;
@@ -120,14 +118,16 @@ export default function TimeOfDayChips({ selected, onToggle, error }: Props) {
               key={slot}
               type="button"
               onClick={() => onToggle(slot)}
-              className={`rounded-[22px] border-2 px-4 py-4 text-left transition focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-[#1479FF]/20 ${
+              className={`rounded-[22px] border-2 px-4 py-4 text-left transition focus-visible:ring-4 focus-visible:ring-[#1479FF]/20 focus-visible:outline-none ${
                 active
                   ? "border-[#1479FF] bg-[#F0F7FF] shadow-[0_18px_35px_rgba(20,121,255,0.2)]"
                   : "border-[#E5E7EB] bg-white hover:border-[#93C5FD] hover:bg-[#F8FAFF]"
               }`}
             >
               <div className="flex items-center gap-4">
-                <div className={`flex h-12 w-12 items-center justify-center ${iconColor}`}>
+                <div
+                  className={`flex h-12 w-12 items-center justify-center ${iconColor}`}
+                >
                   {TIME_OF_DAY_ICONS[slot]}
                 </div>
                 <div>

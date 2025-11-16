@@ -123,7 +123,9 @@ function FieldLabel({
       </label>
       {required && <span className={styles.required}>*</span>}
       {optionalText && <span className={styles.optional}>{optionalText}</span>}
-      {tooltip && <HelpTooltip placement={tooltipPlacement}>{tooltip}</HelpTooltip>}
+      {tooltip && (
+        <HelpTooltip placement={tooltipPlacement}>{tooltip}</HelpTooltip>
+      )}
     </div>
   );
 }

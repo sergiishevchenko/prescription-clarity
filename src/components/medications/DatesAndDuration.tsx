@@ -154,9 +154,7 @@ export default function DatesAndDuration() {
         >
           <span
             className={`inline-flex h-5 w-5 items-center justify-center rounded-md border ${
-              ongoing
-                ? "border-white bg-white/20"
-                : "border-[#9CA3AF] bg-white"
+              ongoing ? "border-white bg-white/20" : "border-[#9CA3AF] bg-white"
             }`}
           >
             {ongoing && (
@@ -189,7 +187,7 @@ export default function DatesAndDuration() {
                 handleValueChange(Number(event.target.value))
               }
               disabled={ongoing}
-              className="mt-2 h-[56px] rounded-2xl border-2 border-[#E0E7FF] px-4 text-lg font-semibold text-[#0F172A] outline-none transition focus:border-[#2563EB] focus:ring-2 focus:ring-[#93C5FD] disabled:cursor-not-allowed disabled:opacity-50"
+              className="mt-2 h-[56px] rounded-2xl border-2 border-[#E0E7FF] px-4 text-lg font-semibold text-[#0F172A] transition outline-none focus:border-[#2563EB] focus:ring-2 focus:ring-[#93C5FD] disabled:cursor-not-allowed disabled:opacity-50"
             />
           </div>
           <div className="flex flex-col">
@@ -202,7 +200,7 @@ export default function DatesAndDuration() {
                 handleUnitChange(event.target.value as DurationUnit)
               }
               disabled={ongoing}
-              className="mt-2 h-[56px] rounded-2xl border-2 border-[#E0E7FF] bg-white px-4 text-base font-medium text-[#0F172A] outline-none transition focus:border-[#2563EB] focus:ring-2 focus:ring-[#93C5FD] disabled:cursor-not-allowed disabled:opacity-50"
+              className="mt-2 h-[56px] rounded-2xl border-2 border-[#E0E7FF] bg-white px-4 text-base font-medium text-[#0F172A] transition outline-none focus:border-[#2563EB] focus:ring-2 focus:ring-[#93C5FD] disabled:cursor-not-allowed disabled:opacity-50"
             >
               {DURATION_UNITS.map((option) => (
                 <option key={option.value} value={option.value}>
@@ -245,9 +243,7 @@ export default function DatesAndDuration() {
       </div>
 
       <div className="rounded-[24px] border border-[#E5E7EB] bg-white px-6 py-6 shadow-sm">
-        <p className="text-base font-semibold text-[#111827]">
-          Schedule dates
-        </p>
+        <p className="text-base font-semibold text-[#111827]">Schedule dates</p>
         <p className="text-sm text-[#6B7280]">
           Adjust start and end dates if your plan changes.
         </p>

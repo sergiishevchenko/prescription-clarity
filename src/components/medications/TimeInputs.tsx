@@ -35,9 +35,9 @@ const INPUT_META: Record<
 
 export default function TimeInputs({ selected }: Props) {
   const { register } = useFormContext<FormValues>();
-  const activeSlots = (["morning", "afternoon", "evening"] as TimeOfDay[]).filter(
-    (slot) => selected.includes(slot),
-  );
+  const activeSlots = (
+    ["morning", "afternoon", "evening"] as TimeOfDay[]
+  ).filter((slot) => selected.includes(slot));
 
   if (!activeSlots.length) {
     return null;
@@ -54,12 +54,10 @@ export default function TimeInputs({ selected }: Props) {
           >
             <div className="flex items-start justify-between gap-3">
               <div>
-                <p className={stepStyles.labelText}>
-                  {meta.label} Reminder
-                </p>
+                <p className={stepStyles.labelText}>{meta.label} Reminder</p>
                 <p className={stepStyles.helperText}>{meta.helper}</p>
               </div>
-              <span className="rounded-full bg-[#EEF2FF] px-3 py-1 text-[12px] font-semibold uppercase tracking-wide text-[#4338CA]">
+              <span className="rounded-full bg-[#EEF2FF] px-3 py-1 text-[12px] font-semibold tracking-wide text-[#4338CA] uppercase">
                 Time
               </span>
             </div>

@@ -96,9 +96,7 @@ export function WizardLayout({
         {/* Step Header with Icon */}
         {(stepIcon || stepTitle || stepSubtitle) && (
           <div className={styles.stepHeader}>
-            {stepIcon && (
-              <div className={styles.iconContainer}>{stepIcon}</div>
-            )}
+            {stepIcon && <div className={styles.iconContainer}>{stepIcon}</div>}
             {stepTitle && <h2 className={styles.stepTitle}>{stepTitle}</h2>}
             {stepSubtitle && (
               <p className={styles.stepSubtitle}>{stepSubtitle}</p>

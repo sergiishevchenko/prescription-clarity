@@ -87,14 +87,24 @@ export default function NewMedicationFormPage() {
     switch (step) {
       case 1:
         return (
-          <svg {...iconProps} stroke="#1479FF" strokeLinecap="round" strokeLinejoin="round">
+          <svg
+            {...iconProps}
+            stroke="#1479FF"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+          >
             <path d="M10.5 20.5 20.5 10.5a4.95 4.95 0 0 0-7-7L3.5 13.5a4.95 4.95 0 0 0 7 7Z" />
             <path d="m8.5 8.5 7 7" />
           </svg>
         );
       case 2:
         return (
-          <svg {...iconProps} stroke="#1D9BF0" strokeLinecap="round" strokeLinejoin="round">
+          <svg
+            {...iconProps}
+            stroke="#1D9BF0"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+          >
             <circle cx="12" cy="12" r="7" />
             <path d="M12 9v4l2 2" />
           </svg>
@@ -145,7 +155,11 @@ export default function NewMedicationFormPage() {
             stroke="currentColor"
             strokeWidth="2"
           >
-            <path d="M15 18l-6-6 6-6" strokeLinecap="round" strokeLinejoin="round" />
+            <path
+              d="M15 18l-6-6 6-6"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            />
           </svg>
           Previous
         </button>
@@ -162,7 +176,11 @@ export default function NewMedicationFormPage() {
             stroke="currentColor"
             strokeWidth="2"
           >
-            <path d="M9 12l2 2 4-4" strokeLinecap="round" strokeLinejoin="round" />
+            <path
+              d="M9 12l2 2 4-4"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            />
           </svg>
           {isSubmitting ? "Saving..." : "Add Medication"}
         </button>
@@ -182,7 +200,9 @@ export default function NewMedicationFormPage() {
       stepSubtitle={subtitleMap[step]}
       stepIcon={getStepIcon()}
       helpText={
-        step === 1 ? "Taking a photo helps you identify your medication easily" : undefined
+        step === 1
+          ? "Taking a photo helps you identify your medication easily"
+          : undefined
       }
       actionButtons={getActionButtons()}
     >

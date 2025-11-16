@@ -20,12 +20,12 @@ export function FormLabel({
   return (
     <label
       htmlFor={htmlFor}
-      className="block text-[14px] font-medium text-gray-700 mb-2"
+      className="mb-2 block text-[14px] font-medium text-gray-700"
     >
       <span className="flex items-center gap-1.5">
         {children}
         {required && (
-          <span className="text-red-500 text-[14px] font-medium leading-none">
+          <span className="text-[14px] leading-none font-medium text-red-500">
             *
           </span>
         )}
@@ -36,4 +36,3 @@ export function FormLabel({
     </label>
   );
 }
-

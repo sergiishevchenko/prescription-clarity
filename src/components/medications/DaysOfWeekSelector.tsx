@@ -15,7 +15,11 @@ const PRESETS = [
   { id: "weekends", label: "Weekends", labels: DAY_LABELS.slice(5) },
 ] as const;
 
-export default function DaysOfWeekSelector({ selected, onToggle, onApplyPreset }: Props) {
+export default function DaysOfWeekSelector({
+  selected,
+  onToggle,
+  onApplyPreset,
+}: Props) {
   const selectedSet = new Set(selected);
   const orderedSelection = DAY_LABELS.filter((label) => selectedSet.has(label));
 

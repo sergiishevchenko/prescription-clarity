@@ -23,7 +23,13 @@ export default function DosageAndQuantity() {
                 How many <strong>pills</strong> or <strong>units</strong> you
                 take at each dose.
               </p>
-              <p style={{ fontWeight: 600, marginBottom: "0.5rem", marginTop: "0.75rem" }}>
+              <p
+                style={{
+                  fontWeight: 600,
+                  marginBottom: "0.5rem",
+                  marginTop: "0.75rem",
+                }}
+              >
                 Examples:
               </p>
               <ul>
@@ -62,7 +68,13 @@ export default function DosageAndQuantity() {
                 The amount of medication in each dose. Look for this on your
                 prescription label.
               </p>
-              <p style={{ fontWeight: 600, marginBottom: "0.5rem", marginTop: "0.75rem" }}>
+              <p
+                style={{
+                  fontWeight: 600,
+                  marginBottom: "0.5rem",
+                  marginTop: "0.75rem",
+                }}
+              >
                 Examples:
               </p>
               <ul>
