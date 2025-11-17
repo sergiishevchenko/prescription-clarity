@@ -280,7 +280,7 @@ export default async function WeekPage() {
               <thead>
                 <tr>
                   <th className={styles.timeHeader}>Time</th>
-                  {weekDays.map((day, index) => {
+                  {weekDays.map((day) => {
                     const dayKey = formatDate(day, "yyyy-MM-dd");
                     const todayKey = formatDate(today, "yyyy-MM-dd");
                     const isToday = dayKey === todayKey;

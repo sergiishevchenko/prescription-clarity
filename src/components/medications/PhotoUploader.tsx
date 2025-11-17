@@ -1,8 +1,17 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import clsx from "clsx";
+import {
+  useEffect,
+  useRef,
+  useState,
+  type KeyboardEvent,
+  type MouseEvent,
+} from "react";
 import { useFormContext } from "react-hook-form";
+
 import type { FormValues } from "@/lib/medicationTypes";
+import styles from "./PhotoUploader.module.css";
 
 export default function PhotoUploader() {
   const { register, setValue, clearErrors } = useFormContext<FormValues>();
@@ -73,13 +82,22 @@ export default function PhotoUploader() {
 
   const reg = register("photo");
 
-  return (
-    <div className="mt-4">
-      <label className="block text-base font-medium text-gray-900">
-        Medication Photo <span className="text-gray-500">(Optional)</span>
-      </label>
+  const openFileDialog = () => inputRef.current?.click();
 
-      {/* СХОВАНЕ поле file (не відображається взагалі) */}
+  const handleKeyDown = (e: KeyboardEvent<HTMLDivElement>) => {
+    if (e.key === "Enter" || e.key === " ") {
+      e.preventDefault();
+      openFileDialog();
+    }
+  };
+
+  const handlePickClick = (e: MouseEvent<HTMLButtonElement>) => {
+    e.stopPropagation();
+    openFileDialog();
+  };
+
+  return (
+    <div className={styles.wrapper}>
       <input
         type="file"
         accept="image/png,image/jpeg"
@@ -93,18 +111,16 @@ export default function PhotoUploader() {
         onChange={(e) => validateAndSet(e.target.files?.[0])}
       />
 
-      {/* Клікабельна зона (вся область у штриховій рамці) */}
       <div
         role="button"
         tabIndex={0}
         aria-label="Upload medication photo"
-        onClick={() => inputRef.current?.click()}
-        onKeyDown={(e) => {
-          if (e.key === "Enter" || e.key === " ") {
-            e.preventDefault();
-            inputRef.current?.click();
-          }
-        }}
+        className={clsx(styles.dropZone, {
+          [styles.dropZoneActive]: dragOver,
+          [styles.dropZonePreview]: Boolean(previewUrl),
+        })}
+        onClick={openFileDialog}
+        onKeyDown={handleKeyDown}
         onDragOver={(e) => {
           e.preventDefault();
           setDragOver(true);
@@ -113,35 +129,95 @@ export default function PhotoUploader() {
         onDrop={(e) => {
           e.preventDefault();
           setDragOver(false);
-          const f = e.dataTransfer.files?.[0];
-          validateAndSet(f);
+          const file = e.dataTransfer.files?.[0];
+          validateAndSet(file);
         }}
-        className={[
-          "mt-2 block w-full cursor-pointer rounded-xl border-2 border-dashed p-6 text-center transition",
-          dragOver
-            ? "border-indigo-500 bg-indigo-50"
-            : "border-gray-300 hover:bg-gray-50 focus:ring-2 focus:ring-indigo-500/50 focus:outline-none",
-        ].join(" ")}
       >
-        <div className="mx-auto mb-3 grid h-12 w-12 place-items-center rounded-full bg-indigo-50 text-2xl text-indigo-600">
-          📷
-        </div>
-        <p className="text-sm text-gray-700">Click to upload photo</p>
-        <p className="text-xs text-gray-500">PNG, JPG (MAX. 5MB)</p>
-
-        {previewUrl && (
-          <div className="mt-4 flex justify-center">
+        {previewUrl ? (
+          <>
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img
               src={previewUrl}
-              alt="Preview"
-              className="max-h-48 rounded-md border"
+              alt="Medication preview"
+              className={styles.previewImage}
             />
-          </div>
+            <button
+              type="button"
+              className={styles.uploadButton}
+              onClick={handlePickClick}
+              aria-label="Change photo"
+            >
+              <UploadIcon />
+            </button>
+          </>
+        ) : (
+          <>
+            <div className={styles.cameraBadge}>
+              <CameraIcon />
+            </div>
+            <button
+              type="button"
+              className={styles.uploadButton}
+              onClick={handlePickClick}
+              aria-label="Select photo"
+            >
+              <UploadIcon />
+            </button>
+          </>
         )}
       </div>
 
-      {error && <p className="mt-2 text-sm text-red-600">{error}</p>}
+      <p className={styles.primaryText}>Click to upload a photo</p>
+      <p className={styles.caption}>Maximum size: 5MB</p>
+
+      {previewUrl && (
+        <button
+          type="button"
+          className={styles.removeButton}
+          onClick={() => validateAndSet(undefined)}
+        >
+          Remove photo
+        </button>
+      )}
+
+      {error && <p className={styles.errorText}>{error}</p>}
     </div>
+  );
+}
+
+function CameraIcon() {
+  return (
+    <svg
+      className={styles.cameraIcon}
+      viewBox="0 0 32 32"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="1.8"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      aria-hidden="true"
+    >
+      <circle cx="16" cy="16" r="6" />
+      <path d="M6 10h3l2-3h10l2 3h3a3 3 0 0 1 3 3v11a3 3 0 0 1-3 3H6a3 3 0 0 1-3-3V13a3 3 0 0 1 3-3z" />
+    </svg>
+  );
+}
+
+function UploadIcon() {
+  return (
+    <svg
+      className={styles.uploadIcon}
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      aria-hidden="true"
+    >
+      <path d="M12 5v11" />
+      <path d="M8 9l4-4 4 4" />
+      <path d="M5 19h14" />
+    </svg>
   );
 }
