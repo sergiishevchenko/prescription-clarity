@@ -55,21 +55,28 @@ describe("POST /api/medications/search", () => {
     expect(data.error).toBe("Invalid input data");
   });
 
-  it("should search medications by name and return only name, dose, units", async () => {
+  it("should search medications by name and return full model except id", async () => {
     jest
       .spyOn(SessionModule, "getSessionUserFromRequest")
       .mockResolvedValueOnce(mockUser);
 
+    const now = new Date();
     const mockMedications = [
       {
         name: "Aspirin",
-        dose: "100mg",
-        units: "tablets",
+        dose: 100,
+        form: "tablets",
+        deletedAt: null,
+        createdAt: now,
+        updatedAt: now,
       },
       {
         name: "Aspirin Extra",
-        dose: "200mg",
-        units: "tablets",
+        dose: 200,
+        form: "tablets",
+        deletedAt: null,
+        createdAt: now,
+        updatedAt: now,
       },
     ];
 
@@ -84,21 +91,23 @@ describe("POST /api/medications/search", () => {
 
     expect(res.status).toBe(200);
     expect(data.medications).toHaveLength(2);
-    expect(data.medications[0]).toEqual({
+    expect(data.medications[0]).toMatchObject({
       name: "Aspirin",
-      dose: "100mg",
-      units: "tablets",
+      dose: 100,
+      form: "tablets",
+      deletedAt: null,
     });
-    expect(data.medications[1]).toEqual({
+    expect(data.medications[1]).toMatchObject({
       name: "Aspirin Extra",
-      dose: "200mg",
-      units: "tablets",
+      dose: 200,
+      form: "tablets",
+      deletedAt: null,
     });
 
     expect(prismaMock.medication.findMany).toHaveBeenCalledWith({
       where: {
         userId: "user123",
-        status: "ACTIVE",
+        deletedAt: null,
         name: {
           contains: "Asp",
           mode: "insensitive",
@@ -110,7 +119,10 @@ describe("POST /api/medications/search", () => {
       select: {
         name: true,
         dose: true,
-        units: true,
+        form: true,
+        deletedAt: true,
+        createdAt: true,
+        updatedAt: true,
       },
     });
   });
@@ -120,11 +132,15 @@ describe("POST /api/medications/search", () => {
       .spyOn(SessionModule, "getSessionUserFromRequest")
       .mockResolvedValueOnce(mockUser);
 
+    const now = new Date();
     const mockMedications = [
       {
         name: "Aspirin",
-        dose: "100mg",
-        units: "tablets",
+        dose: 100,
+        form: "tablets",
+        deletedAt: null,
+        createdAt: now,
+        updatedAt: now,
       },
     ];
 
@@ -142,6 +158,7 @@ describe("POST /api/medications/search", () => {
     expect(prismaMock.medication.findMany).toHaveBeenCalledWith(
       expect.objectContaining({
         where: expect.objectContaining({
+          deletedAt: null,
           name: {
             contains: "asp",
             mode: "insensitive",
@@ -169,7 +186,7 @@ describe("POST /api/medications/search", () => {
     expect(data.medications).toHaveLength(0);
   });
 
-  it("should only search ACTIVE medications", async () => {
+  it("should only search non-deleted medications", async () => {
     jest
       .spyOn(SessionModule, "getSessionUserFromRequest")
       .mockResolvedValueOnce(mockUser);
@@ -185,7 +202,7 @@ describe("POST /api/medications/search", () => {
     expect(prismaMock.medication.findMany).toHaveBeenCalledWith(
       expect.objectContaining({
         where: expect.objectContaining({
-          status: "ACTIVE",
+          deletedAt: null,
         }),
       }),
     );
