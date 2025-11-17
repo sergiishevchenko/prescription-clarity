@@ -101,56 +101,19 @@ export async function POST(request: NextRequest) {
         throw error;
       }
     } else if (medicationId) {
-      const medication = await prisma.medication.findFirst({
-        where: { id: medicationId, userId: user.id },
-      });
-
-      if (!medication) {
-        return NextResponse.json(
-          { error: "Medication not found" },
-          { status: 404 },
-        );
-      }
-
-      const frequencyHours = medication.frequency;
-      if (frequencyHours <= 0) {
-        return NextResponse.json(
-          { error: "Medication frequency must be positive hours" },
-          { status: 400 },
-        );
-      }
-
-      const entries: {
-        medicationId: string;
-        userId: string;
-        dateTime: Date;
-      }[] = [];
-      const start = new Date(medication.startDate);
-      const end = new Date(medication.endDate);
-
-      let current = new Date(start);
-      while (current <= end) {
-        entries.push({
-          medicationId: medication.id,
-          userId: user.id,
-          dateTime: new Date(current),
-        });
-        current = new Date(current.getTime() + frequencyHours * 60 * 60 * 1000);
-      }
-
-      if (entries.length === 0) {
-        return NextResponse.json({ created: 0, skipped: 0 });
-      }
-
-      const result = await prisma.scheduleEntry.createMany({
-        data: entries,
-        skipDuplicates: true,
-      });
-
-      return NextResponse.json({ created: result.count });
+      // NOTE: Medication-based schedule generation is deprecated
+      // Medications no longer have frequency/startDate/endDate fields
+      // Use Schedule model instead for scheduling functionality
+      return NextResponse.json(
+        {
+          error:
+            "Medication-based schedule generation is no longer supported. Please use Schedule model instead.",
+        },
+        { status: 400 },
+      );
     } else {
       return NextResponse.json(
-        { error: "Either scheduleId or medicationId must be provided" },
+        { error: "scheduleId must be provided" },
         { status: 400 },
       );
     }
