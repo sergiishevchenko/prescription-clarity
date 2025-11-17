@@ -8,24 +8,28 @@ describe("Medication validators", () => {
     expect(() =>
       createMedicationSchema.parse({
         name: "Ibuprofen",
-        dose: "200mg",
-        units: "tablets",
-        frequency: 8,
-        startDate: "2025-02-01T00:00:00.000Z",
-        endDate: "2025-02-10T00:00:00.000Z",
+        dose: 200,
+        form: "tablets",
       }),
     ).not.toThrow();
   });
 
-  it("rejects create payload with non-positive frequency", () => {
+  it("rejects create payload with non-positive dose", () => {
     expect(() =>
       createMedicationSchema.parse({
         name: "Ibuprofen",
-        dose: "200mg",
-        units: "tablets",
-        frequency: 0,
-        startDate: "2025-02-01T00:00:00.000Z",
-        endDate: "2025-02-10T00:00:00.000Z",
+        dose: 0,
+        form: "tablets",
+      }),
+    ).toThrow();
+  });
+
+  it("rejects create payload with negative dose", () => {
+    expect(() =>
+      createMedicationSchema.parse({
+        name: "Ibuprofen",
+        dose: -200,
+        form: "tablets",
       }),
     ).toThrow();
   });
@@ -34,54 +38,39 @@ describe("Medication validators", () => {
     expect(() =>
       updateMedicationSchema.parse({
         name: "Updated",
-        frequency: 12,
       }),
     ).not.toThrow();
   });
 
-  it("rejects update payload with invalid date format", () => {
+  it("rejects update payload with negative dose", () => {
     expect(() =>
       updateMedicationSchema.parse({
-        startDate: "tomorrow" as string,
+        dose: -5,
       }),
     ).toThrow();
   });
 
-  it("rejects update payload with negative frequency", () => {
-    expect(() =>
-      updateMedicationSchema.parse({
-        frequency: -5,
-      }),
-    ).toThrow();
-  });
-
-  it("rejects create payload with missing units field", () => {
+  it("rejects create payload with missing form field", () => {
     expect(() =>
       createMedicationSchema.parse({
         name: "Ibuprofen",
-        dose: "200mg",
-        frequency: 8,
-        startDate: "2025-02-01T00:00:00.000Z",
-        endDate: "2025-02-10T00:00:00.000Z",
+        dose: 200,
       }),
     ).toThrow();
   });
 
-  it("rejects create payload with invalid units value", () => {
+  it("rejects create payload with invalid form value", () => {
     expect(() =>
       createMedicationSchema.parse({
         name: "Ibuprofen",
-        dose: "200mg",
-        units: "invalid-unit",
-        frequency: 8,
-        startDate: "2025-02-01T00:00:00.000Z",
-        endDate: "2025-02-10T00:00:00.000Z",
+        dose: 200,
+        form: "invalid-form",
       }),
     ).toThrow();
   });
 
-  it("accepts create payload with different valid units", () => {
-    const validUnitTests = [
+  it("accepts create payload with different valid form values", () => {
+    const validFormTests = [
       "tablets",
       "capsules",
       "lozenges",
@@ -90,45 +79,88 @@ describe("Medication validators", () => {
       "ml",
     ];
 
-    validUnitTests.forEach((unit) => {
+    validFormTests.forEach((form) => {
       expect(() =>
         createMedicationSchema.parse({
           name: "Medication",
-          dose: "100",
-          units: unit,
-          frequency: 12,
-          startDate: "2025-02-01T00:00:00.000Z",
-          endDate: "2025-02-10T00:00:00.000Z",
+          dose: 100,
+          form: form,
         }),
       ).not.toThrow();
     });
   });
 
-  it("accepts update payload with valid units", () => {
+  it("accepts update payload with valid form", () => {
     expect(() =>
       updateMedicationSchema.parse({
-        units: "capsules",
+        form: "capsules",
       }),
     ).not.toThrow();
   });
 
-  it("rejects update payload with invalid units value", () => {
+  it("rejects update payload with invalid form value", () => {
     expect(() =>
       updateMedicationSchema.parse({
-        units: "invalid-unit-type",
+        form: "invalid-form-type",
       }),
     ).toThrow();
   });
 
-  it("rejects create payload with empty units string", () => {
+  it("rejects create payload with empty form string", () => {
     expect(() =>
       createMedicationSchema.parse({
         name: "Ibuprofen",
-        dose: "200mg",
-        units: "",
-        frequency: 8,
-        startDate: "2025-02-01T00:00:00.000Z",
-        endDate: "2025-02-10T00:00:00.000Z",
+        dose: 200,
+        form: "",
+      }),
+    ).toThrow();
+  });
+
+  it("accepts dose as string and coerces to number", () => {
+    const result = createMedicationSchema.parse({
+      name: "Aspirin",
+      dose: "100",
+      form: "tablets",
+    });
+
+    expect(result.dose).toBe(100);
+    expect(typeof result.dose).toBe("number");
+  });
+
+  it("rejects non-integer dose values", () => {
+    expect(() =>
+      createMedicationSchema.parse({
+        name: "Aspirin",
+        dose: 100.5,
+        form: "tablets",
+      }),
+    ).toThrow();
+  });
+
+  it("rejects create payload with missing name", () => {
+    expect(() =>
+      createMedicationSchema.parse({
+        dose: 100,
+        form: "tablets",
+      }),
+    ).toThrow();
+  });
+
+  it("rejects create payload with empty name", () => {
+    expect(() =>
+      createMedicationSchema.parse({
+        name: "",
+        dose: 100,
+        form: "tablets",
+      }),
+    ).toThrow();
+  });
+
+  it("rejects create payload with missing dose", () => {
+    expect(() =>
+      createMedicationSchema.parse({
+        name: "Aspirin",
+        form: "tablets",
       }),
     ).toThrow();
   });

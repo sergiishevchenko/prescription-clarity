@@ -1,6 +1,6 @@
 import { z } from "zod";
 
-const validUnits = [
+const validForms = [
   "tablets",
   "capsules",
   "lozenges",
@@ -24,20 +24,14 @@ export const createMedicationSchema = z.object({
     .string()
     .min(1, "Name is required")
     .max(150, "Medication name must not exceed 150 characters"),
-  dose: z
+  dose: z.coerce.number().int().positive("Dose must be a positive integer"),
+  form: z
     .string()
-    .min(1, "Dose is required")
-    .max(100, "Dose must not exceed 100 characters"),
-  units: z
-    .string()
-    .min(1, "Units are required")
-    .max(50, "Units must not exceed 50 characters")
-    .refine((val) => validUnits.includes(val as (typeof validUnits)[number]), {
-      message: `Units must be one of: ${validUnits.join(", ")}`,
+    .min(1, "Form is required")
+    .max(50, "Form must not exceed 50 characters")
+    .refine((val) => validForms.includes(val as (typeof validForms)[number]), {
+      message: `Form must be one of: ${validForms.join(", ")}`,
     }),
-  frequency: z.coerce.number().int().positive(),
-  startDate: z.string().datetime(),
-  endDate: z.string().datetime(),
 });
 
 export const updateMedicationSchema = z.object({
@@ -46,22 +40,19 @@ export const updateMedicationSchema = z.object({
     .min(1, "Name is required")
     .max(150, "Medication name must not exceed 150 characters")
     .optional(),
-  dose: z
-    .string()
-    .min(1, "Dose is required")
-    .max(100, "Dose must not exceed 100 characters")
+  dose: z.coerce
+    .number()
+    .int()
+    .positive("Dose must be a positive integer")
     .optional(),
-  units: z
+  form: z
     .string()
-    .min(1, "Units are required")
-    .max(50, "Units must not exceed 50 characters")
-    .refine((val) => validUnits.includes(val as (typeof validUnits)[number]), {
-      message: `Units must be one of: ${validUnits.join(", ")}`,
+    .min(1, "Form is required")
+    .max(50, "Form must not exceed 50 characters")
+    .refine((val) => validForms.includes(val as (typeof validForms)[number]), {
+      message: `Form must be one of: ${validForms.join(", ")}`,
     })
     .optional(),
-  frequency: z.coerce.number().int().positive().optional(),
-  startDate: z.string().datetime().optional(),
-  endDate: z.string().datetime().optional(),
 });
 
 export const searchMedicationSchema = z.object({

@@ -25,21 +25,11 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    // Get query parameters
-    const { searchParams } = new URL(request.url);
-    const status = searchParams.get("status"); // optional: filter by ACTIVE/DELETED
-
-    // Build where clause
+    // Build where clause - only return non-deleted medications
     const where: MedicationWhere = {
       userId: user.id,
+      deletedAt: null,
     };
-
-    if (status === "ACTIVE" || status === "DELETED") {
-      where.status = status;
-    } else {
-      // By default, only return ACTIVE medications
-      where.status = "ACTIVE";
-    }
 
     // Fetch medications
     const medications = await prisma.medication.findMany({
@@ -51,11 +41,7 @@ export async function GET(request: NextRequest) {
         id: true,
         name: true,
         dose: true,
-        units: true,
-        frequency: true,
-        startDate: true,
-        endDate: true,
-        status: true,
+        form: true,
         createdAt: true,
         updatedAt: true,
       },
@@ -88,61 +74,19 @@ export async function POST(request: NextRequest) {
     const validatedData: CreateMedicationInput =
       createMedicationSchema.parse(body);
 
-    // Validate date range
-    const startDate = new Date(validatedData.startDate);
-    const endDate = new Date(validatedData.endDate);
-
-    if (endDate <= startDate) {
-      return NextResponse.json(
-        { error: "End date must be after start date" },
-        { status: 400 },
-      );
-    }
-
-    // Check for duplicate medication (same name and dose)
-    const existingMedication = await prisma.medication.findFirst({
-      where: {
-        userId: user.id,
-        name: {
-          equals: validatedData.name,
-          mode: "insensitive",
-        },
-        dose: {
-          equals: validatedData.dose,
-          mode: "insensitive",
-        },
-        status: "ACTIVE",
-      },
-    });
-
-    if (existingMedication) {
-      return NextResponse.json(
-        { error: "Medication with this name and dose already exists" },
-        { status: 409 },
-      );
-    }
-
     // Create medication
     const medication = await prisma.medication.create({
       data: {
         userId: user.id,
         name: validatedData.name,
         dose: validatedData.dose,
-        units: validatedData.units,
-        frequency: validatedData.frequency,
-        startDate,
-        endDate,
-        status: "ACTIVE",
+        form: validatedData.form,
       },
       select: {
         id: true,
         name: true,
         dose: true,
-        units: true,
-        frequency: true,
-        startDate: true,
-        endDate: true,
-        status: true,
+        form: true,
         createdAt: true,
         updatedAt: true,
       },
