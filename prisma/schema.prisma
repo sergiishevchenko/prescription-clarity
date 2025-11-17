@@ -25,6 +25,7 @@ model User {
   sessions     Session[]
   medications  Medication[]
   scheduleEntries ScheduleEntry[]
+  schedules    Schedule[]
 }
 
 model Session {
@@ -73,18 +74,44 @@ enum ScheduleStatus {
   DONE
 }
 
+model Schedule {
+  id            String          @id @default(cuid()) @db.VarChar(32)
+  medicineId    String          @db.VarChar(32)
+  userId        String          @db.VarChar(32)
+  quantity      Int             @default(1)
+  units         String          @default("pill") @db.VarChar(50)
+  frequencyDays Json
+  durationDays  Int
+  dateStart     DateTime
+  dateEnd       DateTime?
+  timeOfDay     Json
+  mealTiming    String          @default("anytime") @db.VarChar(20)
+  createdAt     DateTime        @default(now())
+  updatedAt     DateTime        @updatedAt
+
+  user          User            @relation(fields: [userId], references: [id], onDelete: Cascade)
+  scheduleEntries ScheduleEntry[]
+
+  @@index([userId])
+  @@index([medicineId])
+  @@index([dateStart])
+}
+
 model ScheduleEntry {
   id           String          @id @default(cuid()) @db.VarChar(32)
-  medicationId String          @db.VarChar(32)
+  scheduleId   String?          @db.VarChar(32)
+  medicationId String?          @db.VarChar(32)
   userId       String          @db.VarChar(32)
-  dateTime     DateTime        // stored in UTC
+  dateTime     DateTime
   status       ScheduleStatus  @default(PLANNED)
   createdAt    DateTime        @default(now())
   updatedAt    DateTime        @updatedAt
 
-  medication   Medication      @relation(fields: [medicationId], references: [id], onDelete: Cascade)
+  schedule     Schedule?       @relation(fields: [scheduleId], references: [id], onDelete: Cascade)
+  medication   Medication?     @relation(fields: [medicationId], references: [id], onDelete: SetNull)
   user         User            @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@index([userId, dateTime])
+  @@index([scheduleId, dateTime])
   @@unique([medicationId, dateTime])
 }

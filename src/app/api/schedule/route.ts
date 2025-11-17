@@ -2,7 +2,13 @@ import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
 import { getSessionCookie } from "@/lib/auth/cookies";
 import { verifySession } from "@/lib/auth/session";
-import { scheduleQuerySchema } from "@/lib/validators/schedule";
+import { getSessionUserFromRequest } from "@/lib/auth/session";
+import {
+  scheduleQuerySchema,
+  createScheduleSchema,
+  type CreateScheduleInput,
+} from "@/lib/validators/schedule";
+import { generateScheduleEntries } from "@/app/api/schedule/generate/route";
 
 export const runtime = "nodejs";
 
@@ -79,6 +85,85 @@ export async function GET(request: NextRequest) {
       );
     }
     console.error("List schedule error:", error);
+    return NextResponse.json(
+      { error: "Internal server error" },
+      { status: 500 },
+    );
+  }
+}
+
+export async function POST(request: NextRequest) {
+  try {
+    const user = await getSessionUserFromRequest(request);
+    if (!user) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+
+    const body = await request.json();
+    const validatedData: CreateScheduleInput = createScheduleSchema.parse(body);
+
+    const dateStart = new Date(validatedData.dateStart + "T00:00:00.000Z");
+    let dateEnd: Date | null = null;
+
+    if (validatedData.durationDays > 0) {
+      dateEnd = new Date(dateStart);
+      dateEnd.setDate(dateEnd.getDate() + validatedData.durationDays);
+    }
+
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    if (dateStart < today) {
+      return NextResponse.json(
+        { error: "dateStart must be today or in the future" },
+        { status: 400 },
+      );
+    }
+
+    const schedule = await prisma.schedule.create({
+      data: {
+        medicineId: validatedData.medicineId,
+        userId: user.id,
+        quantity: validatedData.quantity,
+        units: validatedData.units,
+        frequencyDays: validatedData.frequencyDays,
+        durationDays: validatedData.durationDays,
+        dateStart,
+        dateEnd,
+        timeOfDay: validatedData.timeOfDay,
+        mealTiming: validatedData.mealTiming,
+      },
+      select: {
+        id: true,
+        medicineId: true,
+        userId: true,
+        quantity: true,
+        units: true,
+        frequencyDays: true,
+        durationDays: true,
+        dateStart: true,
+        dateEnd: true,
+        timeOfDay: true,
+        mealTiming: true,
+        createdAt: true,
+        updatedAt: true,
+      },
+    });
+
+    try {
+      await generateScheduleEntries(schedule.id, user.id);
+    } catch (error) {
+      console.error("Error generating schedule entries:", error);
+    }
+
+    return NextResponse.json({ schedule }, { status: 201 });
+  } catch (error) {
+    if (error instanceof Error && error.name === "ZodError") {
+      return NextResponse.json(
+        { error: "Invalid input data", details: error },
+        { status: 400 },
+      );
+    }
+    console.error("POST /api/schedule error:", error);
     return NextResponse.json(
       { error: "Internal server error" },
       { status: 500 },
