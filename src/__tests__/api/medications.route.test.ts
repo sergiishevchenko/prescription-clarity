@@ -52,12 +52,9 @@ describe("GET /api/medications", () => {
         id: "med1",
         userId: "user123",
         name: "Aspirin",
-        dose: "100mg",
-        frequency: 24,
-        units: "tablets",
-        startDate: new Date("2025-01-01"),
-        endDate: new Date("2025-12-31"),
-        status: "ACTIVE" as const,
+        dose: 100,
+        form: "tablets",
+        deletedAt: null,
         createdAt: new Date(),
         updatedAt: new Date(),
       },
@@ -75,13 +72,13 @@ describe("GET /api/medications", () => {
       expect.objectContaining({
         where: expect.objectContaining({
           userId: "user123",
-          status: "ACTIVE",
+          deletedAt: null,
         }),
       }),
     );
   });
 
-  it("should filter by status=ACTIVE query parameter", async () => {
+  it("should filter by deletedAt=null to show active medications", async () => {
     jest
       .spyOn(SessionModule, "getSessionUserFromRequest")
       .mockResolvedValueOnce(mockUser);
@@ -91,92 +88,9 @@ describe("GET /api/medications", () => {
         id: "med1",
         userId: "user123",
         name: "Aspirin",
-        dose: "100mg",
-        frequency: 24,
-        units: "tablets",
-        startDate: new Date("2025-01-01"),
-        endDate: new Date("2025-12-31"),
-        status: "ACTIVE" as const,
-        createdAt: new Date(),
-        updatedAt: new Date(),
-      },
-    ];
-
-    prismaMock.medication.findMany.mockResolvedValueOnce(mockActiveMedications);
-
-    const res = await MedicationsRoute.GET(makeGetReq("?status=ACTIVE"));
-    const data = await res.json();
-
-    expect(res.status).toBe(200);
-    expect(data.medications).toHaveLength(1);
-    expect(data.medications[0].status).toBe("ACTIVE");
-    expect(prismaMock.medication.findMany).toHaveBeenCalledWith(
-      expect.objectContaining({
-        where: expect.objectContaining({
-          userId: "user123",
-          status: "ACTIVE",
-        }),
-      }),
-    );
-  });
-
-  it("should filter by status=DELETED query parameter", async () => {
-    jest
-      .spyOn(SessionModule, "getSessionUserFromRequest")
-      .mockResolvedValueOnce(mockUser);
-
-    const mockDeletedMedications = [
-      {
-        id: "med2",
-        userId: "user123",
-        name: "Old Medicine",
-        dose: "50mg",
-        frequency: 12,
-        units: "tablets",
-        startDate: new Date("2024-01-01"),
-        endDate: new Date("2024-12-31"),
-        status: "DELETED" as const,
-        createdAt: new Date(),
-        updatedAt: new Date(),
-      },
-    ];
-
-    prismaMock.medication.findMany.mockResolvedValueOnce(
-      mockDeletedMedications,
-    );
-
-    const res = await MedicationsRoute.GET(makeGetReq("?status=DELETED"));
-    const data = await res.json();
-
-    expect(res.status).toBe(200);
-    expect(data.medications).toHaveLength(1);
-    expect(data.medications[0].status).toBe("DELETED");
-    expect(prismaMock.medication.findMany).toHaveBeenCalledWith(
-      expect.objectContaining({
-        where: expect.objectContaining({
-          userId: "user123",
-          status: "DELETED",
-        }),
-      }),
-    );
-  });
-
-  it("should only return ACTIVE medications when no status parameter is provided", async () => {
-    jest
-      .spyOn(SessionModule, "getSessionUserFromRequest")
-      .mockResolvedValueOnce(mockUser);
-
-    const mockActiveMedications = [
-      {
-        id: "med1",
-        userId: "user123",
-        name: "Aspirin",
-        dose: "100mg",
-        frequency: 24,
-        units: "tablets",
-        startDate: new Date("2025-01-01"),
-        endDate: new Date("2025-12-31"),
-        status: "ACTIVE" as const,
+        dose: 100,
+        form: "tablets",
+        deletedAt: null,
         createdAt: new Date(),
         updatedAt: new Date(),
       },
@@ -189,19 +103,18 @@ describe("GET /api/medications", () => {
 
     expect(res.status).toBe(200);
     expect(data.medications).toHaveLength(1);
-    expect(data.medications[0].status).toBe("ACTIVE");
-    // Verify that the where clause specifically filters for ACTIVE status
+    expect(data.medications[0].deletedAt).toBeNull();
     expect(prismaMock.medication.findMany).toHaveBeenCalledWith(
       expect.objectContaining({
         where: expect.objectContaining({
           userId: "user123",
-          status: "ACTIVE",
+          deletedAt: null,
         }),
       }),
     );
   });
 
-  it("should fallback to ACTIVE when status parameter is invalid", async () => {
+  it("should not include deleted medications regardless of query parameter", async () => {
     jest
       .spyOn(SessionModule, "getSessionUserFromRequest")
       .mockResolvedValueOnce(mockUser);
@@ -211,12 +124,9 @@ describe("GET /api/medications", () => {
         id: "med1",
         userId: "user123",
         name: "Aspirin",
-        dose: "100mg",
-        frequency: 24,
-        units: "tablets",
-        startDate: new Date("2025-01-01"),
-        endDate: new Date("2025-12-31"),
-        status: "ACTIVE" as const,
+        dose: 100,
+        form: "tablets",
+        deletedAt: null,
         createdAt: new Date(),
         updatedAt: new Date(),
       },
@@ -224,7 +134,80 @@ describe("GET /api/medications", () => {
 
     prismaMock.medication.findMany.mockResolvedValueOnce(mockActiveMedications);
 
-    const res = await MedicationsRoute.GET(makeGetReq("?status=ARCHIVED"));
+    const res = await MedicationsRoute.GET(makeGetReq("?deleted=true"));
+    const data = await res.json();
+
+    expect(res.status).toBe(200);
+    expect(data.medications).toHaveLength(1);
+    expect(data.medications[0].deletedAt).toBeNull();
+    expect(prismaMock.medication.findMany).toHaveBeenCalledWith(
+      expect.objectContaining({
+        where: expect.objectContaining({
+          userId: "user123",
+          deletedAt: null,
+        }),
+      }),
+    );
+  });
+
+  it("should only return active medications when no parameter is provided", async () => {
+    jest
+      .spyOn(SessionModule, "getSessionUserFromRequest")
+      .mockResolvedValueOnce(mockUser);
+
+    const mockActiveMedications = [
+      {
+        id: "med1",
+        userId: "user123",
+        name: "Aspirin",
+        dose: 100,
+        form: "tablets",
+        deletedAt: null,
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      },
+    ];
+
+    prismaMock.medication.findMany.mockResolvedValueOnce(mockActiveMedications);
+
+    const res = await MedicationsRoute.GET(makeGetReq());
+    const data = await res.json();
+
+    expect(res.status).toBe(200);
+    expect(data.medications).toHaveLength(1);
+    expect(data.medications[0].deletedAt).toBeNull();
+    // Verify that the where clause specifically filters for active (not deleted) medications
+    expect(prismaMock.medication.findMany).toHaveBeenCalledWith(
+      expect.objectContaining({
+        where: expect.objectContaining({
+          userId: "user123",
+          deletedAt: null,
+        }),
+      }),
+    );
+  });
+
+  it("should fallback to active medications when parameter is invalid", async () => {
+    jest
+      .spyOn(SessionModule, "getSessionUserFromRequest")
+      .mockResolvedValueOnce(mockUser);
+
+    const mockActiveMedications = [
+      {
+        id: "med1",
+        userId: "user123",
+        name: "Aspirin",
+        dose: 100,
+        form: "tablets",
+        deletedAt: null,
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      },
+    ];
+
+    prismaMock.medication.findMany.mockResolvedValueOnce(mockActiveMedications);
+
+    const res = await MedicationsRoute.GET(makeGetReq("?deleted=invalid"));
     const data = await res.json();
 
     expect(res.status).toBe(200);
@@ -233,7 +216,7 @@ describe("GET /api/medications", () => {
       expect.objectContaining({
         where: expect.objectContaining({
           userId: "user123",
-          status: "ACTIVE",
+          deletedAt: null,
         }),
       }),
     );
@@ -272,11 +255,8 @@ describe("POST /api/medications", () => {
     const res = await MedicationsRoute.POST(
       makePostReq({
         name: "Aspirin",
-        dose: "100mg",
-        frequency: 24,
-        units: "tablets",
-        startDate: "2025-01-01T00:00:00Z",
-        endDate: "2025-12-31T00:00:00Z",
+        dose: 100,
+        form: "tablets",
       }),
     );
     const data = await res.json();
@@ -290,19 +270,13 @@ describe("POST /api/medications", () => {
       .spyOn(SessionModule, "getSessionUserFromRequest")
       .mockResolvedValueOnce(mockUser);
 
-    // No existing medication found
-    prismaMock.medication.findFirst.mockResolvedValueOnce(null);
-
     const mockCreatedMedication = {
       id: "med1",
       userId: "user123",
       name: "Aspirin",
-      dose: "100mg",
-      frequency: 24,
-      units: "tablets",
-      startDate: new Date("2025-01-01"),
-      endDate: new Date("2025-12-31"),
-      status: "ACTIVE" as const,
+      dose: 100,
+      form: "tablets",
+      deletedAt: null,
       createdAt: new Date(),
       updatedAt: new Date(),
     };
@@ -312,51 +286,25 @@ describe("POST /api/medications", () => {
     const res = await MedicationsRoute.POST(
       makePostReq({
         name: "Aspirin",
-        dose: "100mg",
-        frequency: 24,
-        units: "tablets",
-        startDate: "2025-01-01T00:00:00Z",
-        endDate: "2025-12-31T00:00:00Z",
+        dose: 100,
+        form: "tablets",
       }),
     );
     const data = await res.json();
 
     expect(res.status).toBe(201);
     expect(data.medication.name).toBe("Aspirin");
-    expect(data.medication.status).toBe("ACTIVE");
+    expect(data.medication.deletedAt).toBeNull();
     expect(prismaMock.medication.create).toHaveBeenCalledWith(
       expect.objectContaining({
         data: expect.objectContaining({
           userId: "user123",
           name: "Aspirin",
-          dose: "100mg",
-          frequency: 24,
-          units: "tablets",
-          status: "ACTIVE",
+          dose: 100,
+          form: "tablets",
         }),
       }),
     );
-  });
-
-  it("should return 400 if end date is before start date", async () => {
-    jest
-      .spyOn(SessionModule, "getSessionUserFromRequest")
-      .mockResolvedValueOnce(mockUser);
-
-    const res = await MedicationsRoute.POST(
-      makePostReq({
-        name: "Aspirin",
-        dose: "100mg",
-        frequency: 24,
-        units: "tablets",
-        startDate: "2025-12-31T00:00:00Z",
-        endDate: "2025-01-01T00:00:00Z",
-      }),
-    );
-    const data = await res.json();
-
-    expect(res.status).toBe(400);
-    expect(data.error).toBe("End date must be after start date");
   });
 
   it("should return 400 on invalid input data", async () => {
@@ -367,246 +315,13 @@ describe("POST /api/medications", () => {
     const res = await MedicationsRoute.POST(
       makePostReq({
         name: "",
-        dose: "100mg",
-        frequency: 24,
+        dose: 100,
       }),
     );
     const data = await res.json();
 
     expect(res.status).toBe(400);
     expect(data.error).toBe("Invalid input data");
-  });
-
-  it("should return 409 if medication with same name and dose already exists", async () => {
-    jest
-      .spyOn(SessionModule, "getSessionUserFromRequest")
-      .mockResolvedValueOnce(mockUser);
-
-    const existingMedication = {
-      id: "med1",
-      userId: "user123",
-      name: "Aspirin",
-      dose: "100mg",
-      frequency: 24,
-      startDate: new Date("2025-01-01"),
-      endDate: new Date("2025-12-31"),
-      status: "ACTIVE" as const,
-      createdAt: new Date(),
-      updatedAt: new Date(),
-    };
-
-    prismaMock.medication.findFirst.mockResolvedValueOnce(existingMedication);
-
-    const res = await MedicationsRoute.POST(
-      makePostReq({
-        name: "Aspirin",
-        dose: "100mg",
-        units: "tablets",
-        frequency: 12,
-        startDate: "2025-02-01T00:00:00Z",
-        endDate: "2025-12-31T00:00:00Z",
-      }),
-    );
-    const data = await res.json();
-
-    expect(res.status).toBe(409);
-    expect(data.error).toBe(
-      "Medication with this name and dose already exists",
-    );
-    expect(prismaMock.medication.findFirst).toHaveBeenCalledWith({
-      where: {
-        userId: "user123",
-        name: {
-          equals: "Aspirin",
-          mode: "insensitive",
-        },
-        dose: {
-          equals: "100mg",
-          mode: "insensitive",
-        },
-        status: "ACTIVE",
-      },
-    });
-    expect(prismaMock.medication.create).not.toHaveBeenCalled();
-  });
-
-  it("should allow creating medication with same name but different dose", async () => {
-    jest
-      .spyOn(SessionModule, "getSessionUserFromRequest")
-      .mockResolvedValueOnce(mockUser);
-
-    // No existing medication found
-    prismaMock.medication.findFirst.mockResolvedValueOnce(null);
-
-    const mockCreatedMedication = {
-      id: "med2",
-      userId: "user123",
-      name: "Aspirin",
-      dose: "200mg",
-      frequency: 12,
-      units: "tablets",
-      startDate: new Date("2025-01-01"),
-      endDate: new Date("2025-12-31"),
-      status: "ACTIVE" as const,
-      createdAt: new Date(),
-      updatedAt: new Date(),
-    };
-
-    prismaMock.medication.create.mockResolvedValueOnce(mockCreatedMedication);
-
-    const res = await MedicationsRoute.POST(
-      makePostReq({
-        name: "Aspirin",
-        dose: "200mg",
-        frequency: 12,
-        units: "tablets",
-        startDate: "2025-01-01T00:00:00Z",
-        endDate: "2025-12-31T00:00:00Z",
-      }),
-    );
-    const data = await res.json();
-
-    expect(res.status).toBe(201);
-    expect(data.medication.name).toBe("Aspirin");
-    expect(data.medication.dose).toBe("200mg");
-    expect(prismaMock.medication.create).toHaveBeenCalled();
-  });
-
-  it("should allow creating medication with same dose but different name", async () => {
-    jest
-      .spyOn(SessionModule, "getSessionUserFromRequest")
-      .mockResolvedValueOnce(mockUser);
-
-    // No existing medication found
-    prismaMock.medication.findFirst.mockResolvedValueOnce(null);
-
-    const mockCreatedMedication = {
-      id: "med3",
-      userId: "user123",
-      name: "Ibuprofen",
-      dose: "100mg",
-      frequency: 12,
-      units: "tablets",
-      startDate: new Date("2025-01-01"),
-      endDate: new Date("2025-12-31"),
-      status: "ACTIVE" as const,
-      createdAt: new Date(),
-      updatedAt: new Date(),
-    };
-
-    prismaMock.medication.create.mockResolvedValueOnce(mockCreatedMedication);
-
-    const res = await MedicationsRoute.POST(
-      makePostReq({
-        name: "Ibuprofen",
-        dose: "100mg",
-        frequency: 12,
-        units: "tablets",
-        startDate: "2025-01-01T00:00:00Z",
-        endDate: "2025-12-31T00:00:00Z",
-      }),
-    );
-    const data = await res.json();
-
-    expect(res.status).toBe(201);
-    expect(data.medication.name).toBe("Ibuprofen");
-    expect(data.medication.dose).toBe("100mg");
-    expect(prismaMock.medication.create).toHaveBeenCalled();
-  });
-
-  it("should perform case-insensitive duplicate check", async () => {
-    jest
-      .spyOn(SessionModule, "getSessionUserFromRequest")
-      .mockResolvedValueOnce(mockUser);
-
-    const existingMedication = {
-      id: "med1",
-      userId: "user123",
-      name: "aspirin",
-      dose: "100mg",
-      frequency: 24,
-      units: "tablets",
-      startDate: new Date("2025-01-01"),
-      endDate: new Date("2025-12-31"),
-      status: "ACTIVE" as const,
-      createdAt: new Date(),
-      updatedAt: new Date(),
-    };
-
-    prismaMock.medication.findFirst.mockResolvedValueOnce(existingMedication);
-
-    const res = await MedicationsRoute.POST(
-      makePostReq({
-        name: "ASPIRIN",
-        dose: "100MG",
-        frequency: 12,
-        units: "tablets",
-        startDate: "2025-02-01T00:00:00Z",
-        endDate: "2025-12-31T00:00:00Z",
-      }),
-    );
-    const data = await res.json();
-
-    expect(res.status).toBe(409);
-    expect(data.error).toBe(
-      "Medication with this name and dose already exists",
-    );
-    expect(prismaMock.medication.findFirst).toHaveBeenCalledWith({
-      where: {
-        userId: "user123",
-        name: {
-          equals: "ASPIRIN",
-          mode: "insensitive",
-        },
-        dose: {
-          equals: "100MG",
-          mode: "insensitive",
-        },
-        status: "ACTIVE",
-      },
-    });
-  });
-
-  it("should allow creating medication if same name and dose exists but status is DELETED", async () => {
-    jest
-      .spyOn(SessionModule, "getSessionUserFromRequest")
-      .mockResolvedValueOnce(mockUser);
-
-    // No ACTIVE medication found (only DELETED ones exist)
-    prismaMock.medication.findFirst.mockResolvedValueOnce(null);
-
-    const mockCreatedMedication = {
-      id: "med4",
-      userId: "user123",
-      name: "Aspirin",
-      dose: "100mg",
-      frequency: 24,
-      units: "tablets",
-      startDate: new Date("2025-01-01"),
-      endDate: new Date("2025-12-31"),
-      status: "ACTIVE" as const,
-      createdAt: new Date(),
-      updatedAt: new Date(),
-    };
-
-    prismaMock.medication.create.mockResolvedValueOnce(mockCreatedMedication);
-
-    const res = await MedicationsRoute.POST(
-      makePostReq({
-        name: "Aspirin",
-        dose: "100mg",
-        frequency: 24,
-        units: "tablets",
-        startDate: "2025-01-01T00:00:00Z",
-        endDate: "2025-12-31T00:00:00Z",
-      }),
-    );
-    const data = await res.json();
-
-    expect(res.status).toBe(201);
-    expect(data.medication.name).toBe("Aspirin");
-    expect(data.medication.dose).toBe("100mg");
-    expect(prismaMock.medication.create).toHaveBeenCalled();
   });
 
   it("should return 500 on database error", async () => {
@@ -625,11 +340,8 @@ describe("POST /api/medications", () => {
     const res = await MedicationsRoute.POST(
       makePostReq({
         name: "Aspirin",
-        dose: "100mg",
-        frequency: 24,
-        units: "tablets",
-        startDate: "2025-01-01T00:00:00Z",
-        endDate: "2025-12-31T00:00:00Z",
+        dose: 100,
+        form: "tablets",
       }),
     );
     const data = await res.json();

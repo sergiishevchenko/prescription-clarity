@@ -11,7 +11,7 @@ export const runtime = "nodejs";
 /**
  * POST /api/medications/search
  * Search medications by name for the authenticated user
- * Returns only name, dose, and units
+ * Returns full medication model except id and userId
  */
 export async function POST(request: NextRequest) {
   try {
@@ -30,7 +30,7 @@ export async function POST(request: NextRequest) {
     const medications = await prisma.medication.findMany({
       where: {
         userId: user.id,
-        status: "ACTIVE",
+        deletedAt: null,
         name: {
           contains: validatedData.name,
           mode: "insensitive",
@@ -42,7 +42,10 @@ export async function POST(request: NextRequest) {
       select: {
         name: true,
         dose: true,
-        units: true,
+        form: true,
+        deletedAt: true,
+        createdAt: true,
+        updatedAt: true,
       },
     });
 

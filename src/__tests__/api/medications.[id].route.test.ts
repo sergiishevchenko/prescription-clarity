@@ -35,12 +35,9 @@ const mockMedication = {
   id: "med1",
   userId: "user123",
   name: "Aspirin",
-  dose: "100mg",
-  units: "tablets",
-  frequency: 24,
-  startDate: new Date("2025-01-01"),
-  endDate: new Date("2025-12-31"),
-  status: "ACTIVE" as const,
+  dose: 100,
+  form: "tablets",
+  deletedAt: null,
   createdAt: new Date(),
   updatedAt: new Date(),
 };
@@ -82,6 +79,7 @@ describe("GET /api/medications/[id]", () => {
         where: {
           id: "med1",
           userId: "user123",
+          deletedAt: null,
         },
       }),
     );
@@ -210,16 +208,16 @@ describe("PATCH /api/medications/[id]", () => {
     const updatedMedication = {
       ...mockMedication,
       name: "New Name",
-      dose: "200mg",
-      frequency: 12,
+      dose: 200,
+      form: "capsules",
     };
     prismaMock.medication.update.mockResolvedValueOnce(updatedMedication);
 
     const res = await MedicationIdRoute.PATCH(
       makePatchReq({
         name: "New Name",
-        dose: "200mg",
-        frequency: 12,
+        dose: 200,
+        form: "capsules",
       }),
       params,
     );
@@ -227,66 +225,8 @@ describe("PATCH /api/medications/[id]", () => {
 
     expect(res.status).toBe(200);
     expect(data.medication.name).toBe("New Name");
-    expect(data.medication.dose).toBe("200mg");
-    expect(data.medication.frequency).toBe(12);
-  });
-
-  it("should return 400 if end date is before start date", async () => {
-    jest
-      .spyOn(SessionModule, "getSessionUserFromRequest")
-      .mockResolvedValueOnce(mockUser);
-
-    prismaMock.medication.findFirst.mockResolvedValueOnce(mockMedication);
-
-    const res = await MedicationIdRoute.PATCH(
-      makePatchReq({
-        startDate: "2025-12-31T00:00:00Z",
-        endDate: "2025-01-01T00:00:00Z",
-      }),
-      params,
-    );
-    const data = await res.json();
-
-    expect(res.status).toBe(400);
-    expect(data.error).toBe("End date must be after start date");
-  });
-
-  it("should return 400 when only startDate pushes past endDate", async () => {
-    jest
-      .spyOn(SessionModule, "getSessionUserFromRequest")
-      .mockResolvedValueOnce(mockUser);
-
-    prismaMock.medication.findFirst.mockResolvedValueOnce(mockMedication);
-
-    const res = await MedicationIdRoute.PATCH(
-      makePatchReq({
-        startDate: "2026-01-01T00:00:00Z",
-      }),
-      params,
-    );
-    const data = await res.json();
-
-    expect(res.status).toBe(400);
-    expect(data.error).toBe("End date must be after start date");
-  });
-
-  it("should return 400 when only endDate precedes startDate", async () => {
-    jest
-      .spyOn(SessionModule, "getSessionUserFromRequest")
-      .mockResolvedValueOnce(mockUser);
-
-    prismaMock.medication.findFirst.mockResolvedValueOnce(mockMedication);
-
-    const res = await MedicationIdRoute.PATCH(
-      makePatchReq({
-        endDate: "2024-01-01T00:00:00Z",
-      }),
-      params,
-    );
-    const data = await res.json();
-
-    expect(res.status).toBe(400);
-    expect(data.error).toBe("End date must be after start date");
+    expect(data.medication.dose).toBe(200);
+    expect(data.medication.form).toBe("capsules");
   });
 
   it("should return 400 on invalid input data", async () => {
@@ -298,7 +238,7 @@ describe("PATCH /api/medications/[id]", () => {
 
     const res = await MedicationIdRoute.PATCH(
       makePatchReq({
-        frequency: -5,
+        dose: -5,
       }),
       params,
     );
@@ -371,7 +311,7 @@ describe("DELETE /api/medications/[id]", () => {
     prismaMock.medication.findFirst.mockResolvedValueOnce(mockMedication);
     prismaMock.medication.update.mockResolvedValueOnce({
       ...mockMedication,
-      status: "DELETED",
+      deletedAt: new Date(),
     });
 
     const res = await MedicationIdRoute.DELETE(makeDeleteReq(), params);
@@ -381,7 +321,7 @@ describe("DELETE /api/medications/[id]", () => {
     expect(data.message).toBe("Medication deleted successfully");
     expect(prismaMock.medication.update).toHaveBeenCalledWith({
       where: { id: "med1" },
-      data: { status: "DELETED" },
+      data: { deletedAt: expect.any(Date) },
     });
   });
 

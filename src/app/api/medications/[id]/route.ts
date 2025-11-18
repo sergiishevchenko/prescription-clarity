@@ -35,16 +35,13 @@ export async function GET(
       where: {
         id,
         userId: user.id, // Ensure the medication belongs to the user
+        deletedAt: null, // Only return non-deleted medications
       },
       select: {
         id: true,
         name: true,
         dose: true,
-        units: true,
-        frequency: true,
-        startDate: true,
-        endDate: true,
-        status: true,
+        form: true,
         createdAt: true,
         updatedAt: true,
       },
@@ -92,6 +89,7 @@ export async function PATCH(
       where: {
         id,
         userId: user.id,
+        deletedAt: null, // Only update non-deleted medications
       },
     });
 
@@ -116,28 +114,8 @@ export async function PATCH(
     if (validatedData.dose !== undefined) {
       updateData.dose = validatedData.dose;
     }
-    if (validatedData.units !== undefined) {
-      updateData.units = validatedData.units;
-    }
-    if (validatedData.frequency !== undefined) {
-      updateData.frequency = validatedData.frequency;
-    }
-    if (validatedData.startDate !== undefined) {
-      updateData.startDate = new Date(validatedData.startDate);
-    }
-    if (validatedData.endDate !== undefined) {
-      updateData.endDate = new Date(validatedData.endDate);
-    }
-
-    // Validate date range if both dates are present
-    const finalStartDate = updateData.startDate || existingMedication.startDate;
-    const finalEndDate = updateData.endDate || existingMedication.endDate;
-
-    if (finalEndDate <= finalStartDate) {
-      return NextResponse.json(
-        { error: "End date must be after start date" },
-        { status: 400 },
-      );
+    if (validatedData.form !== undefined) {
+      updateData.form = validatedData.form;
     }
 
     // Update medication
@@ -148,11 +126,7 @@ export async function PATCH(
         id: true,
         name: true,
         dose: true,
-        units: true,
-        frequency: true,
-        startDate: true,
-        endDate: true,
-        status: true,
+        form: true,
         createdAt: true,
         updatedAt: true,
       },
@@ -196,6 +170,7 @@ export async function DELETE(
       where: {
         id,
         userId: user.id,
+        deletedAt: null, // Only delete non-deleted medications
       },
     });
 
@@ -206,11 +181,11 @@ export async function DELETE(
       );
     }
 
-    // Soft delete: update status to DELETED
+    // Soft delete: set deletedAt timestamp
     await prisma.medication.update({
       where: { id },
       data: {
-        status: "DELETED",
+        deletedAt: new Date(),
       },
     });
 
