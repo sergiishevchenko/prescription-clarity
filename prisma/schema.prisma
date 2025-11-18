@@ -53,6 +53,7 @@ model Medication {
   updatedAt  DateTime  @updatedAt
 
   user       User            @relation(fields: [userId], references: [id], onDelete: Cascade)
+  scheduleEntries ScheduleEntry[]
   schedules  Schedule[]
 
   @@index([userId])
@@ -91,6 +92,7 @@ model Schedule {
 model ScheduleEntry {
   id           String          @id @default(cuid()) @db.VarChar(32)
   scheduleId   String?          @db.VarChar(32)
+  medicationId String?          @db.VarChar(32)
   userId       String          @db.VarChar(32)
   dateTime     DateTime
   status       ScheduleStatus  @default(PLANNED)
@@ -98,9 +100,10 @@ model ScheduleEntry {
   updatedAt    DateTime        @updatedAt
 
   schedule     Schedule?       @relation(fields: [scheduleId], references: [id], onDelete: Cascade)
+  medication   Medication?     @relation(fields: [medicationId], references: [id], onDelete: SetNull)
   user         User            @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@index([userId, dateTime])
   @@index([scheduleId, dateTime])
-  @@unique([scheduleId, dateTime])
+  @@unique([medicationId, dateTime])
 }

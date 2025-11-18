@@ -72,12 +72,16 @@ describe("GET /api/schedule", () => {
     const scheduleEntries = [
       {
         id: "se1",
+        medicationId: "med1",
         userId: mockUser.id,
         dateTime: new Date("2025-02-01T03:00:00.000Z"),
         status: "PLANNED",
+        medication: { id: "med1", name: "Ibuprofen", dose: 200 },
         schedule: {
           medicationId: "med1",
-          medication: { id: "med1", name: "Ibuprofen", dose: 200 },
+          quantity: 1,
+          units: "pill",
+          mealTiming: "before",
         },
       },
     ];
@@ -98,7 +102,10 @@ describe("GET /api/schedule", () => {
         userId: mockUser.id,
         utcDateTime: "2025-02-01T03:00:00.000Z",
         localDateTime: expect.stringContaining("2025-02-01T03:00:00"),
-        medication: scheduleEntries[0].schedule.medication,
+        quantity: 1,
+        units: "pill",
+        mealTiming: "before",
+        medication: scheduleEntries[0].medication,
       }),
     );
     expect(prismaMock.scheduleEntry.findMany).toHaveBeenCalledWith(

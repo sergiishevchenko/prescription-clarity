@@ -9,6 +9,7 @@ import {
   type CreateScheduleInput,
 } from "@/lib/validators/schedule";
 import { generateScheduleEntries } from "@/app/api/schedule/generate/route";
+import type { Prisma } from "@prisma/client";
 
 export const runtime = "nodejs";
 
@@ -59,25 +60,46 @@ export async function GET(request: NextRequest) {
         },
       },
       include: {
+        medication: {
+          select: { id: true, name: true, dose: true },
+        },
         schedule: {
-          include: {
-            medication: {
-              select: { id: true, name: true, dose: true },
-            },
+          select: {
+            medicationId: true,
+            quantity: true,
+            units: true,
+            mealTiming: true,
           },
         },
       },
       orderBy: { dateTime: "asc" },
     });
 
-    const result = events.map((e: (typeof events)[number]) => ({
+    type EventWithRelations = Prisma.ScheduleEntryGetPayload<{
+      include: {
+        medication: { select: { id: true; name: true; dose: true } };
+        schedule: {
+          select: {
+            medicationId: true;
+            quantity: true;
+            units: true;
+            mealTiming: true;
+          };
+        };
+      };
+    }>;
+
+    const result = events.map((e: EventWithRelations) => ({
       id: e.id,
-      medicationId: e.schedule?.medicationId ?? null,
+      medicationId: e.medicationId ?? null,
       userId: e.userId,
       status: e.status,
       utcDateTime: e.dateTime.toISOString(),
       localDateTime: toLocalString(e.dateTime, validated.tz || "UTC"),
-      medication: e.schedule?.medication ?? null,
+      quantity: e.schedule?.quantity ?? null,
+      units: e.schedule?.units ?? null,
+      mealTiming: e.schedule?.mealTiming ?? null,
+      medication: e.medication ?? null,
     }));
 
     return NextResponse.json({ items: result });
