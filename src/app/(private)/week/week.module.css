@@ -403,12 +403,26 @@
   gap: 0.125rem;
 }
 
+.medNameRow {
+  display: flex;
+  align-items: baseline;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
 .medName {
   font-size: 0.75rem;
   font-weight: 700;
   line-height: 1.2;
   color: #0f172a;
   margin: 0;
+}
+
+.medDosage {
+  font-size: 0.7rem;
+  font-weight: 500;
+  line-height: 1.2;
+  color: #94a3b8;
 }
 
 .medDose {
@@ -564,6 +578,7 @@
   }
 
   .medName,
+  .medDosage,
   .medDose,
   .medTiming {
     font-size: 0.6875rem;
