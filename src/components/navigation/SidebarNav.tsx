@@ -5,6 +5,7 @@ import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import clsx from "clsx";
 import type { SessionUser } from "@/lib/auth/session";
+import { clearMedicationWizard } from "@/lib/medicationWizardStorage";
 import styles from "./SidebarNav.module.css";
 
 type IconProps = {
@@ -159,6 +160,7 @@ export function SidebarNav({ user }: SidebarNavProps) {
   };
 
   const handleAddMedication = () => {
+    clearMedicationWizard();
     router.push("/medications/new");
   };
 

@@ -1,33 +1,19 @@
 "use client";
 
 import dynamic from "next/dynamic";
-import type { ReactNode } from "react";
+import { useEffect, useRef, useState, type ReactNode } from "react";
 import { useFormContext } from "react-hook-form";
 
 import { HelpTooltip } from "@/components/shared/HelpTooltip";
-import type { FormValues } from "@/lib/medicationTypes";
+import {
+  MEDICATION_FORMS,
+  getMedicationFormLabel,
+  type FormValues,
+  type MedicationForm,
+} from "@/lib/medicationTypes";
 import styles from "./MedicationWizardStep1.module.css";
 
 const PhotoUploader = dynamic(() => import("./PhotoUploader"), { ssr: false });
-
-const UNIT_OPTIONS = [
-  { value: "tablets", label: "Tablets" },
-  { value: "capsules", label: "Capsules" },
-  { value: "lozenges", label: "Lozenges" },
-  { value: "candy", label: "Candy" },
-  { value: "drops", label: "Drops" },
-  { value: "ampoule", label: "Ampoule" },
-  { value: "syringe", label: "Syringe" },
-  { value: "packet", label: "Packet" },
-  { value: "sachet", label: "Sachet" },
-  { value: "stick", label: "Stick" },
-  { value: "g", label: "Grams (g)" },
-  { value: "mg", label: "Milligrams (mg)" },
-  { value: "ml", label: "Milliliters (ml)" },
-  { value: "dose", label: "Dose" },
-  { value: "teaspoon", label: "Teaspoon" },
-  { value: "tablespoon", label: "Tablespoon" },
-] as const;
 
 const medicationNameTooltip = (
   <>
@@ -53,20 +39,6 @@ const medicationNameTooltip = (
   </>
 );
 
-const quantityTooltip = (
-  <>
-    <p>
-      How many <strong>units you take per dose</strong>. This might be tablets,
-      capsules, or milliliters.
-    </p>
-    <ul>
-      <li>1 tablet</li>
-      <li>2 capsules</li>
-      <li>5 ml liquid</li>
-    </ul>
-  </>
-);
-
 const dosageTooltip = (
   <>
     <p>
@@ -81,14 +53,10 @@ const dosageTooltip = (
   </>
 );
 
-const unitTooltip = (
+const formTooltip = (
   <>
-    <p>Select the form that best matches how you take this medication.</p>
-    <ul>
-      <li>Tablets or capsules</li>
-      <li>Liquid drops</li>
-      <li>Topical gel or cream</li>
-    </ul>
+    <p>Select the physical form so we can show the right reminders.</p>
+    <p>This helps personalize your schedule.</p>
   </>
 );
 
@@ -98,6 +66,34 @@ const photoTooltip = (
     <p>You can upload up to 5MB in PNG or JPG format.</p>
   </>
 );
+
+const MIN_SEARCH_QUERY = 3;
+
+type MedicationSearchResult = {
+  id: string;
+  name: string;
+  dose?: string | number | null;
+  form?: string | null;
+};
+
+const toMedicationFormValue = (
+  value?: string | null,
+): MedicationForm | undefined => {
+  if (!value) return undefined;
+  const normalized = value.toLowerCase() as MedicationForm;
+  return MEDICATION_FORMS.includes(normalized) ? normalized : undefined;
+};
+
+const parseDoseValue = (value?: string | number | null) => {
+  if (typeof value === "number") {
+    return Number.isFinite(value) ? value : undefined;
+  }
+  if (typeof value === "string") {
+    const numeric = Number.parseFloat(value);
+    return Number.isFinite(numeric) ? numeric : undefined;
+  }
+  return undefined;
+};
 
 type FieldLabelProps = {
   label: string;
@@ -134,13 +130,148 @@ export default function MedicationWizardStep1() {
   const {
     register,
     formState: { errors },
+    watch,
+    setValue,
   } = useFormContext<FormValues>();
+  const nameValue = watch("name") ?? "";
+  const medicationIdValue = watch("medicationId") ?? "";
+  const [searchResults, setSearchResults] = useState<MedicationSearchResult[]>(
+    [],
+  );
+  const [showResults, setShowResults] = useState(false);
+  const searchContainerRef = useRef<HTMLDivElement | null>(null);
+  const selectedNameRef = useRef<string>("");
+
+  useEffect(() => {
+    const handler = (event: MouseEvent) => {
+      if (!searchContainerRef.current) return;
+      if (!searchContainerRef.current.contains(event.target as Node)) {
+        setShowResults(false);
+      }
+    };
+    document.addEventListener("mousedown", handler);
+    return () => document.removeEventListener("mousedown", handler);
+  }, []);
+
+  useEffect(() => {
+    const query = nameValue.trim();
+    const normalized = query.toLowerCase();
+    const normalizedSelection = selectedNameRef.current;
+    if (normalizedSelection && normalized !== normalizedSelection) {
+      if (medicationIdValue) {
+        setValue("medicationId", "", { shouldDirty: true });
+      }
+      selectedNameRef.current = "";
+    }
+    if (query.length < MIN_SEARCH_QUERY) {
+      setSearchResults([]);
+      setShowResults(false);
+      return;
+    }
+    if (normalizedSelection && normalized === normalizedSelection) {
+      setSearchResults([]);
+      setShowResults(false);
+      return;
+    }
+    let cancelled = false;
+    const controller = new AbortController();
+    const timeout = window.setTimeout(() => {
+      fetch("/api/medications/search", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ query }),
+        signal: controller.signal,
+      })
+        .then(async (response) => {
+          if (!response.ok) {
+            console.warn(
+              "Medication search unavailable, skipping suggestions",
+              response.status,
+            );
+            if (!cancelled) {
+              setSearchResults([]);
+              setShowResults(false);
+            }
+            return;
+          }
+          const data = (await response.json()) as {
+            results?: MedicationSearchResult[];
+          };
+          if (!cancelled) {
+            const nextResults = data.results ?? [];
+            setSearchResults(nextResults);
+            setShowResults(nextResults.length > 0);
+          }
+        })
+        .catch((error: Error) => {
+          if (cancelled || error.name === "AbortError") return;
+          console.error("Medication search failed", error);
+          setSearchResults([]);
+          setShowResults(false);
+        });
+    }, 250);
+    return () => {
+      cancelled = true;
+      controller.abort();
+      window.clearTimeout(timeout);
+    };
+  }, [medicationIdValue, nameValue, setValue]);
+
+  const handleSelectMedication = (result: MedicationSearchResult) => {
+    setValue("medicationId", result.id, { shouldDirty: true });
+    setValue("name", result.name, { shouldDirty: true });
+    const parsedDose = parseDoseValue(result.dose);
+    setValue("dosageMg", parsedDose, {
+      shouldDirty: true,
+      shouldValidate: true,
+    });
+    const normalizedForm = toMedicationFormValue(result.form);
+    if (normalizedForm) {
+      setValue("form", normalizedForm, {
+        shouldDirty: true,
+        shouldValidate: true,
+      });
+    }
+    selectedNameRef.current = result.name.trim().toLowerCase();
+    setShowResults(false);
+    setSearchResults([]);
+  };
+
+  const dosageValidationRules = {
+    setValueAs: (value: string) => {
+      if (value === "") return undefined;
+      const numeric = Number(value);
+      return Number.isFinite(numeric) ? numeric : undefined;
+    },
+    validate: (value?: number) => {
+      if (value === undefined || Number.isNaN(value)) return true;
+      return value >= 1 || "Please enter a value of at least 1.";
+    },
+  };
+
+  const renderResultMeta = (result: MedicationSearchResult) => {
+    const doseText =
+      typeof result.dose === "number"
+        ? `${result.dose} mg`
+        : typeof result.dose === "string"
+          ? result.dose
+          : null;
+    const normalizedForm = toMedicationFormValue(result.form);
+    const formText = normalizedForm
+      ? getMedicationFormLabel(normalizedForm)
+      : getMedicationFormLabel(result.form as MedicationForm);
+    return [doseText, formText].filter(Boolean).join(" · ");
+  };
 
   return (
     <section className={styles.step}>
       <div className={styles.surface}>
         <div className={styles.fieldStack}>
-          <div className={styles.field}>
+          <input type="hidden" {...register("medicationId")} />
+          <div
+            className={`${styles.field} ${styles.searchContainer}`}
+            ref={searchContainerRef}
+          >
             <FieldLabel
               htmlFor="medication-name"
               label="Medication Name"
@@ -157,100 +288,70 @@ export default function MedicationWizardStep1() {
               {...register("name", {
                 required: "Please enter the name of the medication.",
               })}
+              onFocus={() => {
+                if (
+                  searchResults.length > 0 &&
+                  nameValue.trim().length >= MIN_SEARCH_QUERY
+                ) {
+                  setShowResults(true);
+                }
+              }}
             />
             {errors.name && (
               <p className={styles.errorText}>
                 {errors.name.message as string}
               </p>
             )}
+            {showResults && (
+              <div className={styles.searchResults}>
+                {searchResults.map((result) => {
+                  const meta = renderResultMeta(result);
+                  return (
+                    <button
+                      key={result.id}
+                      type="button"
+                      className={styles.searchResultButton}
+                      onMouseDown={(event) => {
+                        event.preventDefault();
+                        handleSelectMedication(result);
+                      }}
+                    >
+                      <span className={styles.searchResultTitle}>
+                        {result.name}
+                      </span>
+                      {meta && (
+                        <span className={styles.searchResultMeta}>{meta}</span>
+                      )}
+                    </button>
+                  );
+                })}
+              </div>
+            )}
           </div>
 
           <div className={styles.fieldGrid}>
             <div className={styles.field}>
               <FieldLabel
-                htmlFor="medication-quantity"
-                label="Quantity"
+                htmlFor="medication-form"
+                label="Medication Form"
                 required
-                tooltip={quantityTooltip}
-                tooltipPlacement="bottom"
-              />
-              <input
-                id="medication-quantity"
-                type="number"
-                min={1}
-                inputMode="numeric"
-                className={`${styles.input} ${
-                  errors.quantity ? styles.inputError : ""
-                }`}
-                {...register("quantity", {
-                  valueAsNumber: true,
-                  required: "Please enter the quantity you take per dose.",
-                  min: {
-                    value: 1,
-                    message: "Please enter a value of at least 1.",
-                  },
-                })}
-              />
-              {errors.quantity && (
-                <p className={styles.errorText}>
-                  {errors.quantity.message as string}
-                </p>
-              )}
-            </div>
-
-            <div className={styles.field}>
-              <FieldLabel
-                htmlFor="medication-dosage"
-                label="Dosage (mg)"
-                required
-                tooltip={dosageTooltip}
-                tooltipPlacement="bottom"
-              />
-              <input
-                id="medication-dosage"
-                type="number"
-                min={1}
-                inputMode="numeric"
-                className={`${styles.input} ${
-                  errors.dosageMg ? styles.inputError : ""
-                }`}
-                {...register("dosageMg", {
-                  valueAsNumber: true,
-                  required: "Please enter the dosage amount in milligrams.",
-                  min: {
-                    value: 1,
-                    message: "Please enter a value of at least 1.",
-                  },
-                })}
-              />
-              {errors.dosageMg && (
-                <p className={styles.errorText}>
-                  {errors.dosageMg.message as string}
-                </p>
-              )}
-            </div>
-
-            <div className={styles.field}>
-              <FieldLabel
-                htmlFor="medication-unit"
-                label="Units"
-                required
-                tooltip={unitTooltip}
+                tooltip={formTooltip}
                 tooltipPlacement="bottom"
               />
               <div className={styles.selectWrapper}>
                 <select
-                  id="medication-unit"
+                  id="medication-form"
                   className={`${styles.select} ${
-                    errors.unit ? styles.inputError : ""
+                    errors.form ? styles.inputError : ""
                   }`}
-                  {...register("unit", {
-                    required: "Please select the appropriate unit.",
+                  {...register("form", {
+                    required: "Please select the medication form.",
                   })}
                 >
-                  {UNIT_OPTIONS.map((option) => (
-                    <option key={option.value} value={option.value}>
-                      {option.label}
+                  <option value="">Select a form</option>
+                  {MEDICATION_FORMS.map((value) => (
+                    <option key={value} value={value}>
+                      {getMedicationFormLabel(value)}
                     </option>
                   ))}
                 </select>
@@ -269,9 +370,34 @@ export default function MedicationWizardStep1() {
                   />
                 </svg>
               </div>
-              {errors.unit && (
+              {errors.form && (
                 <p className={styles.errorText}>
-                  {errors.unit.message as string}
+                  {errors.form.message as string}
+                </p>
+              )}
+            </div>
+
+            <div className={styles.field}>
+              <FieldLabel
+                htmlFor="medication-dosage"
+                label="Dosage (mg)"
+                optionalText="(Optional)"
+                tooltip={dosageTooltip}
+                tooltipPlacement="bottom"
+              />
+              <input
+                id="medication-dosage"
+                type="number"
+                min={1}
+                inputMode="numeric"
+                className={`${styles.input} ${
+                  errors.dosageMg ? styles.inputError : ""
+                }`}
+                {...register("dosageMg", dosageValidationRules)}
+              />
+              {errors.dosageMg && (
+                <p className={styles.errorText}>
+                  {errors.dosageMg.message as string}
                 </p>
               )}
             </div>
@@ -293,3 +419,4 @@ export default function MedicationWizardStep1() {
     </section>
   );
 }
+

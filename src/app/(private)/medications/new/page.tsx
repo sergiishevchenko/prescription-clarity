@@ -52,7 +52,7 @@ export default function NewMedicationFormPage() {
 
   const showStepError = (currentStep: number) => {
     const errors: Record<number, string> = {
-      1: "Please fill in all required fields: Medication Name, Quantity, Dosage, and Unit",
+      1: "Please fill in all required fields: Medication Name and Form",
       2: "Please complete the dosing schedule",
       3: "Please select at least one day",
       4: "Please complete the treatment duration",

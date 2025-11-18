@@ -17,8 +17,16 @@ import TimeOfDayChips from "./TimeOfDayChips";
 import TimeInputs from "./TimeInputs";
 import DaysOfWeekSelector from "./DaysOfWeekSelector";
 import DatesAndDuration from "./DatesAndDuration";
-import type { FormValues, TimeOfDay } from "@/lib/medicationTypes";
-import { DAY_LABELS } from "@/lib/medicationTypes";
+import type {
+  FormValues,
+  MedicationForm,
+  TimeOfDay,
+} from "@/lib/medicationTypes";
+import {
+  DAY_LABELS,
+  MEDICATION_FORMS,
+  getMedicationFormLabel,
+} from "@/lib/medicationTypes";
 import {
   clearWizardStorage,
   persistWizardFormState,
@@ -66,6 +74,13 @@ const MEAL_TIMING_OPTIONS: Array<{
   { value: "anytime", label: "Anytime", description: "No restriction" },
 ];
 
+const FRACTION_OPTIONS = [
+  { value: 0, label: "-" },
+  { value: 0.25, label: "1/4" },
+  { value: 0.5, label: "1/2" },
+  { value: 0.75, label: "3/4" },
+] as const;
+
 const toIsoDate = (value: string, endOfDay = false) => {
   const base = new Date(`${value}T00:00:00`);
   if (Number.isNaN(base.getTime())) return new Date().toISOString();
@@ -80,10 +95,16 @@ const toFrequencyHours = (timesPerDay?: number) => {
   return Math.max(1, Math.round(24 / occurrences));
 };
 
+const formatApiDose = (value?: number) => {
+  const numeric = Number(value);
+  if (!Number.isFinite(numeric) || numeric <= 0) return undefined;
+  return `${numeric} mg`;
+};
+
 const mapFormToApiPayload = (values: FormValues) => ({
   name: values.name.trim(),
-  dose: `${values.dosageMg} mg`,
-  units: values.unit,
+  dose: formatApiDose(values.dosageMg),
+  units: values.form,
   frequency: toFrequencyHours(values.frequency),
   startDate: toIsoDate(values.startDate),
   endDate: toIsoDate(values.endDate, true),
@@ -146,12 +167,13 @@ export default function NewMedicationForm({
     return end.toISOString().slice(0, 10);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
-  const baseDefaultValues = useMemo<FormValues>(
+const baseDefaultValues = useMemo<FormValues>(
     () => ({
+      medicationId: undefined,
       name: "",
-      quantity: 1,
-      dosageMg: 500,
-      unit: "tablets",
+      quantity: undefined,
+      dosageMg: undefined,
+      form: undefined,
       mealTiming: "before",
       frequency: 1,
       durationDays: defaultDuration,
@@ -180,7 +202,76 @@ export default function NewMedicationForm({
   const { register, handleSubmit, control, setValue, trigger } = methods;
   const freq = useWatch({ control, name: "frequency" });
   const mealTiming = useWatch({ control, name: "mealTiming" });
+  const rawQuantity = useWatch({ control, name: "quantity" });
+  const quantityValue = Number(rawQuantity ?? 0);
   const allValues = methods.watch();
+  const clampWholeQuantity = (value: number) => {
+    if (!Number.isFinite(value)) return 0;
+    return Math.min(1000, Math.max(0, Math.floor(value)));
+  };
+  const getFractionFromQuantity = (value: number) => {
+    const fraction = value - Math.trunc(value);
+    if (fraction >= 0.74 && fraction <= 0.76) return 0.75;
+    if (fraction >= 0.49 && fraction <= 0.51) return 0.5;
+    if (fraction >= 0.24 && fraction <= 0.26) return 0.25;
+    return 0;
+  };
+  const quantityWhole =
+    rawQuantity === undefined || rawQuantity === null
+      ? 0
+      : clampWholeQuantity(quantityValue);
+  const quantityFraction =
+    rawQuantity === undefined || rawQuantity === null
+      ? 0
+      : getFractionFromQuantity(quantityValue);
+  const quantityWholeInputValue =
+    rawQuantity === undefined || rawQuantity === null
+      ? ""
+      : quantityWhole;
+  const handleWholeQuantityChange = (
+    event: React.ChangeEvent<HTMLInputElement>,
+  ) => {
+    const nextWhole = clampWholeQuantity(Number(event.target.value));
+    setValue("quantity", nextWhole + quantityFraction, {
+      shouldDirty: true,
+      shouldValidate: true,
+    });
+  };
+  const handleFractionQuantityChange = (
+    event: React.ChangeEvent<HTMLSelectElement>,
+  ) => {
+    const fractionValue = Number(event.target.value) || 0;
+    setValue("quantity", quantityWhole + fractionValue, {
+      shouldDirty: true,
+      shouldValidate: true,
+    });
+  };
+  const medicationSummary = useMemo(() => {
+    const name = (allValues.name || "").trim();
+    if (!name || step < 2) return null;
+    const formLabel = getMedicationFormLabel(allValues.form);
+    const summaryTitle = formLabel ? `${name} - ${formLabel}` : name;
+    const dosage = Number(allValues.dosageMg);
+    const showDosage = Number.isFinite(dosage) && dosage > 0;
+    return (
+      <div className={stepStyles.medicationSummary}>
+        <div>
+          <p className={stepStyles.summaryLabel}>You are scheduling</p>
+          <p className={stepStyles.summaryName}>{summaryTitle}</p>
+        </div>
+        {showDosage ? (
+          <span className={stepStyles.summaryBadge}>{dosage} mg</span>
+        ) : null}
+      </div>
+    );
+  }, [allValues.dosageMg, allValues.form, allValues.name, step]);
+
+  const scheduleSubtitle = useMemo(() => {
+    const name = (allValues.name || "").trim();
+    if (!name) return "Add this medication to your routine";
+    const formLabel = getMedicationFormLabel(allValues.form);
+    return formLabel ? `${name} - ${formLabel}` : name;
+  }, [allValues.form, allValues.name]);
 
   useEffect(() => {
     const { photo, ...serializableValues } = allValues;
@@ -217,22 +308,11 @@ export default function NewMedicationForm({
   const validateCurrentStep = useCallback(async () => {
     if (step === 1) {
       const nameValid = await trigger("name");
-      const quantityValid = await trigger("quantity");
-      const dosageValid = await trigger("dosageMg");
-      const unitValid = await trigger("unit");
+      const formValid = await trigger("form");
       const nameValue = (allValues.name || "").trim();
-      const quantityValue = allValues.quantity ?? 0;
-      const dosageValue = allValues.dosageMg ?? 0;
-      const unitValue = (allValues.unit || "").trim();
+      const formValue = (allValues.form || "").trim();
       return (
-        nameValid &&
-        quantityValid &&
-        dosageValid &&
-        unitValid &&
-        nameValue.length > 0 &&
-        quantityValue >= 1 &&
-        dosageValue >= 1 &&
-        unitValue.length > 0
+        nameValid && formValid && nameValue.length > 0 && formValue.length > 0
       );
     }
     if (step === 2) {
@@ -262,7 +342,7 @@ export default function NewMedicationForm({
     // step 5 is review
     return true;
   }, [
-    allValues.dosageMg,
+    allValues.form,
     allValues.durationDays,
     allValues.endDate,
     allValues.frequency,
@@ -270,7 +350,6 @@ export default function NewMedicationForm({
     allValues.ongoing,
     allValues.quantity,
     allValues.startDate,
-    allValues.unit,
     step,
     timeError,
     timesOfDay,
@@ -387,7 +466,140 @@ export default function NewMedicationForm({
         {step === 2 && (
           <section className={stepStyles.step}>
             <div className={stepStyles.surface}>
+              {medicationSummary}
               <div className={stepStyles.fieldStack}>
+                <div className={stepStyles.scheduleIntro}>
+                  <div>
+                    <p className={stepStyles.sectionEyebrow}>
+                      Building your schedule
+                    </p>
+                    <p className={stepStyles.sectionSubtitle}>
+                      {scheduleSubtitle}
+                    </p>
+                  </div>
+                </div>
+                <input
+                  type="hidden"
+                  {...register("quantity", {
+                    valueAsNumber: true,
+                    min: { value: 0, message: "Must be at least 0" },
+                    max: { value: 1000, message: "Must be 1000 or less" },
+                  })}
+                />
+                <div className={stepStyles.quantityGrid}>
+                  <div className={stepStyles.quantityField}>
+                    <label
+                      htmlFor="quantity-whole"
+                      className={stepStyles.quantityLabel}
+                    >
+                      Quantity
+                    </label>
+                    <div className={stepStyles.quantityInputs}>
+                      <input
+                        id="quantity-whole"
+                        type="number"
+                        min={0}
+                        max={1000}
+                        className={stepStyles.input}
+                        value={quantityWholeInputValue}
+                        onChange={handleWholeQuantityChange}
+                        placeholder="0"
+                      />
+                    </div>
+                    <p className={stepStyles.helperText}>
+                      Whole units (0-1000)
+                    </p>
+                  </div>
+                  <div className={stepStyles.quantityField}>
+                    <label
+                      htmlFor="quantity-fraction"
+                      className={stepStyles.quantityLabel}
+                    >
+                      Fraction
+                    </label>
+                    <div className={stepStyles.selectWrapper}>
+                      <select
+                        id="quantity-fraction"
+                        className={stepStyles.select}
+                        value={quantityFraction}
+                        onChange={handleFractionQuantityChange}
+                      >
+                        {FRACTION_OPTIONS.map(({ value, label }) => (
+                          <option key={label} value={value}>
+                            {label}
+                          </option>
+                        ))}
+                      </select>
+                      <svg
+                        className={stepStyles.selectChevron}
+                        viewBox="0 0 20 20"
+                        fill="none"
+                        xmlns="http://www.w3.org/2000/svg"
+                      >
+                        <path
+                          d="M6 8l4 4 4-4"
+                          stroke="currentColor"
+                          strokeWidth="1.6"
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                        />
+                      </svg>
+                    </div>
+                    <p className={stepStyles.helperText}>
+                      Fractional part of the dose
+                    </p>
+                  </div>
+                  <div className={stepStyles.quantityField}>
+                    <label
+                      htmlFor="quantity-form"
+                      className={stepStyles.quantityLabel}
+                    >
+                      Units
+                    </label>
+                    <div className={stepStyles.selectWrapper}>
+                      <select
+                        id="quantity-form"
+                        className={stepStyles.select}
+                        value={allValues.form ?? ""}
+                        onChange={(event) => {
+                          const value = event.target.value;
+                          setValue(
+                            "form",
+                            value ? (value as MedicationForm) : undefined,
+                            {
+                              shouldDirty: true,
+                              shouldValidate: true,
+                            },
+                          );
+                        }}
+                      >
+                        <option value="">Select a form</option>
+                        {MEDICATION_FORMS.map((value) => (
+                          <option key={value} value={value}>
+                            {getMedicationFormLabel(value)}
+                          </option>
+                        ))}
+                      </select>
+                      <svg
+                        className={stepStyles.selectChevron}
+                        viewBox="0 0 20 20"
+                        fill="none"
+                        xmlns="http://www.w3.org/2000/svg"
+                      >
+                        <path
+                          d="M6 8l4 4 4-4"
+                          stroke="currentColor"
+                          strokeWidth="1.6"
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                        />
+                      </svg>
+                    </div>
+                    <p className={stepStyles.helperText}>
+                      Same list as the medication form
+                    </p>
+                  </div>
+                </div>
                 <div className={stepStyles.field}>
                   <div className={stepStyles.labelRow}>
                     <span className={stepStyles.labelText}>
@@ -503,10 +715,10 @@ export default function NewMedicationForm({
             </div>
           </section>
         )}
-
         {step === 3 && (
           <section className={stepStyles.step}>
             <div className={stepStyles.surface}>
+              {medicationSummary}
               <div className="flex flex-col gap-3">
                 <label className="flex items-center text-base font-medium text-gray-900">
                   Select Days of the Week
@@ -536,7 +748,7 @@ export default function NewMedicationForm({
                         </ul>
                       </div>
                       <p className="flex items-start gap-2 text-sm text-[#FBBF24]">
-                        <span aria-hidden="true">💡</span>
+                        <span aria-hidden="true">рџ’Ў</span>
                         <span>
                           Some medications are only needed on specific days
                           (e.g., weekly supplements on Sundays).
@@ -555,7 +767,14 @@ export default function NewMedicationForm({
           </section>
         )}
 
-        {step === 4 && <DatesAndDuration />}
+        {step === 4 && (
+          <section className={stepStyles.step}>
+            <div className={stepStyles.surface}>
+              {medicationSummary}
+              <DatesAndDuration />
+            </div>
+          </section>
+        )}
 
         {step === 5 &&
           (() => {
@@ -566,6 +785,12 @@ export default function NewMedicationForm({
             const displayedSlots =
               selectedSlots.length > 0 ? selectedSlots : [slotOrder[0]];
             const dosesPerDay = Number(allValues.frequency) || 1;
+            const quantityDisplay = Number(allValues.quantity);
+            const safeQuantity =
+              Number.isFinite(quantityDisplay) && quantityDisplay > 0
+                ? quantityDisplay
+                : 0;
+            const formLabel = getMedicationFormLabel(allValues.form);
             return (
               <section className={stepStyles.step}>
                 <div className={stepStyles.surface}>
@@ -578,8 +803,7 @@ export default function NewMedicationForm({
                         {allValues.name?.trim() || "Medication"}
                       </h3>
                       <p className="mt-1 text-[14px] text-gray-600">
-                        {Number(allValues.quantity) || 1} unit
-                        {Number(allValues.quantity) > 1 ? "s" : ""},{" "}
+                        {safeQuantity} {formLabel || allValues.form || "units"},{" "}
                         {Number(allValues.dosageMg) || 0} mg
                       </p>
                     </div>
@@ -677,7 +901,7 @@ export default function NewMedicationForm({
                             {Number(allValues.durationDays) || 0} days total
                           </p>
                           <p className="text-[13px] text-gray-500">
-                            {formatDateLabel(allValues.startDate)} →{" "}
+                            {formatDateLabel(allValues.startDate)} в†’{" "}
                             {formatDateLabel(allValues.endDate)}
                           </p>
                         </>
