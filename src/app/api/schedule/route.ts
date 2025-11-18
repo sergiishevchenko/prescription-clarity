@@ -9,6 +9,7 @@ import {
   type CreateScheduleInput,
 } from "@/lib/validators/schedule";
 import { generateScheduleEntries } from "@/app/api/schedule/generate/route";
+import type { Prisma } from "@prisma/client";
 
 export const runtime = "nodejs";
 
@@ -62,18 +63,43 @@ export async function GET(request: NextRequest) {
         medication: {
           select: { id: true, name: true, dose: true },
         },
+        schedule: {
+          select: {
+            medicationId: true,
+            quantity: true,
+            units: true,
+            mealTiming: true,
+          },
+        },
       },
       orderBy: { dateTime: "asc" },
     });
 
-    const result = events.map((e: (typeof events)[number]) => ({
+    type EventWithRelations = Prisma.ScheduleEntryGetPayload<{
+      include: {
+        medication: { select: { id: true; name: true; dose: true } };
+        schedule: {
+          select: {
+            medicationId: true;
+            quantity: true;
+            units: true;
+            mealTiming: true;
+          };
+        };
+      };
+    }>;
+
+    const result = events.map((e: EventWithRelations) => ({
       id: e.id,
-      medicationId: e.medicationId,
+      medicationId: e.medicationId ?? null,
       userId: e.userId,
       status: e.status,
       utcDateTime: e.dateTime.toISOString(),
       localDateTime: toLocalString(e.dateTime, validated.tz || "UTC"),
-      medication: e.medication,
+      quantity: e.schedule?.quantity ?? null,
+      units: e.schedule?.units ?? null,
+      mealTiming: e.schedule?.mealTiming ?? null,
+      medication: e.medication ?? null,
     }));
 
     return NextResponse.json({ items: result });
@@ -121,7 +147,7 @@ export async function POST(request: NextRequest) {
 
     const schedule = await prisma.schedule.create({
       data: {
-        medicineId: validatedData.medicineId,
+        medicationId: validatedData.medicationId,
         userId: user.id,
         quantity: validatedData.quantity,
         units: validatedData.units,
@@ -134,7 +160,7 @@ export async function POST(request: NextRequest) {
       },
       select: {
         id: true,
-        medicineId: true,
+        medicationId: true,
         userId: true,
         quantity: true,
         units: true,

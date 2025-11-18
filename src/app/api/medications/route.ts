@@ -6,10 +6,10 @@ import {
   createMedicationSchema,
   type CreateMedicationInput,
 } from "@/lib/validators/medication";
-// Derive the exact where input type from the Prisma client
-type MedicationWhere = NonNullable<
-  Parameters<typeof prisma.medication.findMany>[0]
->["where"];
+import type { Prisma } from "@prisma/client";
+
+// Derive the exact where input type from Prisma
+type MedicationWhere = Prisma.MedicationWhereInput;
 
 export const runtime = "nodejs";
 

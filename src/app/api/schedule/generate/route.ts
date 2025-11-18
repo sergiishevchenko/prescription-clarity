@@ -25,6 +25,7 @@ export async function generateScheduleEntries(
 
   const entries: {
     scheduleId: string;
+    medicationId: string;
     userId: string;
     dateTime: Date;
   }[] = [];
@@ -51,6 +52,7 @@ export async function generateScheduleEntries(
 
         entries.push({
           scheduleId: schedule.id,
+          medicationId: schedule.medicationId,
           userId,
           dateTime: entryDateTime,
         });

@@ -53,7 +53,8 @@ model Medication {
   updatedAt  DateTime  @updatedAt
 
   user       User            @relation(fields: [userId], references: [id], onDelete: Cascade)
-  schedule   ScheduleEntry[]
+  scheduleEntries ScheduleEntry[]
+  schedules  Schedule[]
 
   @@index([userId])
   @@index([userId, deletedAt])
@@ -66,7 +67,7 @@ enum ScheduleStatus {
 
 model Schedule {
   id            String          @id @default(cuid()) @db.VarChar(32)
-  medicineId    String          @db.VarChar(32)
+  medicationId  String          @db.VarChar(32)
   userId        String          @db.VarChar(32)
   quantity      Int             @default(1)
   units         String          @default("pill") @db.VarChar(50)
@@ -80,10 +81,11 @@ model Schedule {
   updatedAt     DateTime        @updatedAt
 
   user          User            @relation(fields: [userId], references: [id], onDelete: Cascade)
+  medication    Medication      @relation(fields: [medicationId], references: [id], onDelete: Cascade)
   scheduleEntries ScheduleEntry[]
 
   @@index([userId])
-  @@index([medicineId])
+  @@index([medicationId])
   @@index([dateStart])
 }
 

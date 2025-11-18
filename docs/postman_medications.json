@@ -1,0 +1,131 @@
+{
+  "info": {
+    "name": "Medications API Test Data",
+    "description": "Test data for medication API endpoints"
+  },
+  "requests": [
+    {
+      "name": "1. POST /api/medications - Create new medication - Ibuprofen tablets",
+      "method": "POST",
+      "url": "http://localhost:3000/api/medications",
+      "headers": {
+        "Content-Type": "application/json",
+        "Cookie": "SESSION_ID=your_session_token_here"
+      },
+      "body": {
+        "name": "Ibuprofen",
+        "dose": 200,
+        "form": "tablets"
+      }
+    },
+    {
+      "name": "2. POST /api/medications - Create new medication - Vitamin D drops",
+      "method": "POST",
+      "url": "http://localhost:3000/api/medications",
+      "headers": {
+        "Content-Type": "application/json",
+        "Cookie": "SESSION_ID=your_session_token_here"
+      },
+      "body": {
+        "name": "Vitamin D3",
+        "dose": 1000,
+        "form": "drops"
+      }
+    },
+    {
+      "name": "3. POST /api/medications - Create new medication - Antibiotic capsules",
+      "method": "POST",
+      "url": "http://localhost:3000/api/medications",
+      "headers": {
+        "Content-Type": "application/json",
+        "Cookie": "SESSION_ID=your_session_token_here"
+      },
+      "body": {
+        "name": "Amoxicillin",
+        "dose": 500,
+        "form": "capsules"
+      }
+    },
+    {
+      "name": "4. POST /api/medications - Create new medication - Cough syrup",
+      "method": "POST",
+      "url": "http://localhost:3000/api/medications",
+      "headers": {
+        "Content-Type": "application/json",
+        "Cookie": "SESSION_ID=your_session_token_here"
+      },
+      "body": {
+        "name": "Cough Syrup",
+        "dose": 10,
+        "form": "ml"
+      }
+    },
+    {
+      "name": "5. GET /api/medications - Get all medications",
+      "method": "GET",
+      "url": "http://localhost:3000/api/medications",
+      "headers": {
+        "Cookie": "SESSION_ID=your_session_token_here"
+      }
+    },
+    {
+      "name": "6. GET /api/medications/[id] - Get single medication by ID",
+      "method": "GET",
+      "url": "http://localhost:3000/api/medications/medication_id_here",
+      "headers": {
+        "Cookie": "SESSION_ID=your_session_token_here"
+      }
+    },
+    {
+      "name": "7. PATCH /api/medications/[id] - Update medication",
+      "method": "PATCH",
+      "url": "http://localhost:3000/api/medications/medication_id_here",
+      "headers": {
+        "Content-Type": "application/json",
+        "Cookie": "SESSION_ID=your_session_token_here"
+      },
+      "body": {
+        "name": "Ibuprofen Updated",
+        "dose": 400,
+        "form": "tablets"
+      },
+      "note": "All fields are optional. Only include fields you want to update."
+    },
+    {
+      "name": "8. DELETE /api/medications/[id] - Soft delete medication",
+      "method": "DELETE",
+      "url": "http://localhost:3000/api/medications/medication_id_here",
+      "headers": {
+        "Cookie": "SESSION_ID=your_session_token_here"
+      }
+    },
+    {
+      "name": "9. POST /api/medications/search - Search medications by name",
+      "method": "POST",
+      "url": "http://localhost:3000/api/medications/search",
+      "headers": {
+        "Content-Type": "application/json",
+        "Cookie": "SESSION_ID=your_session_token_here"
+      },
+      "body": {
+        "name": "ibu"
+      }
+    }
+  ],
+  "fieldReference": {
+    "name": "String, required, 1-150 characters. Medication name (e.g., 'Ibuprofen', 'Vitamin D3')",
+    "dose": "Number (integer), required, must be positive. Dose amount (e.g., 200, 500, 1000)",
+    "form": "String, required, must be one of: tablets, capsules, lozenges, candy, drops, ampoule, syringe, packet, sachet, stick, g, mg, ml, dose, teaspoon, tablespoon",
+    "authentication": "First login via POST /api/auth/login and use the SESSION_ID cookie value"
+  },
+  "exampleResponse": {
+    "medication": {
+      "id": "clx1234567890abcdef",
+      "name": "Ibuprofen",
+      "dose": 200,
+      "form": "tablets",
+      "createdAt": "2025-11-18T15:00:00.000Z",
+      "updatedAt": "2025-11-18T15:00:00.000Z"
+    }
+  }
+}

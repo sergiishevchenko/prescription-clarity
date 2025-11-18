@@ -76,7 +76,13 @@ describe("GET /api/schedule", () => {
         userId: mockUser.id,
         dateTime: new Date("2025-02-01T03:00:00.000Z"),
         status: "PLANNED",
-        medication: { id: "med1", name: "Ibuprofen", dose: "200 mg" },
+        medication: { id: "med1", name: "Ibuprofen", dose: 200 },
+        schedule: {
+          medicationId: "med1",
+          quantity: 1,
+          units: "pill",
+          mealTiming: "before",
+        },
       },
     ];
 
@@ -96,6 +102,9 @@ describe("GET /api/schedule", () => {
         userId: mockUser.id,
         utcDateTime: "2025-02-01T03:00:00.000Z",
         localDateTime: expect.stringContaining("2025-02-01T03:00:00"),
+        quantity: 1,
+        units: "pill",
+        mealTiming: "before",
         medication: scheduleEntries[0].medication,
       }),
     );
