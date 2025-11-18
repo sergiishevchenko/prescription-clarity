@@ -59,8 +59,12 @@ export async function GET(request: NextRequest) {
         },
       },
       include: {
-        medication: {
-          select: { id: true, name: true, dose: true },
+        schedule: {
+          include: {
+            medication: {
+              select: { id: true, name: true, dose: true },
+            },
+          },
         },
       },
       orderBy: { dateTime: "asc" },
@@ -68,12 +72,12 @@ export async function GET(request: NextRequest) {
 
     const result = events.map((e: (typeof events)[number]) => ({
       id: e.id,
-      medicationId: e.medicationId,
+      medicationId: e.schedule?.medicationId ?? null,
       userId: e.userId,
       status: e.status,
       utcDateTime: e.dateTime.toISOString(),
       localDateTime: toLocalString(e.dateTime, validated.tz || "UTC"),
-      medication: e.medication,
+      medication: e.schedule?.medication ?? null,
     }));
 
     return NextResponse.json({ items: result });
@@ -121,7 +125,7 @@ export async function POST(request: NextRequest) {
 
     const schedule = await prisma.schedule.create({
       data: {
-        medicineId: validatedData.medicineId,
+        medicationId: validatedData.medicationId,
         userId: user.id,
         quantity: validatedData.quantity,
         units: validatedData.units,
@@ -134,7 +138,7 @@ export async function POST(request: NextRequest) {
       },
       select: {
         id: true,
-        medicineId: true,
+        medicationId: true,
         userId: true,
         quantity: true,
         units: true,

@@ -20,7 +20,7 @@ export const updateScheduleStatusSchema = z.object({
 });
 
 export const createScheduleSchema = z.object({
-  medicineId: z.string().min(1, "medicineId is required"),
+  medicationId: z.string().min(1, "medicationId is required"),
   quantity: z.coerce.number().int().positive().default(1),
   units: z.string().min(1).max(50).default("pill"),
   frequencyDays: z

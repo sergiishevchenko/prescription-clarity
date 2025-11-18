@@ -13,7 +13,7 @@
         "Cookie": "SESSION_ID=your_session_token_here"
       },
       "body": {
-        "medicineId": "med123",
+        "medicationId": "med123",
         "quantity": 1,
         "units": "pill",
         "frequencyDays": [1, 2, 3, 4, 5, 6, 7],
@@ -32,7 +32,7 @@
         "Cookie": "SESSION_ID=your_session_token_here"
       },
       "body": {
-        "medicineId": "med456",
+        "medicationId": "med456",
         "quantity": 2,
         "units": "tablet",
         "frequencyDays": [1, 2, 3, 4, 5],
@@ -51,7 +51,7 @@
         "Cookie": "SESSION_ID=your_session_token_here"
       },
       "body": {
-        "medicineId": "med789",
+        "medicationId": "med789",
         "quantity": 1,
         "units": "pill",
         "frequencyDays": [6, 7],
@@ -70,7 +70,7 @@
         "Cookie": "SESSION_ID=your_session_token_here"
       },
       "body": {
-        "medicineId": "med999",
+        "medicationId": "med999",
         "quantity": 1,
         "units": "pill",
         "frequencyDays": [1, 2, 3, 4, 5, 6, 7],
@@ -89,7 +89,7 @@
         "Cookie": "SESSION_ID=your_session_token_here"
       },
       "body": {
-        "medicineId": "med111",
+        "medicationId": "med111",
         "quantity": 1,
         "units": "pill",
         "frequencyDays": [1, 2, 3, 4, 5, 6, 7],
