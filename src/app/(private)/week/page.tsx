@@ -2,136 +2,10 @@ import { redirect } from "next/navigation";
 import clsx from "clsx";
 import { getCurrentUser } from "@/lib/auth/current-user";
 import styles from "./week.module.css";
+import { getScheduleEntries, type ScheduleEntryItem } from "@/lib/schedule";
+import { WeekScheduleTable } from "./WeekScheduleTable";
 
-type MedicationItem = {
-  id: string;
-  name: string;
-  dose: string;
-  mealTiming: "before" | "with" | "after" | "any";
-  isTaken?: boolean;
-};
-
-type TimeSlot = {
-  time: string;
-  medications: MedicationItem[];
-};
-
-// Mock data for the week view
-const MOCK_WEEK_DATA: Record<string, TimeSlot[]> = {
-  "2025-11-10": [
-    {
-      time: "07:30",
-      medications: [
-        { id: "1", name: "Omeprazole", dose: "20mg", mealTiming: "before" },
-      ],
-    },
-    {
-      time: "08:00",
-      medications: [
-        { id: "2", name: "Aspirin", dose: "75mg", mealTiming: "with" },
-        { id: "3", name: "Metformin", dose: "500mg", mealTiming: "with" },
-        { id: "4", name: "Lisinopril", dose: "10mg", mealTiming: "any" },
-      ],
-    },
-    {
-      time: "12:00",
-      medications: [
-        {
-          id: "5",
-          name: "Calcium Carbonate",
-          dose: "600mg",
-          mealTiming: "with",
-        },
-        { id: "6", name: "Vitamin D3", dose: "2000 IU", mealTiming: "with" },
-      ],
-    },
-    {
-      time: "16:00",
-      medications: [
-        { id: "7", name: "Amlodipine", dose: "5mg", mealTiming: "any" },
-      ],
-    },
-    {
-      time: "19:00",
-      medications: [
-        {
-          id: "8",
-          name: "Calcium Carbonate",
-          dose: "600mg",
-          mealTiming: "with",
-        },
-        { id: "9", name: "Atorvastatin", dose: "20mg", mealTiming: "after" },
-      ],
-    },
-    {
-      time: "20:00",
-      medications: [
-        { id: "10", name: "Metformin", dose: "500mg", mealTiming: "with" },
-        { id: "11", name: "Simvastatin", dose: "20mg", mealTiming: "with" },
-      ],
-    },
-    {
-      time: "21:30",
-      medications: [
-        { id: "12", name: "Melatonin", dose: "3mg", mealTiming: "any" },
-      ],
-    },
-  ],
-  "2025-11-11": [
-    {
-      time: "07:30",
-      medications: [
-        { id: "1", name: "Omeprazole", dose: "20mg", mealTiming: "before" },
-      ],
-    },
-  ],
-  "2025-11-12": [
-    {
-      time: "07:30",
-      medications: [
-        { id: "1", name: "Omeprazole", dose: "20mg", mealTiming: "before" },
-      ],
-    },
-  ],
-  "2025-11-13": [
-    {
-      time: "07:30",
-      medications: [
-        { id: "1", name: "Omeprazole", dose: "20mg", mealTiming: "before" },
-      ],
-    },
-  ],
-  "2025-11-14": [
-    {
-      time: "07:30",
-      medications: [
-        { id: "1", name: "Omeprazole", dose: "20mg", mealTiming: "before" },
-      ],
-    },
-    {
-      time: "16:00",
-      medications: [
-        { id: "7", name: "Amlodipine", dose: "5mg", mealTiming: "any" },
-      ],
-    },
-  ],
-  "2025-11-15": [
-    {
-      time: "07:30",
-      medications: [
-        { id: "1", name: "Omeprazole", dose: "20mg", mealTiming: "before" },
-      ],
-    },
-  ],
-  "2025-11-16": [
-    {
-      time: "07:30",
-      medications: [
-        { id: "1", name: "Omeprazole", dose: "20mg", mealTiming: "before" },
-      ],
-    },
-  ],
-};
+export const dynamic = "force-dynamic";
 
 // Generate week days (Monday to Sunday)
 function getWeekDays(date: Date): Date[] {
@@ -185,12 +59,26 @@ export default async function WeekPage() {
   const weekEnd = weekDays[6];
   const weekRange = `${formatDate(weekStart, "MMM d")} - ${formatDate(weekEnd, "MMM d")}`;
 
-  // Get all unique time slots from the week data
-  const allTimeSlots = new Set<string>();
-  Object.values(MOCK_WEEK_DATA).forEach((dayData) => {
-    dayData.forEach((slot) => allTimeSlots.add(slot.time));
-  });
-  const sortedTimeSlots = Array.from(allTimeSlots).sort();
+  // Fetch week's schedule entries
+  const startOfWeek = new Date(weekStart);
+  startOfWeek.setHours(0, 0, 0, 0);
+  const endOfWeek = new Date(weekEnd);
+  endOfWeek.setHours(23, 59, 59, 999);
+
+  // Get user's timezone
+  const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
+
+  let scheduleEntries: ScheduleEntryItem[] = [];
+  try {
+    scheduleEntries = await getScheduleEntries(
+      startOfWeek,
+      endOfWeek,
+      timezone,
+    );
+  } catch (error) {
+    console.error("Failed to load schedule entries:", error);
+    scheduleEntries = [];
+  }
 
   return (
     <div className={styles.page}>
@@ -274,123 +162,11 @@ export default async function WeekPage() {
       </header>
 
       <div className={styles.contentWrapper}>
-        <div className={styles.tableCard}>
-          <div className={styles.tableWrapper}>
-            <table className={styles.table}>
-              <thead>
-                <tr>
-                  <th className={styles.timeHeader}>Time</th>
-                  {weekDays.map((day) => {
-                    const dayKey = formatDate(day, "yyyy-MM-dd");
-                    const todayKey = formatDate(today, "yyyy-MM-dd");
-                    const isToday = dayKey === todayKey;
-                    return (
-                      <th
-                        key={dayKey}
-                        className={clsx(
-                          styles.dayHeader,
-                          isToday && styles.dayHeaderToday,
-                        )}
-                      >
-                        <div className={styles.dayName}>
-                          {formatDate(day, "EEE")}
-                        </div>
-                        <div
-                          className={clsx(
-                            styles.dayNumber,
-                            isToday && styles.dayNumberToday,
-                          )}
-                        >
-                          {formatDate(day, "d")}
-                        </div>
-                      </th>
-                    );
-                  })}
-                </tr>
-              </thead>
-              <tbody>
-                {sortedTimeSlots.map((time) => (
-                  <tr key={time}>
-                    <td className={styles.timeCell}>
-                      <div className={styles.timeText}>{time}</div>
-                    </td>
-                    {weekDays.map((day) => {
-                      const dayKey = formatDate(day, "yyyy-MM-dd");
-                      const dayData = MOCK_WEEK_DATA[dayKey] || [];
-                      const slot = dayData.find((s) => s.time === time);
-                      const medications = slot?.medications || [];
-
-                      return (
-                        <td
-                          key={`${dayKey}-${time}`}
-                          className={styles.dayCell}
-                        >
-                          <div className={styles.medicationsList}>
-                            {medications.map((med) => (
-                              <div key={med.id} className={styles.medCard}>
-                                <button
-                                  type="button"
-                                  className={clsx(
-                                    styles.checkbox,
-                                    med.isTaken && styles.checkboxChecked,
-                                  )}
-                                  aria-label={`Mark ${med.name} as ${med.isTaken ? "not taken" : "taken"}`}
-                                >
-                                  {med.isTaken && (
-                                    <CheckIcon className={styles.checkIcon} />
-                                  )}
-                                </button>
-                                <div className={styles.medInfo}>
-                                  <p className={styles.medName}>{med.name}</p>
-                                  <p className={styles.medDose}>{med.dose}</p>
-                                  <p className={styles.medTiming}>
-                                    {med.mealTiming}
-                                  </p>
-                                </div>
-                              </div>
-                            ))}
-                          </div>
-                        </td>
-                      );
-                    })}
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        </div>
-
-        <div className={styles.quickGuide}>
-          <h3 className={styles.quickGuideTitle}>Quick Guide</h3>
-          <div className={styles.quickGuideContent}>
-            <div className={styles.quickGuideItem}>
-              <div className={styles.quickGuideTodayIndicator}></div>
-              <span className={styles.quickGuideLabel}>
-                Today&apos;s column
-              </span>
-            </div>
-            <div className={styles.quickGuideItem}>
-              <div
-                className={clsx(
-                  styles.checkbox,
-                  styles.checkboxChecked,
-                  styles.checkboxSmall,
-                )}
-              >
-                <CheckIcon className={styles.checkIcon} />
-              </div>
-              <span className={styles.quickGuideLabel}>Taken medication</span>
-            </div>
-            <div className={styles.quickGuideItem}>
-              <div
-                className={clsx(styles.checkbox, styles.checkboxSmall)}
-              ></div>
-              <span className={styles.quickGuideLabel}>
-                Click checkbox to mark as taken
-              </span>
-            </div>
-          </div>
-        </div>
+        <WeekScheduleTable
+          initialEntries={scheduleEntries}
+          weekDays={weekDays}
+          today={today}
+        />
       </div>
     </div>
   );
@@ -470,23 +246,6 @@ function ChevronRightIcon({ className }: IconProps) {
       aria-hidden="true"
     >
       <path d="M9 6l6 6-6 6" />
-    </svg>
-  );
-}
-
-function CheckIcon({ className }: IconProps) {
-  return (
-    <svg
-      className={className}
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth={2.5}
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      aria-hidden="true"
-    >
-      <path d="m5 12 5 5 9-9" />
     </svg>
   );
 }
