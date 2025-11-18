@@ -70,5 +70,6 @@ export type FormValues = {
   morningTime?: string;
   afternoonTime?: string;
   eveningTime?: string;
+  customTimes?: string[];
   photo?: FileList;
 };

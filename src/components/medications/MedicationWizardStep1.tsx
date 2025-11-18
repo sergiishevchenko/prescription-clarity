@@ -1,7 +1,13 @@
 "use client";
 
 import dynamic from "next/dynamic";
-import { useEffect, useRef, useState, type ReactNode } from "react";
+import {
+  useCallback,
+  useEffect,
+  useRef,
+  useState,
+  type ReactNode,
+} from "react";
 import { useFormContext } from "react-hook-form";
 
 import { HelpTooltip } from "@/components/shared/HelpTooltip";
@@ -142,6 +148,19 @@ export default function MedicationWizardStep1() {
   const searchContainerRef = useRef<HTMLDivElement | null>(null);
   const selectedNameRef = useRef<string>("");
 
+  const hideSearchResultsSoon = useCallback(() => {
+    const enqueue =
+      typeof queueMicrotask === "function"
+        ? queueMicrotask
+        : (cb: () => void) => {
+            Promise.resolve().then(cb);
+          };
+    enqueue(() => {
+      setSearchResults([]);
+      setShowResults(false);
+    });
+  }, []);
+
   useEffect(() => {
     const handler = (event: MouseEvent) => {
       if (!searchContainerRef.current) return;
@@ -164,13 +183,11 @@ export default function MedicationWizardStep1() {
       selectedNameRef.current = "";
     }
     if (query.length < MIN_SEARCH_QUERY) {
-      setSearchResults([]);
-      setShowResults(false);
+      hideSearchResultsSoon();
       return;
     }
     if (normalizedSelection && normalized === normalizedSelection) {
-      setSearchResults([]);
-      setShowResults(false);
+      hideSearchResultsSoon();
       return;
     }
     let cancelled = false;
@@ -179,7 +196,7 @@ export default function MedicationWizardStep1() {
       fetch("/api/medications/search", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ query }),
+        body: JSON.stringify({ name: query }),
         signal: controller.signal,
       })
         .then(async (response) => {
@@ -195,10 +212,10 @@ export default function MedicationWizardStep1() {
             return;
           }
           const data = (await response.json()) as {
-            results?: MedicationSearchResult[];
+            medications?: MedicationSearchResult[];
           };
           if (!cancelled) {
-            const nextResults = data.results ?? [];
+            const nextResults = data.medications ?? [];
             setSearchResults(nextResults);
             setShowResults(nextResults.length > 0);
           }
@@ -215,7 +232,7 @@ export default function MedicationWizardStep1() {
       controller.abort();
       window.clearTimeout(timeout);
     };
-  }, [medicationIdValue, nameValue, setValue]);
+  }, [hideSearchResultsSoon, medicationIdValue, nameValue, setValue]);
 
   const handleSelectMedication = (result: MedicationSearchResult) => {
     setValue("medicationId", result.id, { shouldDirty: true });
@@ -334,7 +351,7 @@ export default function MedicationWizardStep1() {
               <FieldLabel
                 htmlFor="medication-form"
                 label="Medication Form"
-                required
+                optionalText="(Optional)"
                 tooltip={formTooltip}
                 tooltipPlacement="bottom"
               />
@@ -344,9 +361,7 @@ export default function MedicationWizardStep1() {
                   className={`${styles.select} ${
                     errors.form ? styles.inputError : ""
                   }`}
-                  {...register("form", {
-                    required: "Please select the medication form.",
-                  })}
+                  {...register("form")}
                 >
                   <option value="">Select a form</option>
                   {MEDICATION_FORMS.map((value) => (
@@ -419,4 +434,3 @@ export default function MedicationWizardStep1() {
     </section>
   );
 }
-
