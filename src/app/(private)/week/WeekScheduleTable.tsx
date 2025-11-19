@@ -28,54 +28,83 @@ type TimeSlot = {
   medications: MedicationItem[];
 };
 
+type StatusFilter = "all" | "taken" | "missed";
+type MealTimingFilter = "all" | "before" | "with" | "after";
+
 type WeekScheduleTableProps = {
   initialEntries: ScheduleEntryItem[];
   weekDays: Date[];
   today: Date;
+  statusFilter?: StatusFilter;
+  mealTimingFilter?: MealTimingFilter;
 };
 
 export function WeekScheduleTable({
   initialEntries,
   weekDays,
   today,
+  statusFilter = "all",
+  mealTimingFilter = "all",
 }: WeekScheduleTableProps) {
   const router = useRouter();
   const [isPending, startTransition] = useTransition();
   const [updatingIds, setUpdatingIds] = useState<Set<string>>(new Set());
 
+  // Filter entries based on active filters
+  const filteredEntries = initialEntries.filter((entry) => {
+    if (!entry.medication) return false;
+
+    // Status filter
+    if (statusFilter === "taken" && entry.status !== "DONE") {
+      return false;
+    }
+    if (statusFilter === "missed" && entry.status !== "PLANNED") {
+      return false;
+    }
+
+    // Meal timing filter
+    const entryMealTiming =
+      entry.mealTiming === "anytime" ? "any" : entry.mealTiming || "any";
+    if (mealTimingFilter !== "all") {
+      if (entryMealTiming !== mealTimingFilter) {
+        return false;
+      }
+    }
+
+    return true;
+  });
+
   // Transform API response to week data format: Record<date, TimeSlot[]>
   const weekData: Record<string, TimeSlot[]> = {};
 
-  initialEntries
-    .filter((entry) => entry.medication)
-    .forEach((entry) => {
-      const date = extractDateFromLocalDateTime(entry.localDateTime);
-      const time = extractTimeFromLocalDateTime(entry.localDateTime);
+  filteredEntries.forEach((entry) => {
+    const date = extractDateFromLocalDateTime(entry.localDateTime);
+    const time = extractTimeFromLocalDateTime(entry.localDateTime);
 
-      if (!date || !time) return;
+    if (!date || !time) return;
 
-      if (!weekData[date]) {
-        weekData[date] = [];
-      }
+    if (!weekData[date]) {
+      weekData[date] = [];
+    }
 
-      let timeSlot = weekData[date].find((slot) => slot.time === time);
-      if (!timeSlot) {
-        timeSlot = { time, medications: [] };
-        weekData[date].push(timeSlot);
-      }
+    let timeSlot = weekData[date].find((slot) => slot.time === time);
+    if (!timeSlot) {
+      timeSlot = { time, medications: [] };
+      weekData[date].push(timeSlot);
+    }
 
-      const mealTiming =
-        entry.mealTiming === "anytime" ? "any" : entry.mealTiming || "any";
-      timeSlot.medications.push({
-        id: entry.id,
-        name: entry.medication!.name,
-        dosage: formatDosage(entry.medication!.dose),
-        dose: formatDose(entry.quantity, entry.units),
-        mealTiming: mealTiming as "before" | "with" | "after" | "any",
-        isTaken: entry.status === "DONE",
-        status: entry.status,
-      });
+    const mealTiming =
+      entry.mealTiming === "anytime" ? "any" : entry.mealTiming || "any";
+    timeSlot.medications.push({
+      id: entry.id,
+      name: entry.medication!.name,
+      dosage: formatDosage(entry.medication!.dose),
+      dose: formatDose(entry.quantity, entry.units),
+      mealTiming: mealTiming as "before" | "with" | "after" | "any",
+      isTaken: entry.status === "DONE",
+      status: entry.status,
     });
+  });
 
   // Sort time slots within each day
   Object.keys(weekData).forEach((date) => {
@@ -186,17 +215,31 @@ export function WeekScheduleTable({
                   </td>
                   {weekDays.map((day) => {
                     const dayKey = formatDate(day, "yyyy-MM-dd");
+                    const todayKey = formatDate(today, "yyyy-MM-dd");
+                    const isToday = dayKey === todayKey;
                     const dayData = weekData[dayKey] || [];
                     const slot = dayData.find((s) => s.time === time);
                     const medications = slot?.medications || [];
 
                     return (
-                      <td key={`${dayKey}-${time}`} className={styles.dayCell}>
+                      <td
+                        key={`${dayKey}-${time}`}
+                        className={clsx(
+                          styles.dayCell,
+                          isToday && styles.dayCellToday,
+                        )}
+                      >
                         <div className={styles.medicationsList}>
                           {medications.map((med) => {
                             const isUpdating = updatingIds.has(med.id);
                             return (
-                              <div key={med.id} className={styles.medCard}>
+                              <div
+                                key={med.id}
+                                className={clsx(
+                                  styles.medCard,
+                                  med.isTaken && styles.medCardTaken,
+                                )}
+                              >
                                 <button
                                   type="button"
                                   className={clsx(

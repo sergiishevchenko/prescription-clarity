@@ -1,9 +1,12 @@
+import Link from "next/link";
 import { redirect } from "next/navigation";
 import clsx from "clsx";
 import { getCurrentUser } from "@/lib/auth/current-user";
 import styles from "./week.module.css";
 import { getScheduleEntries, type ScheduleEntryItem } from "@/lib/schedule";
-import { WeekScheduleTable } from "./WeekScheduleTable";
+import { WeekFilterProvider } from "./WeekFilterContext";
+import { WeekFiltersPlaceholder } from "./WeekFiltersPlaceholder";
+import { WeekTableWrapper } from "./WeekTableWrapper";
 
 export const dynamic = "force-dynamic";
 
@@ -47,17 +50,51 @@ function formatDate(
   return "";
 }
 
-export default async function WeekPage() {
+type WeekPageProps = {
+  searchParams: Promise<{ week?: string }>;
+};
+
+export default async function WeekPage({ searchParams }: WeekPageProps) {
   const user = await getCurrentUser();
   if (!user) {
     redirect("/login");
   }
 
   const today = new Date();
-  const weekDays = getWeekDays(new Date(today));
+  const params = await searchParams;
+
+  let referenceDate: Date;
+  if (params.week) {
+    const [year, month, day] = params.week.split("-").map(Number);
+    if (
+      !isNaN(year) &&
+      !isNaN(month) &&
+      !isNaN(day) &&
+      month >= 1 &&
+      month <= 12 &&
+      day >= 1 &&
+      day <= 31
+    ) {
+      referenceDate = new Date(year, month - 1, day);
+    } else {
+      referenceDate = new Date(today);
+    }
+  } else {
+    referenceDate = new Date(today);
+  }
+
+  const weekDays = getWeekDays(new Date(referenceDate));
   const weekStart = weekDays[0];
   const weekEnd = weekDays[6];
   const weekRange = `${formatDate(weekStart, "MMM d")} - ${formatDate(weekEnd, "MMM d")}`;
+  const currentWeekParam = formatDate(weekStart, "yyyy-MM-dd");
+
+  const prevWeekStart = new Date(weekStart);
+  prevWeekStart.setDate(prevWeekStart.getDate() - 7);
+  const nextWeekStart = new Date(weekStart);
+  nextWeekStart.setDate(nextWeekStart.getDate() + 7);
+  const prevWeekParam = formatDate(prevWeekStart, "yyyy-MM-dd");
+  const nextWeekParam = formatDate(nextWeekStart, "yyyy-MM-dd");
 
   // Fetch week's schedule entries
   const startOfWeek = new Date(weekStart);
@@ -81,94 +118,61 @@ export default async function WeekPage() {
   }
 
   return (
-    <div className={styles.page}>
-      <header className={styles.stickyHeader}>
-        <div className={styles.headerInner}>
-          <div className={styles.headerTop}>
-            <h1 className={styles.title}>Week View</h1>
-            <div className={styles.headerButtons}>
-              <button
-                type="button"
-                className={styles.printButton}
-                aria-label="Print week schedule"
-              >
-                <PrintIcon className={styles.printIcon} />
-                <span className={styles.printText}>Print</span>
-              </button>
-              <button
-                type="button"
-                className={styles.todayButton}
-                aria-label="Go to today"
-              >
-                <CalendarIcon className={styles.calendarIcon} />
-                <span>Today</span>
-              </button>
+    <WeekFilterProvider>
+      <div className={styles.page}>
+        <header className={styles.stickyHeader}>
+          <div className={styles.headerInner}>
+            <div className={styles.headerTop}>
+              <h1 className={styles.title}>Week View</h1>
+              <div className={styles.headerButtons}>
+                <button
+                  type="button"
+                  className={styles.printButton}
+                  aria-label="Print week schedule"
+                >
+                  <PrintIcon className={styles.printIcon} />
+                  <span className={styles.printText}>Print</span>
+                </button>
+                <Link
+                  href="/week"
+                  className={styles.todayButton}
+                  aria-label="Go to current week"
+                >
+                  <CalendarIcon className={styles.calendarIcon} />
+                  <span>Today</span>
+                </Link>
+              </div>
             </div>
-          </div>
-          <div className={styles.weekNavigation}>
-            <button
-              type="button"
-              className={styles.navButton}
-              aria-label="Previous week"
-            >
-              <ChevronLeftIcon className={styles.navIcon} />
-              <span className={styles.navText}>Previous</span>
-            </button>
-            <div className={styles.weekRange}>{weekRange}</div>
-            <button
-              type="button"
-              className={styles.navButton}
-              aria-label="Next week"
-            >
-              <span className={styles.navText}>Next</span>
-              <ChevronRightIcon className={styles.navIcon} />
-            </button>
-          </div>
-          <div className={styles.filters}>
-            <div className={styles.filterGroup}>
-              <button
-                type="button"
-                className={clsx(styles.filterButton, styles.filterButtonActive)}
+            <div className={styles.weekNavigation}>
+              <Link
+                href={`/week?week=${prevWeekParam}`}
+                className={styles.navButton}
+                aria-label="Previous week"
               >
-                All
-              </button>
-              <button type="button" className={styles.filterButton}>
-                Taken
-              </button>
-              <button type="button" className={styles.filterButton}>
-                Missed
-              </button>
-            </div>
-            <div className={styles.filterDivider}></div>
-            <div className={styles.filterGroup}>
-              <button
-                type="button"
-                className={clsx(styles.filterButton, styles.filterButtonActive)}
+                <ChevronLeftIcon className={styles.navIcon} />
+                <span className={styles.navText}>Previous</span>
+              </Link>
+              <div className={styles.weekRange}>{weekRange}</div>
+              <Link
+                href={`/week?week=${nextWeekParam}`}
+                className={styles.navButton}
+                aria-label="Next week"
               >
-                All Meals
-              </button>
-              <button type="button" className={styles.filterButton}>
-                Before
-              </button>
-              <button type="button" className={styles.filterButton}>
-                With
-              </button>
-              <button type="button" className={styles.filterButton}>
-                After
-              </button>
+                <span className={styles.navText}>Next</span>
+                <ChevronRightIcon className={styles.navIcon} />
+              </Link>
             </div>
+            <WeekFiltersPlaceholder />
           </div>
-        </div>
-      </header>
+        </header>
 
-      <div className={styles.contentWrapper}>
-        <WeekScheduleTable
+        <WeekTableWrapper
           initialEntries={scheduleEntries}
           weekDays={weekDays}
           today={today}
         />
       </div>
-    </div>
+    </WeekFilterProvider>
   );
 }
 

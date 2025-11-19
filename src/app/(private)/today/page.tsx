@@ -4,18 +4,52 @@ import { getCurrentUser } from "@/lib/auth/current-user";
 import styles from "./today.module.css";
 import { getScheduleEntries, type ScheduleEntryItem } from "@/lib/schedule";
 import { ScheduleList } from "./ScheduleList";
+import { DayNavigation } from "./DayNavigation";
+import { CalendarGrid } from "./CalendarGrid";
+import { CalendarNavigation } from "./CalendarNavigation";
 
 type CalendarStatus = "AllTaken" | "Partial" | "Scheduled" | "Missed" | "None";
 
 type CalendarDay = {
-  value: number;
+  value: number | null;
   status: CalendarStatus;
   isToday?: boolean;
+  isSelected?: boolean;
 };
 
-// Static calendar data (can be enhanced later with actual API data)
-const calendarDays: CalendarDay[] = Array.from({ length: 30 }, (_, index) => {
-  const day = index + 1;
+function generateCalendarDays(
+  year: number,
+  month: number,
+  today: Date,
+  selectedDate: Date,
+): CalendarDay[] {
+  // Get first day of the month
+  const firstDay = new Date(year, month, 1);
+  // Get last day of the month (day 0 of next month)
+  const lastDay = new Date(year, month + 1, 0);
+
+  // Get day of week for first day (0 = Sunday, 1 = Monday, ..., 6 = Saturday)
+  const firstDayOfWeek = firstDay.getDay();
+  // Number of days in the month
+  const daysInMonth = lastDay.getDate();
+
+  const days: CalendarDay[] = [];
+
+  // Add empty cells before the first day of the month
+  // Week starts with Monday, so:
+  // - If first day is Sunday (0), we need 6 empty cells
+  // - If first day is Monday (1), we need 0 empty cells
+  // - If first day is Tuesday (2), we need 1 empty cell, etc.
+  const emptyCells = firstDayOfWeek === 0 ? 6 : firstDayOfWeek - 1;
+  for (let i = 0; i < emptyCells; i++) {
+    days.push({
+      value: null,
+      status: "None",
+      isToday: false,
+    });
+  }
+
+  // Status mapping example (to be replaced with actual API data later)
   const statusMap: Record<number, CalendarStatus> = {
     5: "Missed",
     6: "Missed",
@@ -32,12 +66,29 @@ const calendarDays: CalendarDay[] = Array.from({ length: 30 }, (_, index) => {
     17: "Scheduled",
     18: "AllTaken",
   };
-  return {
-    value: day,
-    status: statusMap[day] ?? "None",
-    isToday: day === 13,
-  };
-});
+
+  // Add all days of the month
+  for (let day = 1; day <= daysInMonth; day++) {
+    const currentDate = new Date(year, month, day);
+    const isToday =
+      currentDate.getDate() === today.getDate() &&
+      currentDate.getMonth() === today.getMonth() &&
+      currentDate.getFullYear() === today.getFullYear();
+    const isSelected =
+      currentDate.getDate() === selectedDate.getDate() &&
+      currentDate.getMonth() === selectedDate.getMonth() &&
+      currentDate.getFullYear() === selectedDate.getFullYear();
+
+    days.push({
+      value: day,
+      status: statusMap[day] ?? "None",
+      isToday,
+      isSelected,
+    });
+  }
+
+  return days;
+}
 
 const legendItems = [
   { label: "All taken", className: styles.legendSwatchSuccess },
@@ -55,24 +106,69 @@ function formatDateParts(date: Date) {
     date,
   );
   const full = new Intl.DateTimeFormat("en-US", {
-    month: "short",
+    month: "long",
     day: "numeric",
     year: "numeric",
   }).format(date);
   return { short, weekday, full };
 }
 
-function statusClass(status: CalendarStatus) {
-  if (status === "None") return undefined;
-  return styles[`calendarDay${status}` as keyof typeof styles];
-}
-
 export const dynamic = "force-dynamic";
 
-export default async function TodayPage() {
+type TodayPageProps = {
+  searchParams: Promise<{ date?: string; month?: string }>;
+};
+
+export default async function TodayPage({ searchParams }: TodayPageProps) {
   const user = await getCurrentUser();
   if (!user) {
     redirect("/login");
+  }
+
+  const params = await searchParams;
+  // Parse date from search params (YYYY-MM-DD format) or default to today
+  let selectedDate: Date;
+  if (params.date) {
+    // Parse YYYY-MM-DD format in local timezone
+    const [year, month, day] = params.date.split("-").map(Number);
+    if (
+      isNaN(year) ||
+      isNaN(month) ||
+      isNaN(day) ||
+      month < 1 ||
+      month > 12 ||
+      day < 1 ||
+      day > 31
+    ) {
+      redirect("/today");
+    }
+    selectedDate = new Date(year, month - 1, day);
+    // Ensure valid date
+    if (isNaN(selectedDate.getTime())) {
+      redirect("/today");
+    }
+  } else {
+    selectedDate = new Date();
+  }
+
+  // Parse month from search params (YYYY-MM format) for calendar view
+  // If not provided, use the selected date's month
+  let calendarYear: number;
+  let calendarMonth: number;
+  if (params.month) {
+    const [year, month] = params.month.split("-").map(Number);
+    if (isNaN(year) || isNaN(month) || month < 1 || month > 12) {
+      // Invalid month param, use selected date's month
+      calendarYear = selectedDate.getFullYear();
+      calendarMonth = selectedDate.getMonth();
+    } else {
+      calendarYear = year;
+      calendarMonth = month - 1; // Convert to 0-indexed
+    }
+  } else {
+    // No month param, use selected date's month
+    calendarYear = selectedDate.getFullYear();
+    calendarMonth = selectedDate.getMonth();
   }
 
   const displayName =
@@ -80,12 +176,12 @@ export default async function TodayPage() {
     user.email?.split("@")[0]?.replace(/\./g, " ") ||
     "Patient";
   const today = new Date();
-  const { full, short, weekday } = formatDateParts(today);
+  const { full, short, weekday } = formatDateParts(selectedDate);
 
-  // Fetch today's schedule entries
-  const startOfDay = new Date(today);
+  // Fetch selected day's schedule entries
+  const startOfDay = new Date(selectedDate);
   startOfDay.setHours(0, 0, 0, 0);
-  const endOfDay = new Date(today);
+  const endOfDay = new Date(selectedDate);
   endOfDay.setHours(23, 59, 59, 999);
 
   // Get user's timezone (default to UTC, can be enhanced later)
@@ -98,6 +194,14 @@ export default async function TodayPage() {
     console.error("Failed to load schedule entries:", error);
     scheduleEntries = [];
   }
+
+  // Generate calendar for the specified month (or selected date's month if not specified)
+  const calendarDays = generateCalendarDays(
+    calendarYear,
+    calendarMonth,
+    today,
+    selectedDate,
+  );
 
   return (
     <div className={styles.page}>
@@ -128,70 +232,38 @@ export default async function TodayPage() {
         </header>
 
         <div className={styles.content}>
-          <ScheduleList initialEntries={scheduleEntries} />
+          <ScheduleList
+            initialEntries={scheduleEntries}
+            selectedDate={selectedDate}
+            today={today}
+          />
 
-          <nav className={styles.dayControls} aria-label="Day selector">
-            <button
-              type="button"
-              className={styles.navArrow}
-              aria-label="Previous day"
-            >
-              <ArrowLeftIcon className={styles.navIcon} />
-            </button>
-            <button type="button" className={styles.dateButton}>
-              <span className={styles.datePrimary}>{short}</span>
-              <span className={styles.dateSecondary}>{weekday}</span>
-            </button>
-            <button
-              type="button"
-              className={styles.navArrow}
-              aria-label="Next day"
-            >
-              <ArrowRightIcon className={styles.navIcon} />
-            </button>
-          </nav>
+          <DayNavigation
+            selectedDate={selectedDate}
+            today={today}
+            short={short}
+            weekday={weekday}
+          />
 
           <section
             className={styles.calendarSection}
             aria-label="Monthly overview"
           >
-            <div className={styles.calendarHeader}>
-              <button
-                type="button"
-                className={styles.calendarNav}
-                aria-label="Previous month"
-              >
-                <ArrowLeftIcon className={styles.navIcon} />
-              </button>
-              <h4 className={styles.calendarTitle}>November 2025</h4>
-              <button
-                type="button"
-                className={styles.calendarNav}
-                aria-label="Next month"
-              >
-                <ArrowRightIcon className={styles.navIcon} />
-              </button>
-            </div>
+            <CalendarNavigation
+              calendarYear={calendarYear}
+              calendarMonth={calendarMonth}
+              selectedDate={selectedDate}
+            />
             <div className={styles.weekdays}>
-              {"SMTWTFS".split("").map((day, index) => (
+              {"MTWTFSS".split("").map((day, index) => (
                 <span key={`${day}-${index}`}>{day}</span>
               ))}
             </div>
-            <div className={styles.calendarGrid}>
-              {calendarDays.map((day) => (
-                <button
-                  key={day.value}
-                  type="button"
-                  className={clsx(
-                    styles.calendarDay,
-                    day.isToday && styles.calendarDayToday,
-                    statusClass(day.status),
-                  )}
-                >
-                  {day.value}
-                </button>
-              ))}
-            </div>
+            <CalendarGrid
+              days={calendarDays}
+              calendarYear={calendarYear}
+              calendarMonth={calendarMonth}
+            />
             <div className={styles.calendarLegend}>
               {legendItems.map((item) => (
                 <div key={item.label} className={styles.legendItem}>

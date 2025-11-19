@@ -48,9 +48,34 @@ const contextClassMap: Record<ScheduleContext, string> = {
 
 type ScheduleListProps = {
   initialEntries: ScheduleEntryItem[];
+  selectedDate: Date;
+  today: Date;
 };
 
-export function ScheduleList({ initialEntries }: ScheduleListProps) {
+function formatScheduleTitle(selectedDate: Date, today: Date): string {
+  const isToday =
+    selectedDate.getDate() === today.getDate() &&
+    selectedDate.getMonth() === today.getMonth() &&
+    selectedDate.getFullYear() === today.getFullYear();
+
+  if (isToday) {
+    return "Today's Schedule";
+  }
+
+  const dateStr = new Intl.DateTimeFormat("en-US", {
+    month: "long",
+    day: "numeric",
+    year: "numeric",
+  }).format(selectedDate);
+
+  return `${dateStr} Schedule`;
+}
+
+export function ScheduleList({
+  initialEntries,
+  selectedDate,
+  today,
+}: ScheduleListProps) {
   const router = useRouter();
   const [isPending, startTransition] = useTransition();
   const [updatingIds, setUpdatingIds] = useState<Set<string>>(new Set());
@@ -101,6 +126,41 @@ export function ScheduleList({ initialEntries }: ScheduleListProps) {
     }
   };
 
+  const handleMarkAll = async () => {
+    if (activeSchedule.length === 0) {
+      return;
+    }
+
+    // Add all active items to updatingIds for optimistic UI
+    const allActiveIds = activeSchedule.map((item) => item.id);
+    setUpdatingIds((prev) => new Set([...prev, ...allActiveIds]));
+
+    try {
+      // Update all active entries to DONE in parallel
+      await Promise.all(
+        activeSchedule.map((item) =>
+          updateScheduleEntryStatus(item.id, "DONE"),
+        ),
+      );
+
+      // Refresh the page data after all updates complete
+      startTransition(() => {
+        router.refresh();
+      });
+    } catch (error) {
+      console.error("Failed to mark all as taken:", error);
+      // On error, refresh to restore correct state
+      router.refresh();
+    } finally {
+      // Clear all IDs from updatingIds
+      setUpdatingIds((prev) => {
+        const next = new Set(prev);
+        allActiveIds.forEach((id) => next.delete(id));
+        return next;
+      });
+    }
+  };
+
   const pendingCount = activeSchedule.length;
   const completedCount = completedSchedule.length;
 
@@ -108,17 +168,24 @@ export function ScheduleList({ initialEntries }: ScheduleListProps) {
     <section className={styles.scheduleSection}>
       <div className={styles.sectionHeader}>
         <div className={styles.sectionHeading}>
-          <h2 className={styles.sectionTitle}>Today&apos;s Schedule</h2>
+          <h2 className={styles.sectionTitle}>
+            {formatScheduleTitle(selectedDate, today)}
+          </h2>
           <p className={styles.sectionSubtitle}>
             {pendingCount === 0
-              ? "All caught up for today"
+              ? "All caught up"
               : pendingCount === 1
                 ? "1 medication pending"
                 : `${pendingCount} medications pending`}{" "}
             · {completedCount} completed
           </p>
         </div>
-        <button type="button" className={styles.markAllButton}>
+        <button
+          type="button"
+          className={styles.markAllButton}
+          onClick={handleMarkAll}
+          disabled={isPending || pendingCount === 0}
+        >
           <CheckIcon className={styles.markAllIcon} />
           <span>Mark All</span>
         </button>
