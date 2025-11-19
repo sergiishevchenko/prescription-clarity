@@ -4,7 +4,9 @@ import { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 
 import { WizardLayout } from "@/components/medications/WizardLayout";
-import NewMedicationForm from "@/components/medications/NewMedicationForm";
+import NewMedicationForm, {
+  type StepValidatorFn,
+} from "@/components/medications/NewMedicationForm";
 import MedicationWizardStep1 from "@/components/medications/MedicationWizardStep1";
 import { useToast } from "@/components/shared/ToastProvider";
 import styles from "@/components/medications/WizardLayout.module.css";
@@ -20,9 +22,9 @@ export default function NewMedicationFormPage() {
   const [step, setStep] = useState(() => readWizardStep(totalSteps));
   const [isStepValid, setIsStepValid] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const validateStepRef = useRef<(() => Promise<boolean>) | null>(null);
+  const validateStepRef = useRef<StepValidatorFn | null>(null);
+  const ensureMedicationRef = useRef<(() => Promise<boolean>) | null>(null);
   const submitFormRef = useRef<(() => Promise<void> | void) | null>(null);
-
   useEffect(() => {
     persistWizardStep(step);
   }, [step]);
@@ -30,14 +32,25 @@ export default function NewMedicationFormPage() {
   const handleNext = async () => {
     if (step >= totalSteps) return;
     if (validateStepRef.current) {
-      const valid = await validateStepRef.current();
+      const validator = validateStepRef.current;
+      const valid = await validator();
       if (!valid) {
-        showStepError(step);
+        if (validator.lastErrorMessage) {
+          toast(validator.lastErrorMessage, { variant: "error" });
+        } else {
+          showStepError(step);
+        }
         return;
       }
     } else if (!isStepValid) {
       showStepError(step);
       return;
+    }
+    if (step === 1 && ensureMedicationRef.current) {
+      const ensured = await ensureMedicationRef.current();
+      if (!ensured) {
+        return;
+      }
     }
     setStep((prev) => prev + 1);
   };
@@ -52,7 +65,7 @@ export default function NewMedicationFormPage() {
 
   const showStepError = (currentStep: number) => {
     const errors: Record<number, string> = {
-      1: "Please fill in all required fields: Medication Name, Quantity, Dosage, and Unit",
+      1: "Please fill in the medication name",
       2: "Please complete the dosing schedule",
       3: "Please select at least one day",
       4: "Please complete the treatment duration",
@@ -138,7 +151,7 @@ export default function NewMedicationFormPage() {
 
   const getActionButtons = () => {
     if (step !== 5) return undefined;
-    const handleAddMedication = () => {
+    const handleAddSchedule = () => {
       submitFormRef.current?.();
     };
     return (
@@ -165,16 +178,16 @@ export default function NewMedicationFormPage() {
         </button>
         <button
           type="button"
-          onClick={handleAddMedication}
+          onClick={handleAddSchedule}
           className={`${styles.button} ${styles.buttonSuccess}`}
           disabled={isSubmitting}
         >
           <svg
-            className={styles.buttonIcon}
+            className={`${styles.buttonIcon} ${styles.buttonIconLarge}`}
             viewBox="0 0 24 24"
             fill="none"
             stroke="currentColor"
-            strokeWidth="2"
+            strokeWidth="2.2"
           >
             <path
               d="M9 12l2 2 4-4"
@@ -182,7 +195,7 @@ export default function NewMedicationFormPage() {
               strokeLinejoin="round"
             />
           </svg>
-          {isSubmitting ? "Saving..." : "Add Medication"}
+          {isSubmitting ? "Saving..." : "Add Schedule"}
         </button>
       </div>
     );
@@ -211,6 +224,7 @@ export default function NewMedicationFormPage() {
         stepOneComponent={<MedicationWizardStep1 />}
         onValidate={setIsStepValid}
         validateStepRef={validateStepRef}
+        ensureMedicationRef={ensureMedicationRef}
         submitFormRef={submitFormRef}
         onSubmittingChange={setIsSubmitting}
       />

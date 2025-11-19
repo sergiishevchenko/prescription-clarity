@@ -103,3 +103,8 @@ export const clearWizardStorage = () => {
   clearWizardFormState();
   clearWizardStep();
 };
+
+export const clearMedicationWizard = () => {
+  clearWizardFormState();
+  clearWizardStep();
+};

@@ -1,5 +1,6 @@
 "use client";
 
+import { useState } from "react";
 import { useFormContext, useWatch } from "react-hook-form";
 
 import { HelpTooltip } from "@/components/shared/HelpTooltip";
@@ -40,23 +41,66 @@ const formatTimeValue = (value?: string) => {
   }).format(date);
 };
 
+const normalizeCustomTime = (value?: string | null) => {
+  if (!value) return null;
+  const trimmed = value.trim();
+  if (!trimmed) return null;
+  if (!/^([0-1][0-9]|2[0-3]):[0-5][0-9]$/.test(trimmed)) {
+    return null;
+  }
+  return trimmed;
+};
+
 export default function TimeOfDayChips({ selected, onToggle, error }: Props) {
-  const { control, watch } = useFormContext<FormValues>();
+  const { control, watch, setValue } = useFormContext<FormValues>();
   const freq = useWatch({ control, name: "frequency" });
   const [morningTime, afternoonTime, eveningTime] = watch([
     "morningTime",
     "afternoonTime",
     "eveningTime",
   ]) as Array<string | undefined>;
+  const customTimes = (watch("customTimes") as string[] | undefined) ?? [];
+  const [showCustomPicker, setShowCustomPicker] = useState(false);
+  const [customTimeValue, setCustomTimeValue] = useState("08:00");
 
   const required = Number(freq || 1) || 1;
   const label =
     required === 1 ? "Select 1 Time of Day" : `Select ${required} Times of Day`;
-  const selectedCount = Math.min(selected.length, required);
-  const isComplete = selectedCount === required;
+  const totalSelected = selected.length + customTimes.length;
+  const selectedCount = totalSelected;
+  const isComplete = totalSelected === required;
   const statusClass = isComplete
     ? stepStyles.statusSuccess
     : stepStyles.statusWarning;
+
+  const openCustomPicker = () => {
+    setCustomTimeValue("08:00");
+    setShowCustomPicker(true);
+  };
+
+  const handleCustomSave = () => {
+    const normalized = normalizeCustomTime(customTimeValue) ?? "08:00";
+    setValue("customTimes", [...customTimes, normalized], {
+      shouldDirty: true,
+      shouldValidate: true,
+    });
+    setShowCustomPicker(false);
+  };
+
+  const handleRemoveCustomTime = (index: number) => {
+    const nextTimes = customTimes.filter((_, i) => i !== index);
+    setValue("customTimes", nextTimes, {
+      shouldDirty: true,
+      shouldValidate: true,
+    });
+  };
+
+  const customPreview =
+    customTimes.length > 0
+      ? `${customTimes.length} custom ${
+          customTimes.length === 1 ? "time" : "times"
+        }`
+      : "Create a reminder at any hour";
 
   return (
     <div>
@@ -138,7 +182,94 @@ export default function TimeOfDayChips({ selected, onToggle, error }: Props) {
             </button>
           );
         })}
+        <button
+          type="button"
+          onClick={openCustomPicker}
+          className={`flex items-center gap-4 rounded-[22px] border-2 border-dashed border-[#CBD5F5] bg-white px-4 py-4 text-left text-[#1F2A44] transition hover:border-[#1479FF] focus-visible:ring-4 focus-visible:ring-[#1479FF]/20 focus-visible:outline-none`}
+        >
+          <div className="flex h-14 w-14 min-w-[3.5rem] items-center justify-center rounded-full bg-[#EEF2FF] text-[#4338CA]">
+            <svg
+              viewBox="0 0 20 20"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="1.8"
+              className="h-6 w-6"
+            >
+              <path d="M10 4v12M4 10h12" strokeLinecap="round" />
+            </svg>
+          </div>
+          <div>
+            <p className={stepStyles.cardTitle}>Add custom time</p>
+            <p className={stepStyles.cardDescription}>{customPreview}</p>
+          </div>
+        </button>
       </div>
+      {customTimes.length > 0 && (
+        <div className="mt-4 space-y-2">
+          {customTimes.map((time, index) => (
+            <div
+              key={`${time}-${index}`}
+              className="flex items-center justify-between rounded-[18px] border border-[#E5E7EB] bg-[#F8FAFF] px-4 py-3"
+            >
+              <div>
+                <p className="text-[14px] font-semibold text-[#111827]">
+                  Custom time {index + 1}
+                </p>
+                <p className="text-[13px] text-gray-600">
+                  {formatTimeValue(time)}
+                </p>
+              </div>
+              <button
+                type="button"
+                onClick={() => handleRemoveCustomTime(index)}
+                className="rounded-full border border-transparent px-3 py-1 text-[13px] font-semibold text-[#B91C1C] transition hover:border-[#FECACA] hover:bg-[#FEF2F2]"
+              >
+                Remove
+              </button>
+            </div>
+          ))}
+          <p className="text-[13px] text-[#6B7280]">
+            Custom reminders count toward your daily total.
+          </p>
+        </div>
+      )}
+      {showCustomPicker && (
+        <div className="mt-4 rounded-[28px] border border-[#E0E7FF] bg-white px-6 py-6 shadow-[0_24px_60px_rgba(15,23,42,0.08)]">
+          <div className="flex flex-col gap-4 md:flex-row md:items-center">
+            <div className="flex-1">
+              <p className={stepStyles.labelText}>Custom time</p>
+              <p className={stepStyles.helperText}>
+                Set the exact minute with 15-minute increments. These times
+                count toward your daily reminders.
+              </p>
+              <input
+                id="custom-time-value"
+                type="time"
+                step={900}
+                value={customTimeValue}
+                onChange={(event) => setCustomTimeValue(event.target.value)}
+                className={`${stepStyles.input} mt-3 h-[56px] w-full rounded-[18px] border border-[#E0E7FF] bg-[#F8FAFF] px-4 focus:border-[#1479FF] focus:ring-2 focus:ring-[#1479FF]/30 focus:outline-none`}
+              />
+            </div>
+          </div>
+          <div className="mt-6 flex flex-col gap-3 md:flex-row">
+            <button
+              type="button"
+              onClick={handleCustomSave}
+              className="flex-1 rounded-[18px] bg-gradient-to-r from-[#1479FF] to-[#2DD4BF] px-4 py-3 text-center text-[15px] font-semibold text-white shadow-[0_18px_35px_rgba(20,121,255,0.3)] transition hover:brightness-105"
+            >
+              Apply custom time
+            </button>
+            <button
+              type="button"
+              onClick={() => setShowCustomPicker(false)}
+              className="flex-1 rounded-[18px] border border-[#D1D5DB] px-4 py-3 text-center text-[15px] font-semibold text-[#111827] transition hover:bg-[#F3F4F6]"
+            >
+              Cancel
+            </button>
+          </div>
+        </div>
+      )}
       {error && (
         <div className="mt-4 rounded-[18px] border border-[#FCD34D] bg-[#FFFBEB] px-4 py-3 text-[14px] text-[#92400E]">
           {error}

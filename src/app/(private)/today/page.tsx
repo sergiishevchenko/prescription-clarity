@@ -218,12 +218,12 @@ function CheckIcon({ className }: IconProps) {
       viewBox="0 0 24 24"
       fill="none"
       stroke="currentColor"
-      strokeWidth={2.5}
+      strokeWidth={2.2}
       strokeLinecap="round"
       strokeLinejoin="round"
       aria-hidden="true"
     >
-      <path d="m5 12 5 5 9-9" />
+      <path d="M5 13l4 4L19 7" />
     </svg>
   );
 }
