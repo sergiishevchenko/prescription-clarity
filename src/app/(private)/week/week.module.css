@@ -336,6 +336,11 @@
   vertical-align: top;
 }
 
+.dayCellToday {
+  border: 3px solid #60a5fa;
+  background-color: #eff6ff;
+}
+
 .medicationsList {
   display: flex;
   flex-direction: column;
@@ -353,6 +358,11 @@
   transition:
     border-color 0.2s ease,
     background-color 0.2s ease;
+}
+
+.medCardTaken {
+  background-color: #dcfce7;
+  border-color: #bbf7d0;
 }
 
 .checkbox {

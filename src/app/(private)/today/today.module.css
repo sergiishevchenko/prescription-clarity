@@ -138,10 +138,15 @@
     background-color 0.2s ease;
 }
 
-.markAllButton:hover {
+.markAllButton:hover:not(:disabled) {
   transform: translateY(-1px);
   box-shadow: 0 12px 20px -16px rgba(22, 163, 74, 0.35);
   background-color: #d1fae5;
+}
+
+.markAllButton:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
 }
 
 .markAllIcon {
@@ -451,7 +456,9 @@
   display: flex;
   flex-direction: column;
   align-items: center;
+  justify-content: center;
   gap: 0.2rem;
+  min-height: 4rem;
   cursor: pointer;
   transition:
     transform 0.2s ease,
@@ -545,6 +552,7 @@
 }
 
 .calendarDay {
+  position: relative;
   height: 48px;
   border-radius: 1rem;
   border: 1px solid transparent;
@@ -562,14 +570,37 @@
     border-color 0.2s ease;
 }
 
-.calendarDay:hover {
+.calendarDay:hover:not(:disabled) {
   transform: translateY(-1px);
   box-shadow: 0 12px 20px -16px rgba(15, 23, 42, 0.35);
+}
+
+.calendarDay:disabled {
+  cursor: default;
+  opacity: 0;
+}
+
+.calendarDayEmpty {
+  background-color: transparent;
+  cursor: default;
 }
 
 .calendarDayToday {
   background-color: #1d4ed8;
   border-color: #1d4ed8;
+  color: #ffffff;
+}
+
+.selectedDateIcon {
+  position: absolute;
+  top: 4px;
+  right: 4px;
+  width: 12px;
+  height: 12px;
+  color: #1d4ed8;
+}
+
+.calendarDayToday .selectedDateIcon {
   color: #ffffff;
 }
 
