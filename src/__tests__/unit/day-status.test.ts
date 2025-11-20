@@ -233,14 +233,14 @@ describe("day-status", () => {
 
     it("calculates and caches status when not cached", async () => {
       jest.setSystemTime(new Date("2025-02-15T12:00:00.000Z"));
-      
+
       prismaMock.dayStatus.findUnique.mockResolvedValueOnce(null);
-      
+
       // Mock for calculateDayStatus (called via updateDayStatusForDate)
       prismaMock.scheduleEntry.findMany
         .mockResolvedValueOnce([{ status: "PLANNED" }]) // For calculateDayStatus
         .mockResolvedValueOnce([{ status: "PLANNED" }]); // For counts in updateDayStatusForDate
-      
+
       const upsertedStatus = {
         id: "ds1",
         userId,
@@ -252,7 +252,7 @@ describe("day-status", () => {
         createdAt: new Date(),
         updatedAt: new Date(),
       };
-      
+
       prismaMock.dayStatus.upsert.mockResolvedValueOnce(upsertedStatus);
       prismaMock.dayStatus.findUnique.mockResolvedValueOnce(upsertedStatus);
 
@@ -320,7 +320,7 @@ describe("day-status", () => {
       expect(result["2025-02-05"]).toBe("MISSED");
       expect(result["2025-02-06"]).toBe("SCHEDULED");
       expect(result["2025-02-07"]).toBe("PARTIAL");
-      
+
       // Should not call calculateDayStatus since all dates are cached
       expect(prismaMock.scheduleEntry.findMany).not.toHaveBeenCalled();
     });
@@ -451,4 +451,3 @@ describe("day-status", () => {
     });
   });
 });
-

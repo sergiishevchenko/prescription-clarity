@@ -150,9 +150,7 @@ describe("POST /api/schedule/generate", () => {
       new Error("Database error"),
     );
 
-    const res = await GenerateRoute.POST(
-      makePostRequest({ scheduleId: "s1" }),
-    );
+    const res = await GenerateRoute.POST(makePostRequest({ scheduleId: "s1" }));
     expect(res.status).toBe(500);
     await expect(res.json()).resolves.toEqual(
       expect.objectContaining({ error: "Internal server error" }),

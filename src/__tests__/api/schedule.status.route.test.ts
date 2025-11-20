@@ -2,6 +2,7 @@ import * as ScheduleStatusRoute from "@/app/api/schedule/status/route";
 import { getSessionCookie } from "@/lib/auth/cookies";
 import { verifySession } from "@/lib/auth/session";
 import * as DayStatus from "@/lib/day-status";
+import type { DayStatusType } from "@prisma/client";
 
 jest.mock("@/lib/day-status", () => ({
   getDayStatusesForRange: jest.fn(),
@@ -117,7 +118,7 @@ describe("GET /api/schedule/status", () => {
     jest.mocked(getSessionCookie).mockResolvedValueOnce("token");
     jest.mocked(verifySession).mockResolvedValueOnce(mockUser);
 
-    const mockStatuses = {
+    const mockStatuses: Record<string, DayStatusType> = {
       "2025-02-01": "ALL_TAKEN",
       "2025-02-02": "PARTIAL",
       "2025-02-03": "SCHEDULED",
@@ -146,9 +147,7 @@ describe("GET /api/schedule/status", () => {
     jest.mocked(getSessionCookie).mockResolvedValueOnce("token");
     jest.mocked(verifySession).mockResolvedValueOnce(mockUser);
 
-    jest
-      .mocked(DayStatus.getDayStatusesForRange)
-      .mockResolvedValueOnce({});
+    jest.mocked(DayStatus.getDayStatusesForRange).mockResolvedValueOnce({});
 
     const req = new Request(
       `http://localhost/api/schedule/status?from=${defaultFrom}&to=${defaultTo}`,
@@ -178,4 +177,3 @@ describe("GET /api/schedule/status", () => {
     );
   });
 });
-
