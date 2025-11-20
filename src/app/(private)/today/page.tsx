@@ -2,7 +2,11 @@ import { redirect } from "next/navigation";
 import clsx from "clsx";
 import { getCurrentUser } from "@/lib/auth/current-user";
 import styles from "./today.module.css";
-import { getScheduleEntries, type ScheduleEntryItem } from "@/lib/schedule";
+import {
+  getScheduleEntries,
+  getDayStatuses,
+  type ScheduleEntryItem,
+} from "@/lib/schedule";
 import { ScheduleList } from "./ScheduleList";
 import { DayNavigation } from "./DayNavigation";
 import { CalendarGrid } from "./CalendarGrid";
@@ -17,11 +21,33 @@ type CalendarDay = {
   isSelected?: boolean;
 };
 
+/**
+ * Map database DayStatusType to CalendarStatus
+ */
+function mapDayStatusToCalendar(
+  status: string | undefined,
+): CalendarStatus {
+  switch (status) {
+    case "ALL_TAKEN":
+      return "AllTaken";
+    case "PARTIAL":
+      return "Partial";
+    case "SCHEDULED":
+      return "Scheduled";
+    case "MISSED":
+      return "Missed";
+    case "NONE":
+    default:
+      return "None";
+  }
+}
+
 function generateCalendarDays(
   year: number,
   month: number,
   today: Date,
   selectedDate: Date,
+  statusMap: Record<string, string> = {},
 ): CalendarDay[] {
   // Get first day of the month
   const firstDay = new Date(year, month, 1);
@@ -49,24 +75,6 @@ function generateCalendarDays(
     });
   }
 
-  // Status mapping example (to be replaced with actual API data later)
-  const statusMap: Record<number, CalendarStatus> = {
-    5: "Missed",
-    6: "Missed",
-    7: "Partial",
-    8: "Partial",
-    9: "Scheduled",
-    10: "Scheduled",
-    11: "AllTaken",
-    12: "AllTaken",
-    13: "AllTaken",
-    14: "Partial",
-    15: "AllTaken",
-    16: "Scheduled",
-    17: "Scheduled",
-    18: "AllTaken",
-  };
-
   // Add all days of the month
   for (let day = 1; day <= daysInMonth; day++) {
     const currentDate = new Date(year, month, day);
@@ -79,9 +87,14 @@ function generateCalendarDays(
       currentDate.getMonth() === selectedDate.getMonth() &&
       currentDate.getFullYear() === selectedDate.getFullYear();
 
+    // Format date as YYYY-MM-DD for status lookup
+    const dateKey = `${year}-${String(month + 1).padStart(2, "0")}-${String(day).padStart(2, "0")}`;
+    const dayStatus = statusMap[dateKey];
+    const status = mapDayStatusToCalendar(dayStatus);
+
     days.push({
       value: day,
-      status: statusMap[day] ?? "None",
+      status,
       isToday,
       isSelected,
     });
@@ -195,12 +208,30 @@ export default async function TodayPage({ searchParams }: TodayPageProps) {
     scheduleEntries = [];
   }
 
+  // Fetch day statuses for the calendar month
+  const calendarStartDate = new Date(calendarYear, calendarMonth, 1);
+  const calendarEndDate = new Date(calendarYear, calendarMonth + 1, 0);
+  calendarEndDate.setHours(23, 59, 59, 999);
+
+  let dayStatuses: Record<string, string> = {};
+  try {
+    dayStatuses = await getDayStatuses(
+      calendarStartDate,
+      calendarEndDate,
+      timezone,
+    );
+  } catch (error) {
+    console.error("Failed to load day statuses:", error);
+    dayStatuses = {};
+  }
+
   // Generate calendar for the specified month (or selected date's month if not specified)
   const calendarDays = generateCalendarDays(
     calendarYear,
     calendarMonth,
     today,
     selectedDate,
+    dayStatuses,
   );
 
   return (
