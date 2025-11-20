@@ -42,11 +42,9 @@ export async function PATCH(
 
     // Update day status cache for the entry's date
     // Note: We don't await this to avoid blocking the response
-    updateDayStatusForDate(user.id, existing.dateTime, "UTC").catch(
-      (error) => {
-        console.error("Failed to update day status cache:", error);
-      },
-    );
+    updateDayStatusForDate(user.id, existing.dateTime, "UTC").catch((error) => {
+      console.error("Failed to update day status cache:", error);
+    });
 
     return NextResponse.json({ id: updated.id, status: updated.status });
   } catch (error) {

@@ -24,9 +24,7 @@ type CalendarDay = {
 /**
  * Map database DayStatusType to CalendarStatus
  */
-function mapDayStatusToCalendar(
-  status: string | undefined,
-): CalendarStatus {
+function mapDayStatusToCalendar(status: string | undefined): CalendarStatus {
   switch (status) {
     case "ALL_TAKEN":
       return "AllTaken";

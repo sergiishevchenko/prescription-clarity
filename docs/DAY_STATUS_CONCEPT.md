@@ -1,6 +1,7 @@
 # Day Status Concept
 
 ## Overview
+
 This document outlines the concept for calculating, storing, and retrieving daily schedule statuses (AllTaken, Missed, Partial, Scheduled, None) for calendar views and statistics.
 
 ## Status Definitions
@@ -14,16 +15,20 @@ This document outlines the concept for calculating, storing, and retrieving dail
 ## Architecture Approach
 
 ### Option 1: Compute on Demand (Recommended for MVP)
+
 **Pros:**
+
 - Always accurate, no sync issues
 - Simple implementation
 - No storage overhead
 
 **Cons:**
+
 - Requires database query for each date range
 - Can be slower for large date ranges
 
 **Implementation:**
+
 - Create utility function: `calculateDayStatus(userId, date, timezone)`
 - Function queries schedule entries for that day
 - Calculates status based on:
@@ -33,16 +38,20 @@ This document outlines the concept for calculating, storing, and retrieving dail
 - Used in calendar view and statistics APIs
 
 ### Option 2: Cached in Database (Recommended for Production)
+
 **Pros:**
+
 - Fast retrieval for calendar views
 - Can be indexed for performance
 - Supports historical queries efficiently
 
 **Cons:**
+
 - Requires cache invalidation when entries change
 - Additional storage and maintenance
 
 **Implementation:**
+
 - Create `DayStatus` table with daily aggregates
 - Update status when:
   - Schedule entries are created/deleted
@@ -50,15 +59,19 @@ This document outlines the concept for calculating, storing, and retrieving dail
 - Compute on-demand if cache miss occurs
 
 ### Option 3: Hybrid Approach (Best Balance)
+
 **Pros:**
+
 - Fast for frequently accessed dates
 - Accurate for all dates
 - Can compute on-demand as fallback
 
 **Cons:**
+
 - More complex implementation
 
 **Implementation:**
+
 - Cache statuses in database for recent dates (e.g., last 90 days + next 30 days)
 - Compute on-demand for dates outside cache window
 - Background job to maintain cache
@@ -106,12 +119,12 @@ model DayStatus {
 export async function calculateDayStatus(
   userId: string,
   date: Date,
-  timezone: string = "UTC"
+  timezone: string = "UTC",
 ): Promise<DayStatusType> {
   // Get start and end of day in user's timezone
   const startOfDay = getStartOfDay(date, timezone);
   const endOfDay = getEndOfDay(date, timezone);
-  
+
   // Query entries for this day
   const entries = await prisma.scheduleEntry.findMany({
     where: {
@@ -128,27 +141,27 @@ export async function calculateDayStatus(
 
   // Calculate status
   const totalCount = entries.length;
-  const plannedCount = entries.filter(e => e.status === "PLANNED").length;
-  const takenCount = entries.filter(e => e.status === "DONE").length;
+  const plannedCount = entries.filter((e) => e.status === "PLANNED").length;
+  const takenCount = entries.filter((e) => e.status === "DONE").length;
   const now = new Date();
   const isPastDate = date < getStartOfDay(now, timezone);
 
   if (totalCount === 0) {
     return "NONE";
   }
-  
+
   if (takenCount === totalCount) {
     return "ALL_TAKEN";
   }
-  
+
   if (takenCount === 0 && isPastDate) {
     return "MISSED";
   }
-  
+
   if (plannedCount === totalCount && !isPastDate) {
     return "SCHEDULED";
   }
-  
+
   // Some taken, some not
   return "PARTIAL";
 }
@@ -159,7 +172,7 @@ export async function calculateDayStatus(
 export async function getDayStatus(
   userId: string,
   date: Date,
-  timezone: string = "UTC"
+  timezone: string = "UTC",
 ): Promise<DayStatusType> {
   // Try to get from cache first
   const dateOnly = getDateOnly(date);
@@ -179,7 +192,7 @@ export async function getDayStatus(
   // Compute and cache
   const status = await calculateDayStatus(userId, date, timezone);
   await upsertDayStatus(userId, dateOnly, status);
-  
+
   return status;
 }
 
@@ -189,15 +202,15 @@ export async function getDayStatus(
 export async function updateDayStatusForDate(
   userId: string,
   date: Date,
-  timezone: string = "UTC"
+  timezone: string = "UTC",
 ): Promise<void> {
   const dateOnly = getDateOnly(date);
   const status = await calculateDayStatus(userId, date, timezone);
-  
+
   // Get counts for detailed stats
   const startOfDay = getStartOfDay(date, timezone);
   const endOfDay = getEndOfDay(date, timezone);
-  
+
   const entries = await prisma.scheduleEntry.findMany({
     where: {
       userId,
@@ -207,8 +220,8 @@ export async function updateDayStatusForDate(
   });
 
   const totalCount = entries.length;
-  const plannedCount = entries.filter(e => e.status === "PLANNED").length;
-  const takenCount = entries.filter(e => e.status === "DONE").length;
+  const plannedCount = entries.filter((e) => e.status === "PLANNED").length;
+  const takenCount = entries.filter((e) => e.status === "DONE").length;
 
   await prisma.dayStatus.upsert({
     where: {
@@ -241,11 +254,11 @@ export async function getDayStatusesForRange(
   userId: string,
   startDate: Date,
   endDate: Date,
-  timezone: string = "UTC"
+  timezone: string = "UTC",
 ): Promise<Map<string, DayStatusType>> {
   const start = getDateOnly(startDate);
   const end = getDateOnly(endDate);
-  
+
   const cachedStatuses = await prisma.dayStatus.findMany({
     where: {
       userId,
@@ -261,9 +274,9 @@ export async function getDayStatusesForRange(
   });
 
   const statusMap = new Map<string, DayStatusType>();
-  
+
   // Add cached statuses
-  cachedStatuses.forEach(s => {
+  cachedStatuses.forEach((s) => {
     const dateKey = formatDateForKey(s.date);
     statusMap.set(dateKey, s.status as DayStatusType);
   });
@@ -318,7 +331,7 @@ const statuses = await getDayStatusesForRange(
   user.id,
   startOfMonth,
   endOfMonth,
-  timezone
+  timezone,
 );
 
 // Use in generateCalendarDays
@@ -347,4 +360,3 @@ If you prefer to start simpler:
 - **Batch updates**: When generating schedule, batch update multiple dates at once
 - **Indexing**: Ensure proper indexes on `DayStatus(userId, date)` for fast lookups
 - **Lazy computation**: Compute missing statuses on-demand during calendar render
-

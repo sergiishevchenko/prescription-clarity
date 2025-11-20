@@ -11,7 +11,7 @@ function getDateOnly(date: Date, timezone: string = "UTC"): Date {
     month: "2-digit",
     day: "2-digit",
   }).format(date);
-  
+
   // Parse as UTC to ensure we get the correct date
   return new Date(dateStr + "T00:00:00.000Z");
 }
@@ -51,12 +51,12 @@ function formatDateForKey(date: Date): string {
 function getDatesBetween(start: Date, end: Date): Date[] {
   const dates: Date[] = [];
   const current = new Date(start);
-  
+
   while (current <= end) {
     dates.push(new Date(current));
     current.setUTCDate(current.getUTCDate() + 1);
   }
-  
+
   return dates;
 }
 
@@ -307,4 +307,3 @@ export async function invalidateDayStatus(
     },
   });
 }
-
