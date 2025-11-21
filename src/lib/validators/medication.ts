@@ -24,14 +24,19 @@ export const createMedicationSchema = z.object({
     .string()
     .min(1, "Name is required")
     .max(150, "Medication name must not exceed 150 characters"),
-  dose: z.coerce.number().int().positive("Dose must be a positive integer"),
+  dose: z
+    .coerce
+    .number()
+    .int()
+    .positive("Dose must be a positive integer")
+    .optional(),
   form: z
     .string()
-    .min(1, "Form is required")
     .max(50, "Form must not exceed 50 characters")
     .refine((val) => validForms.includes(val as (typeof validForms)[number]), {
       message: `Form must be one of: ${validForms.join(", ")}`,
-    }),
+    })
+    .optional(),
 });
 
 export const updateMedicationSchema = z.object({

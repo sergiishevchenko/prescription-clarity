@@ -138,6 +138,7 @@ export default function MedicationWizardStep1() {
     formState: { errors },
     watch,
     setValue,
+    clearErrors,
   } = useFormContext<FormValues>();
   const nameValue = watch("name") ?? "";
   const medicationIdValue = watch("medicationId") ?? "";
@@ -257,12 +258,24 @@ export default function MedicationWizardStep1() {
   const dosageValidationRules = {
     setValueAs: (value: string) => {
       if (value === "") return undefined;
+      if (value.includes(",")) return Number.NaN;
       const numeric = Number(value);
-      return Number.isFinite(numeric) ? numeric : undefined;
+      if (!Number.isFinite(numeric)) return Number.NaN;
+      if (numeric === 0) return undefined;
+      return numeric;
     },
     validate: (value?: number) => {
-      if (value === undefined || Number.isNaN(value)) return true;
-      return value >= 1 || "Please enter a value of at least 1.";
+      if (value === undefined) return true;
+      if (!Number.isFinite(value)) {
+        return "Please enter a valid whole number.";
+      }
+      if (!Number.isInteger(value)) {
+        return "Please enter a whole number.";
+      }
+      if (value < 1) {
+        return "Please enter a value of at least 1.";
+      }
+      return true;
     },
   };
 
@@ -303,7 +316,9 @@ export default function MedicationWizardStep1() {
                 errors.name ? styles.inputError : ""
               }`}
               {...register("name", {
-                required: "Please enter the name of the medication.",
+                onChange: () => {
+                  if (errors.name) clearErrors("name");
+                },
               })}
               onFocus={() => {
                 if (

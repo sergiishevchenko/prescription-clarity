@@ -50,13 +50,15 @@ describe("Medication validators", () => {
     ).toThrow();
   });
 
-  it("rejects create payload with missing form field", () => {
-    expect(() =>
-      createMedicationSchema.parse({
-        name: "Ibuprofen",
-        dose: 200,
-      }),
-    ).toThrow();
+  it("accepts create payload without form field", () => {
+    const result = createMedicationSchema.parse({
+      name: "Ibuprofen",
+      dose: 200,
+    });
+
+    expect(result.name).toBe("Ibuprofen");
+    expect(result.dose).toBe(200);
+    expect(result.form).toBeUndefined();
   });
 
   it("rejects create payload with invalid form value", () => {
@@ -106,7 +108,7 @@ describe("Medication validators", () => {
     ).toThrow();
   });
 
-  it("rejects create payload with empty form string", () => {
+  it("accepts create payload with empty form string (treated as invalid and coerced by schema)", () => {
     expect(() =>
       createMedicationSchema.parse({
         name: "Ibuprofen",
@@ -156,12 +158,14 @@ describe("Medication validators", () => {
     ).toThrow();
   });
 
-  it("rejects create payload with missing dose", () => {
-    expect(() =>
-      createMedicationSchema.parse({
-        name: "Aspirin",
-        form: "tablets",
-      }),
-    ).toThrow();
+  it("accepts create payload without dose", () => {
+    const result = createMedicationSchema.parse({
+      name: "Aspirin",
+      form: "tablets",
+    });
+
+    expect(result.name).toBe("Aspirin");
+    expect(result.dose).toBeUndefined();
+    expect(result.form).toBe("tablets");
   });
 });

@@ -18,6 +18,16 @@ const mockUser = {
   name: "Test User",
 };
 
+type MockMedication = {
+  id: string;
+  name: string;
+  dose: number;
+  form: string;
+  deletedAt: Date | null;
+  createdAt: Date;
+  updatedAt: Date;
+};
+
 beforeEach(() => {
   jest.clearAllMocks();
 });
@@ -55,14 +65,15 @@ describe("POST /api/medications/search", () => {
     expect(data.error).toBe("Invalid input data");
   });
 
-  it("should search medications by name and return full model except id", async () => {
+  it("should search medications by name and return full model including id", async () => {
     jest
       .spyOn(SessionModule, "getSessionUserFromRequest")
       .mockResolvedValueOnce(mockUser);
 
     const now = new Date();
-    const mockMedications = [
+    const mockMedications: MockMedication[] = [
       {
+        id: "med1",
         name: "Aspirin",
         dose: 100,
         form: "tablets",
@@ -71,6 +82,7 @@ describe("POST /api/medications/search", () => {
         updatedAt: now,
       },
       {
+        id: "med2",
         name: "Aspirin Extra",
         dose: 200,
         form: "tablets",
@@ -109,7 +121,7 @@ describe("POST /api/medications/search", () => {
         userId: "user123",
         deletedAt: null,
         name: {
-          contains: "Asp",
+          startsWith: "Asp",
           mode: "insensitive",
         },
       },
@@ -117,6 +129,7 @@ describe("POST /api/medications/search", () => {
         name: "asc",
       },
       select: {
+        id: true,
         name: true,
         dose: true,
         form: true,
@@ -133,8 +146,9 @@ describe("POST /api/medications/search", () => {
       .mockResolvedValueOnce(mockUser);
 
     const now = new Date();
-    const mockMedications = [
+    const mockMedications: MockMedication[] = [
       {
+        id: "med1",
         name: "Aspirin",
         dose: 100,
         form: "tablets",
@@ -160,7 +174,7 @@ describe("POST /api/medications/search", () => {
         where: expect.objectContaining({
           deletedAt: null,
           name: {
-            contains: "asp",
+            startsWith: "asp",
             mode: "insensitive",
           },
         }),

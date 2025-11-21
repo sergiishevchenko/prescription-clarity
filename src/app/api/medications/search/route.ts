@@ -26,13 +26,13 @@ export async function POST(request: NextRequest) {
     const validatedData: SearchMedicationInput =
       searchMedicationSchema.parse(body);
 
-    // Search medications using LIKE (case-insensitive)
+    // Search medications by name prefix (case-insensitive)
     const medications = await prisma.medication.findMany({
       where: {
         userId: user.id,
         deletedAt: null,
         name: {
-          contains: validatedData.name,
+          startsWith: validatedData.name,
           mode: "insensitive",
         },
       },
@@ -40,6 +40,7 @@ export async function POST(request: NextRequest) {
         name: "asc",
       },
       select: {
+        id: true,
         name: true,
         dose: true,
         form: true,

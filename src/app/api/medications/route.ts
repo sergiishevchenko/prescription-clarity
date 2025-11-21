@@ -79,8 +79,8 @@ export async function POST(request: NextRequest) {
       data: {
         userId: user.id,
         name: validatedData.name,
-        dose: (validatedData.dose ?? null) as unknown as number,
-        form: (validatedData.form ?? null) as unknown as string,
+        dose: validatedData.dose ?? null,
+        form: validatedData.form ?? null,
       },
       select: {
         id: true,

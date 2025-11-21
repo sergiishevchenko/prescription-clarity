@@ -42,6 +42,28 @@ const convertDaysToUnitValue = (days: number, unit: DurationUnit) => {
   return Math.max(1, Math.round(days / multiplier));
 };
 
+const parseDateIso = (value: string) => {
+  const parts = String(value).split("-");
+  if (parts.length !== 3) return null;
+  const [yearStr, monthStr, dayStr] = parts;
+  const year = Number(yearStr);
+  const month = Number(monthStr);
+  const day = Number(dayStr);
+  if (!year || !month || !day) return null;
+  const date = new Date(Date.UTC(year, month - 1, day));
+  if (Number.isNaN(date.getTime())) return null;
+  return date;
+};
+
+const formatDateDisplay = (value: string) => {
+  const date = parseDateIso(value);
+  if (!date) return value;
+  const day = String(date.getUTCDate()).padStart(2, "0");
+  const month = String(date.getUTCMonth() + 1).padStart(2, "0");
+  const year = date.getUTCFullYear();
+  return `${day}.${month}.${year}`;
+};
+
 export default function DatesAndDuration() {
   const {
     register,
@@ -58,21 +80,62 @@ export default function DatesAndDuration() {
   const [displayUnit, setDisplayUnit] = useState<DurationUnit>(() =>
     deriveUnitFromDays(durationDays || 30),
   );
+
   const displayValue = useMemo(() => {
     const sourceDays = durationDays || unitToDays(1, displayUnit);
     return convertDaysToUnitValue(sourceDays, displayUnit);
   }, [displayUnit, durationDays]);
 
+  // Допоміжна функція для обчислення кінцевої дати
+  const calculateEndDateFromStartAndDuration = (
+    start: string,
+    days: number,
+  ): string | null => {
+    const s = parseDateIso(String(start));
+    if (!s) return null;
+
+    const safeDays = Math.max(1, Math.round(days));
+    const e = new Date(s);
+    // включно: 1 день => +0, 7 днів => +6
+    e.setUTCDate(e.getUTCDate() + (safeDays - 1));
+
+    return e.toISOString().slice(0, 10);
+  };
+
+  // Коли змінюються startDate / durationDays і курс не ongoing — перераховуємо endDate
   useEffect(() => {
     if (ongoing) return;
     if (!startDate || !durationDays) return;
-    const s = new Date(String(startDate) + "T00:00:00");
-    if (Number.isNaN(s.getTime())) return;
-    const e = new Date(s);
-    e.setDate(s.getDate() + Number(durationDays) - 1);
-    const endStr = e.toISOString().slice(0, 10);
-    setValue("endDate", endStr, { shouldDirty: true });
-  }, [startDate, durationDays, ongoing, setValue]);
+
+    const endStr = calculateEndDateFromStartAndDuration(
+      String(startDate),
+      durationDays,
+    );
+    if (!endStr) return;
+
+    if (endStr !== String(endDate)) {
+      setValue("endDate", endStr, { shouldDirty: true });
+    }
+  }, [startDate, endDate, durationDays, ongoing, setValue]);
+
+  // Стежимо, щоб endDate не був раніше за startDate
+  useEffect(() => {
+    if (ongoing) return;
+    if (!startDate || !endDate) return;
+
+    const s = parseDateIso(String(startDate));
+    const e = parseDateIso(String(endDate));
+    if (!s || !e) return;
+
+    const diffMs = e.getTime() - s.getTime();
+    const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24)) + 1;
+
+    if (diffDays < 1) {
+      // end date не може бути раніше start date
+      setValue("endDate", startDate, { shouldDirty: true });
+    }
+  }, [startDate, endDate, ongoing, setValue]);
+
   const updateDurationDays = (nextDays: number) => {
     const safeDays = Math.max(1, Math.round(nextDays));
     setValue("durationDays", safeDays, {
@@ -101,7 +164,19 @@ export default function DatesAndDuration() {
   };
 
   const toggleOngoing = () => {
-    setValue("ongoing", !ongoing, { shouldDirty: true });
+    const next = !ongoing;
+    setValue("ongoing", next, { shouldDirty: true });
+
+    // Якщо переходимо з ongoing = true на false — одразу порахувати endDate
+    if (!next && startDate && durationDays) {
+      const endStr = calculateEndDateFromStartAndDuration(
+        String(startDate),
+        durationDays,
+      );
+      if (endStr) {
+        setValue("endDate", endStr, { shouldDirty: true });
+      }
+    }
   };
 
   const startError = errors.startDate?.message as string | undefined;
@@ -110,6 +185,7 @@ export default function DatesAndDuration() {
 
   return (
     <div className="space-y-6">
+      {/* durationDays у формі як hidden field */}
       <input
         type="number"
         className="hidden"
@@ -119,6 +195,7 @@ export default function DatesAndDuration() {
           required: "Duration is required",
         })}
       />
+      {/* ongoing у формі як hidden checkbox */}
       <input type="checkbox" className="hidden" {...register("ongoing")} />
 
       <div className="rounded-[28px] border border-[#E0E7FF] bg-white px-6 py-6 shadow-[0_24px_60px_rgba(15,23,42,0.08)]">
@@ -269,12 +346,19 @@ export default function DatesAndDuration() {
               type="date"
               disabled={ongoing}
               className="mt-2 h-[52px] rounded-2xl border-2 border-[#E0E7FF] px-4 text-base disabled:cursor-not-allowed disabled:opacity-50"
-              {...register("endDate", { required: "End date is required" })}
+              {...register("endDate", {
+                validate: (value) => {
+                  if (!ongoing && !value) {
+                    return "End date is required";
+                  }
+                  return true;
+                },
+              })}
             />
-            {ongoing && (
+            {!ongoing && (
               <p className="mt-1 text-xs text-[#6B7280]">
-                End date calculated automatically when medication is not
-                ongoing.
+                End date is calculated automatically from start date and
+                duration. You can adjust it if needed.
               </p>
             )}
             {!ongoing && endError && (
@@ -284,7 +368,9 @@ export default function DatesAndDuration() {
         </div>
         {!ongoing && startDate && endDate && (
           <p className="mt-4 rounded-2xl bg-[#F9FAFB] px-4 py-3 text-sm text-[#1F2937]">
-            Schedule: <strong>{startDate}</strong> → <strong>{endDate}</strong>
+            Schedule:{" "}
+            <strong>{formatDateDisplay(String(startDate))}</strong> →{" "}
+            <strong>{formatDateDisplay(String(endDate))}</strong>
           </p>
         )}
       </div>

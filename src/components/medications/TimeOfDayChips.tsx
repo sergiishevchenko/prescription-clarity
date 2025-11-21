@@ -82,7 +82,7 @@ export default function TimeOfDayChips({ selected, onToggle, error }: Props) {
     const normalized = normalizeCustomTime(customTimeValue) ?? "08:00";
     setValue("customTimes", [...customTimes, normalized], {
       shouldDirty: true,
-      shouldValidate: true,
+      shouldValidate: false,
     });
     setShowCustomPicker(false);
   };
@@ -91,7 +91,7 @@ export default function TimeOfDayChips({ selected, onToggle, error }: Props) {
     const nextTimes = customTimes.filter((_, i) => i !== index);
     setValue("customTimes", nextTimes, {
       shouldDirty: true,
-      shouldValidate: true,
+      shouldValidate: false,
     });
   };
 

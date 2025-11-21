@@ -55,8 +55,8 @@ type NewMedicationFormProps = {
 type MedicationSearchHit = {
   id: string;
   name: string;
-  form?: string | null;
   dose?: number | null;
+  form?: string | null;
 };
 
 export default function NewMedicationForm({
@@ -131,6 +131,8 @@ export default function NewMedicationForm({
     setValue,
     trigger,
     reset,
+    setError,
+    clearErrors,
     formState: { errors },
   } = methods;
   const freq = useWatch({ control, name: "frequency" });
@@ -214,6 +216,15 @@ export default function NewMedicationForm({
     }
   }, []);
 
+  const scrollToNameInput = useCallback(() => {
+    if (typeof document === "undefined") return;
+    const nameInput = document.getElementById("medication-name");
+    if (nameInput instanceof HTMLInputElement) {
+      nameInput.scrollIntoView({ behavior: "smooth", block: "center" });
+      nameInput.focus({ preventScroll: true });
+    }
+  }, []);
+
   const medicationSummary = useMemo(() => {
     const name = (allValues.name || "").trim();
     if (!name || step === 1 || step === 5) return null;
@@ -245,9 +256,26 @@ export default function NewMedicationForm({
     const validator = validateCurrentStep as StepValidatorFn;
     validator.lastErrorMessage = undefined;
     if (step === 1) {
-      const nameValid = await trigger("name");
       const nameValue = (allValues.name || "").trim();
-      return nameValid && nameValue.length > 0;
+      if (!nameValue) {
+        validator.lastErrorMessage = "Please fill in the medication name";
+        setError("name", {
+          type: "manual",
+          message: "Please fill in the medication name",
+        });
+        scrollToNameInput();
+        return false;
+      }
+      clearErrors("name");
+
+      const dosageValid = await trigger("dosageMg");
+      if (!dosageValid) {
+        validator.lastErrorMessage =
+          "Please enter a valid dosage (1 mg or more) or leave the field empty.";
+        return false;
+      }
+
+      return true;
     }
     if (step === 2) {
       const expected = Number(allValues.frequency || 1);
@@ -271,8 +299,8 @@ export default function NewMedicationForm({
     if (step === 3) {
       return days.length > 0;
     }
-    if (step === 4) {
-      if (allValues.ongoing) return true;
+      if (step === 4) {
+        if (allValues.ongoing) return true;
       const startValid = await trigger("startDate");
       const endValid = await trigger("endDate");
       const durationValid = await trigger("durationDays");
@@ -282,34 +310,39 @@ export default function NewMedicationForm({
       return (
         startValid &&
         endValid &&
-        durationValid &&
-        startValue.length > 0 &&
-        endValue.length > 0 &&
-        durationValue >= 1
-      );
-    }
-    return true;
-  }, [
-    allValues.durationDays,
-    allValues.endDate,
-    allValues.frequency,
-    customTimes,
-    allValues.name,
-    allValues.ongoing,
-    allValues.startDate,
-    days.length,
-    step,
-    timeError,
-    timesOfDay.length,
-    trigger,
-    scrollToQuantityInputs,
-  ]);
+          durationValid &&
+          startValue.length > 0 &&
+          endValue.length > 0 &&
+          durationValue >= 1
+        );
+      }
+      return true;
+    }, [
+      allValues.durationDays,
+      allValues.endDate,
+      allValues.frequency,
+      customTimes,
+      allValues.name,
+      allValues.ongoing,
+      allValues.startDate,
+      days.length,
+      step,
+      timeError,
+      timesOfDay.length,
+      trigger,
+      scrollToQuantityInputs,
+      scrollToNameInput,
+    ]);
 
   useEffect(() => {
-    if (onValidate) {
-      validateCurrentStep().then(onValidate);
+    if (!onValidate) return;
+    if (step === 1) {
+      const nameValue = (allValues.name || "").trim();
+      onValidate(Boolean(nameValue));
+      return;
     }
-  }, [onValidate, step, validateCurrentStep]);
+    validateCurrentStep().then(onValidate);
+  }, [allValues.name, onValidate, step, validateCurrentStep]);
 
   useEffect(() => {
     if (!validateStepRef) return;
@@ -342,31 +375,59 @@ export default function NewMedicationForm({
       return true;
     }
 
-    ensuringMedicationRef.current = true;
-    const normalizedName = trimmedName.toLowerCase();
+      ensuringMedicationRef.current = true;
+      const normalizedName = trimmedName.toLowerCase();
 
-    const findExisting = async () => {
-      try {
-        const response = await fetch("/api/medications/search", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ name: trimmedName }),
+      const numericDose = Number(allValues.dosageMg);
+      const desiredDose = Number.isFinite(numericDose) && numericDose > 0
+        ? Math.round(numericDose)
+        : undefined;
+      const desiredForm = allValues.form
+        ? allValues.form.toLowerCase()
+        : undefined;
+
+      const findExisting = async () => {
+        try {
+          const response = await fetch("/api/medications/search", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ name: trimmedName }),
         });
         if (!response.ok) {
           return null;
+          }
+          const data = (await response.json()) as {
+            medications?: MedicationSearchHit[];
+          };
+          return (
+            data.medications?.find((hit) => {
+              if (hit.name.trim().toLowerCase() !== normalizedName) {
+                return false;
+              }
+
+              const hitDose =
+                typeof hit.dose === "number" ? hit.dose : undefined;
+              const hitForm = hit.form
+                ? hit.form.toLowerCase()
+                : undefined;
+
+              const doseMatches =
+                desiredDose === undefined ||
+                hitDose === undefined ||
+                hitDose === desiredDose;
+
+              const formMatches =
+                !desiredForm ||
+                !hitForm ||
+                hitForm === desiredForm;
+
+              return doseMatches && formMatches;
+            }) ?? null
+          );
+        } catch {
+          return null;
         }
-        const data = (await response.json()) as {
-          medications?: MedicationSearchHit[];
-        };
-        return (
-          data.medications?.find(
-            (hit) => hit.name.trim().toLowerCase() === normalizedName,
-          ) ?? null
-        );
-      } catch {
-        return null;
-      }
-    };
+      };
 
     try {
       const existing = await findExisting();
@@ -386,9 +447,8 @@ export default function NewMedicationForm({
         name: trimmedName,
       };
 
-      const numericDose = Number(allValues.dosageMg);
-      if (Number.isFinite(numericDose) && numericDose > 0) {
-        payload.dose = Math.round(numericDose);
+      if (desiredDose !== undefined) {
+        payload.dose = desiredDose;
       }
       if (allValues.form) {
         payload.form = allValues.form;
