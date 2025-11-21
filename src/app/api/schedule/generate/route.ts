@@ -3,6 +3,7 @@ import { prisma } from "@/lib/db";
 import { getSessionCookie } from "@/lib/auth/cookies";
 import { verifySession } from "@/lib/auth/session";
 import { generateScheduleSchema } from "@/lib/validators/schedule";
+import { updateDayStatusesForDates } from "@/lib/day-status";
 
 export const runtime = "nodejs";
 
@@ -69,6 +70,23 @@ export async function generateScheduleEntries(
   const result = await prisma.scheduleEntry.createMany({
     data: entries,
     skipDuplicates: true,
+  });
+
+  // Update day status cache for all affected dates
+  // Get unique dates from entries
+  const uniqueDates = Array.from(
+    new Set(
+      entries.map((e) => {
+        const d = new Date(e.dateTime);
+        d.setHours(0, 0, 0, 0);
+        return d.toISOString();
+      }),
+    ),
+  ).map((iso) => new Date(iso));
+
+  // Update statuses asynchronously (don't block response)
+  updateDayStatusesForDates(userId, uniqueDates, "UTC").catch((error) => {
+    console.error("Failed to update day status cache after generation:", error);
   });
 
   return result.count;

@@ -30,6 +30,21 @@ const mockScheduleEntry = {
   update: jest.fn() as AsyncMockFn<[unknown], unknown>,
 };
 
+const mockDayStatus = {
+  findUnique: jest.fn() as AsyncMockFn<[unknown], unknown>,
+  findMany: jest.fn() as AsyncMockFn<[unknown], unknown>,
+  upsert: jest.fn() as AsyncMockFn<[unknown], unknown>,
+  deleteMany: jest.fn() as AsyncMockFn<[unknown], unknown>,
+};
+
+const mockSchedule = {
+  findFirst: jest.fn() as AsyncMockFn<[unknown], unknown>,
+  findMany: jest.fn() as AsyncMockFn<[unknown], unknown>,
+  create: jest.fn() as AsyncMockFn<[unknown], unknown>,
+  update: jest.fn() as AsyncMockFn<[unknown], unknown>,
+  delete: jest.fn() as AsyncMockFn<[unknown], unknown>,
+};
+
 jest.mock("@/lib/db", () => ({
   __esModule: true,
   prisma: {
@@ -37,12 +52,16 @@ jest.mock("@/lib/db", () => ({
     session: mockSession,
     medication: mockMedication,
     scheduleEntry: mockScheduleEntry,
+    schedule: mockSchedule,
+    dayStatus: mockDayStatus,
   },
   default: {
     user: mockUser,
     session: mockSession,
     medication: mockMedication,
     scheduleEntry: mockScheduleEntry,
+    schedule: mockSchedule,
+    dayStatus: mockDayStatus,
   },
 }));
 
@@ -51,6 +70,8 @@ export const prismaMock = {
   session: mockSession,
   medication: mockMedication,
   scheduleEntry: mockScheduleEntry,
+  schedule: mockSchedule,
+  dayStatus: mockDayStatus,
 };
 
 beforeEach(() => jest.clearAllMocks());

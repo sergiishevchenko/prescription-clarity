@@ -3,6 +3,7 @@ import { prisma } from "@/lib/db";
 import { getSessionCookie } from "@/lib/auth/cookies";
 import { verifySession } from "@/lib/auth/session";
 import { updateScheduleStatusSchema } from "@/lib/validators/schedule";
+import { updateDayStatusForDate } from "@/lib/day-status";
 
 export const runtime = "nodejs";
 
@@ -27,7 +28,7 @@ export async function PATCH(
 
     const existing = await prisma.scheduleEntry.findFirst({
       where: { id, userId: user.id },
-      select: { id: true },
+      select: { id: true, dateTime: true },
     });
 
     if (!existing) {
@@ -37,6 +38,12 @@ export async function PATCH(
     const updated = await prisma.scheduleEntry.update({
       where: { id },
       data: { status },
+    });
+
+    // Update day status cache for the entry's date
+    // Note: We don't await this to avoid blocking the response
+    updateDayStatusForDate(user.id, existing.dateTime, "UTC").catch((error) => {
+      console.error("Failed to update day status cache:", error);
     });
 
     return NextResponse.json({ id: updated.id, status: updated.status });

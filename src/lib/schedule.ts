@@ -54,6 +54,54 @@ export async function getScheduleEntries(
   return data.items;
 }
 
+export async function getDayStatuses(
+  from: Date,
+  to: Date,
+  timezone: string = "UTC",
+): Promise<Record<string, string>> {
+  const store = await cookies();
+  const cookieHeader = store
+    .getAll()
+    .map((c) => `${c.name}=${encodeURIComponent(c.value)}`)
+    .join("; ");
+
+  // Format dates as YYYY-MM-DD
+  const fromStr = new Intl.DateTimeFormat("sv-SE", {
+    timeZone: timezone,
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+  }).format(from);
+
+  const toStr = new Intl.DateTimeFormat("sv-SE", {
+    timeZone: timezone,
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+  }).format(to);
+
+  const url = new URL(absoluteUrl("/api/schedule/status"));
+  url.searchParams.set("from", fromStr);
+  url.searchParams.set("to", toStr);
+  url.searchParams.set("tz", timezone);
+
+  const res = await fetch(url.toString(), {
+    headers: cookieHeader ? { cookie: cookieHeader } : undefined,
+    cache: "no-store",
+  });
+
+  if (res.status === 401 || res.status === 403) {
+    return {};
+  }
+
+  if (!res.ok) {
+    throw new Error(`Failed to load day statuses: ${res.statusText}`);
+  }
+
+  const data = (await res.json()) as { statuses: Record<string, string> };
+  return data.statuses;
+}
+
 // Re-export client-safe utilities for convenience
 export {
   extractTimeFromLocalDateTime,
