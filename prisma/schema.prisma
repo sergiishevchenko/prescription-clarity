@@ -5,7 +5,7 @@
 // Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
 
 generator client {
-  provider = "prisma-client-js"
+  provider      = "prisma-client-js"
   binaryTargets = ["native", "rhel-openssl-3.0.x"]
 }
 
@@ -22,39 +22,40 @@ model User {
   createdAt    DateTime @default(now())
   updatedAt    DateTime @updatedAt
 
-  sessions     Session[]
-  medications  Medication[]
+  sessions        Session[]
+  medications     Medication[]
   scheduleEntries ScheduleEntry[]
-  schedules    Schedule[]
+  schedules       Schedule[]
+  dayStatuses     DayStatus[]
 }
 
 model Session {
-  id         String   @id @default(cuid()) @db.VarChar(32)
-  userId     String   @db.VarChar(32)
-  tokenHash  String   @unique @db.VarChar(64)
-  expiresAt  DateTime
-  createdAt  DateTime @default(now())
-  updatedAt  DateTime @updatedAt
+  id        String   @id @default(cuid()) @db.VarChar(32)
+  userId    String   @db.VarChar(32)
+  tokenHash String   @unique @db.VarChar(64)
+  expiresAt DateTime
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
-  user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@index([userId])
   @@index([expiresAt])
 }
 
 model Medication {
-  id         String    @id @default(cuid()) @db.VarChar(32)
-  userId     String    @db.VarChar(32)
-  name       String    @db.VarChar(150)
-  dose       Int?
-  form       String?   @db.VarChar(50)
-  deletedAt  DateTime?
-  createdAt  DateTime  @default(now())
-  updatedAt  DateTime  @updatedAt
+  id        String    @id @default(cuid()) @db.VarChar(32)
+  userId    String    @db.VarChar(32)
+  name      String    @db.VarChar(150)
+  dose      Int
+  form      String    @db.VarChar(50)
+  deletedAt DateTime?
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
 
-  user       User            @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user            User            @relation(fields: [userId], references: [id], onDelete: Cascade)
   scheduleEntries ScheduleEntry[]
-  schedules  Schedule[]
+  schedules       Schedule[]
 
   @@index([userId])
   @@index([userId, deletedAt])
@@ -65,23 +66,31 @@ enum ScheduleStatus {
   DONE
 }
 
+enum DayStatusType {
+  NONE
+  SCHEDULED
+  ALL_TAKEN
+  PARTIAL
+  MISSED
+}
+
 model Schedule {
-  id            String          @id @default(cuid()) @db.VarChar(32)
-  medicationId  String          @db.VarChar(32)
-  userId        String          @db.VarChar(32)
-  quantity      Int             @default(1)
-  units         String          @default("pill") @db.VarChar(50)
+  id            String    @id @default(cuid()) @db.VarChar(32)
+  medicationId  String    @db.VarChar(32)
+  userId        String    @db.VarChar(32)
+  quantity      Int       @default(1)
+  units         String    @default("pill") @db.VarChar(50)
   frequencyDays Json
   durationDays  Int
   dateStart     DateTime
   dateEnd       DateTime?
   timeOfDay     Json
-  mealTiming    String          @default("anytime") @db.VarChar(20)
-  createdAt     DateTime        @default(now())
-  updatedAt     DateTime        @updatedAt
+  mealTiming    String    @default("anytime") @db.VarChar(20)
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
 
-  user          User            @relation(fields: [userId], references: [id], onDelete: Cascade)
-  medication    Medication      @relation(fields: [medicationId], references: [id], onDelete: Cascade)
+  user            User            @relation(fields: [userId], references: [id], onDelete: Cascade)
+  medication      Medication      @relation(fields: [medicationId], references: [id], onDelete: Cascade)
   scheduleEntries ScheduleEntry[]
 
   @@index([userId])
@@ -90,20 +99,38 @@ model Schedule {
 }
 
 model ScheduleEntry {
-  id           String          @id @default(cuid()) @db.VarChar(32)
-  scheduleId   String?          @db.VarChar(32)
-  medicationId String?          @db.VarChar(32)
-  userId       String          @db.VarChar(32)
+  id           String         @id @default(cuid()) @db.VarChar(32)
+  scheduleId   String?        @db.VarChar(32)
+  medicationId String?        @db.VarChar(32)
+  userId       String         @db.VarChar(32)
   dateTime     DateTime
-  status       ScheduleStatus  @default(PLANNED)
-  createdAt    DateTime        @default(now())
-  updatedAt    DateTime        @updatedAt
+  status       ScheduleStatus @default(PLANNED)
+  createdAt    DateTime       @default(now())
+  updatedAt    DateTime       @updatedAt
 
-  schedule     Schedule?       @relation(fields: [scheduleId], references: [id], onDelete: Cascade)
-  medication   Medication?     @relation(fields: [medicationId], references: [id], onDelete: SetNull)
-  user         User            @relation(fields: [userId], references: [id], onDelete: Cascade)
+  schedule   Schedule?   @relation(fields: [scheduleId], references: [id], onDelete: Cascade)
+  medication Medication? @relation(fields: [medicationId], references: [id], onDelete: SetNull)
+  user       User        @relation(fields: [userId], references: [id], onDelete: Cascade)
 
+  @@unique([medicationId, dateTime])
   @@index([userId, dateTime])
   @@index([scheduleId, dateTime])
-  @@unique([medicationId, dateTime])
+}
+
+model DayStatus {
+  id           String        @id @default(cuid()) @db.VarChar(32)
+  userId       String        @db.VarChar(32)
+  date         DateTime      @db.Date
+  status       DayStatusType
+  totalCount   Int           @default(0)
+  plannedCount Int           @default(0)
+  takenCount   Int           @default(0)
+  createdAt    DateTime      @default(now())
+  updatedAt    DateTime      @updatedAt
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, date])
+  @@index([userId, date])
+  @@index([userId, status])
 }

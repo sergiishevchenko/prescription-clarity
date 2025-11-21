@@ -2,6 +2,11 @@ import * as ScheduleIdRoute from "@/app/api/schedule/[id]/route";
 import { getSessionCookie } from "@/lib/auth/cookies";
 import { verifySession } from "@/lib/auth/session";
 import { prismaMock } from "../../../tests-setup/prisma.mock";
+import * as DayStatus from "@/lib/day-status";
+
+jest.mock("@/lib/day-status", () => ({
+  updateDayStatusForDate: jest.fn().mockResolvedValue(undefined),
+}));
 
 type PatchHandler = typeof ScheduleIdRoute.PATCH;
 type PatchRequest = Parameters<PatchHandler>[0];
@@ -80,13 +85,17 @@ describe("PATCH /api/schedule/[id]", () => {
   it("updates status when entry exists", async () => {
     jest.mocked(getSessionCookie).mockResolvedValueOnce("token");
 
+    const mockDateTime = new Date("2025-02-01T10:00:00.000Z");
     prismaMock.scheduleEntry.findFirst.mockResolvedValueOnce({
       id: "se1",
       userId: "u1",
+      dateTime: mockDateTime,
     });
     prismaMock.scheduleEntry.update.mockResolvedValueOnce({
       id: "se1",
       status: "DONE",
+      userId: "u1",
+      dateTime: mockDateTime,
     });
 
     const res = await ScheduleIdRoute.PATCH(
@@ -103,5 +112,65 @@ describe("PATCH /api/schedule/[id]", () => {
         data: { status: "DONE" },
       }),
     );
+    expect(DayStatus.updateDayStatusForDate).toHaveBeenCalledWith(
+      "u1",
+      mockDateTime,
+      "UTC",
+    );
+  });
+
+  it("returns 500 when database update fails", async () => {
+    jest.mocked(getSessionCookie).mockResolvedValueOnce("token");
+
+    const mockDateTime = new Date("2025-02-01T10:00:00.000Z");
+    prismaMock.scheduleEntry.findFirst.mockResolvedValueOnce({
+      id: "se1",
+      userId: "u1",
+      dateTime: mockDateTime,
+    });
+    prismaMock.scheduleEntry.update.mockRejectedValueOnce(
+      new Error("Database error"),
+    );
+
+    const res = await ScheduleIdRoute.PATCH(
+      makePatchRequest({ status: "DONE" }),
+      params,
+    );
+    expect(res.status).toBe(500);
+    await expect(res.json()).resolves.toEqual(
+      expect.objectContaining({ error: "Internal server error" }),
+    );
+  });
+
+  it("handles day status cache update error gracefully", async () => {
+    jest.mocked(getSessionCookie).mockResolvedValueOnce("token");
+
+    const mockDateTime = new Date("2025-02-01T10:00:00.000Z");
+    prismaMock.scheduleEntry.findFirst.mockResolvedValueOnce({
+      id: "se1",
+      userId: "u1",
+      dateTime: mockDateTime,
+    });
+    prismaMock.scheduleEntry.update.mockResolvedValueOnce({
+      id: "se1",
+      status: "DONE",
+      userId: "u1",
+      dateTime: mockDateTime,
+    });
+    // Day status update fails, but should not affect the response
+    jest
+      .mocked(DayStatus.updateDayStatusForDate)
+      .mockRejectedValueOnce(new Error("Cache update failed"));
+
+    const res = await ScheduleIdRoute.PATCH(
+      makePatchRequest({ status: "DONE" }),
+      params,
+    );
+    // Response should still be successful
+    expect(res.status).toBe(200);
+    await expect(res.json()).resolves.toEqual(
+      expect.objectContaining({ id: "se1", status: "DONE" }),
+    );
+    expect(DayStatus.updateDayStatusForDate).toHaveBeenCalled();
   });
 });

@@ -1,7 +1,13 @@
 import * as ScheduleRoute from "@/app/api/schedule/route";
 import { getSessionCookie } from "@/lib/auth/cookies";
-import { verifySession } from "@/lib/auth/session";
+import { verifySession, getSessionUserFromRequest } from "@/lib/auth/session";
 import { prismaMock } from "../../../tests-setup/prisma.mock";
+import * as GenerateRoute from "@/app/api/schedule/generate/route";
+
+// Mock the generateScheduleEntries function
+jest.mock("@/app/api/schedule/generate/route", () => ({
+  generateScheduleEntries: jest.fn().mockResolvedValue(5),
+}));
 
 type GetHandler = typeof ScheduleRoute.GET;
 type GetRequest = Parameters<GetHandler>[0];
@@ -127,6 +133,290 @@ describe("GET /api/schedule", () => {
     prismaMock.scheduleEntry.findMany.mockRejectedValueOnce(new Error("fail"));
 
     const res = await ScheduleRoute.GET(makeGetRequest());
+    expect(res.status).toBe(500);
+    await expect(res.json()).resolves.toEqual(
+      expect.objectContaining({ error: "Internal server error" }),
+    );
+  });
+});
+
+describe("POST /api/schedule", () => {
+  type PostHandler = typeof ScheduleRoute.POST;
+  type PostRequest = Parameters<PostHandler>[0];
+
+  const makePostRequest = (body: object): PostRequest =>
+    new Request("http://localhost/api/schedule", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(body),
+    }) as unknown as PostRequest;
+
+  beforeEach(() => {
+    jest.clearAllMocks();
+  });
+
+  it("returns 401 when no session user", async () => {
+    jest.mocked(getSessionUserFromRequest).mockResolvedValueOnce(null);
+
+    const res = await ScheduleRoute.POST(
+      makePostRequest({
+        medicationId: "m1",
+        frequencyDays: [1],
+        durationDays: 7,
+        dateStart: "2025-02-20",
+        timeOfDay: ["09:00"],
+      }),
+    );
+    expect(res.status).toBe(401);
+    await expect(res.json()).resolves.toEqual(
+      expect.objectContaining({ error: "Unauthorized" }),
+    );
+  });
+
+  it("returns 400 when payload is invalid", async () => {
+    jest.mocked(getSessionUserFromRequest).mockResolvedValueOnce(mockUser);
+
+    const res = await ScheduleRoute.POST(makePostRequest({}));
+    expect(res.status).toBe(400);
+    await expect(res.json()).resolves.toEqual(
+      expect.objectContaining({ error: "Invalid input data" }),
+    );
+  });
+
+  it("returns 400 when dateStart is in the past", async () => {
+    jest.mocked(getSessionUserFromRequest).mockResolvedValueOnce(mockUser);
+
+    const yesterday = new Date();
+    yesterday.setDate(yesterday.getDate() - 1);
+    const dateStr = yesterday.toISOString().split("T")[0];
+
+    const res = await ScheduleRoute.POST(
+      makePostRequest({
+        medicationId: "m1",
+        frequencyDays: [1],
+        durationDays: 7,
+        dateStart: dateStr,
+        timeOfDay: ["09:00"],
+      }),
+    );
+    expect(res.status).toBe(400);
+    await expect(res.json()).resolves.toEqual(
+      expect.objectContaining({
+        error: "dateStart must be today or in the future",
+      }),
+    );
+  });
+
+  it("creates schedule and generates entries", async () => {
+    jest.mocked(getSessionUserFromRequest).mockResolvedValueOnce(mockUser);
+
+    const futureDate = new Date();
+    futureDate.setDate(futureDate.getDate() + 7);
+    const dateStr = futureDate.toISOString().split("T")[0];
+
+    const mockSchedule = {
+      id: "s1",
+      medicationId: "m1",
+      userId: mockUser.id,
+      quantity: 1,
+      units: "pill",
+      frequencyDays: [1, 3, 5],
+      durationDays: 7,
+      dateStart: new Date(dateStr + "T00:00:00.000Z"),
+      dateEnd: null,
+      timeOfDay: ["09:00", "21:00"],
+      mealTiming: "before",
+      createdAt: new Date(),
+      updatedAt: new Date(),
+    };
+
+    prismaMock.schedule.create.mockResolvedValueOnce(mockSchedule);
+
+    const res = await ScheduleRoute.POST(
+      makePostRequest({
+        medicationId: "m1",
+        frequencyDays: [1, 3, 5],
+        durationDays: 7,
+        dateStart: dateStr,
+        timeOfDay: ["09:00", "21:00"],
+        mealTiming: "before",
+      }),
+    );
+
+    expect(res.status).toBe(201);
+    const json = await res.json();
+    expect(json.schedule).toEqual(
+      expect.objectContaining({
+        id: "s1",
+        medicationId: "m1",
+        frequencyDays: [1, 3, 5],
+      }),
+    );
+    expect(prismaMock.schedule.create).toHaveBeenCalled();
+    expect(GenerateRoute.generateScheduleEntries).toHaveBeenCalledWith(
+      "s1",
+      mockUser.id,
+    );
+  });
+
+  it("handles entry generation errors gracefully", async () => {
+    jest.mocked(getSessionUserFromRequest).mockResolvedValueOnce(mockUser);
+
+    const futureDate = new Date();
+    futureDate.setDate(futureDate.getDate() + 7);
+    const dateStr = futureDate.toISOString().split("T")[0];
+
+    const mockSchedule = {
+      id: "s1",
+      medicationId: "m1",
+      userId: mockUser.id,
+      quantity: 1,
+      units: "pill",
+      frequencyDays: [1],
+      durationDays: 7,
+      dateStart: new Date(dateStr + "T00:00:00.000Z"),
+      dateEnd: null,
+      timeOfDay: ["09:00"],
+      mealTiming: "before",
+      createdAt: new Date(),
+      updatedAt: new Date(),
+    };
+
+    prismaMock.schedule.create.mockResolvedValueOnce(mockSchedule);
+    jest
+      .mocked(GenerateRoute.generateScheduleEntries)
+      .mockRejectedValueOnce(new Error("Generation failed"));
+
+    const res = await ScheduleRoute.POST(
+      makePostRequest({
+        medicationId: "m1",
+        frequencyDays: [1],
+        durationDays: 7,
+        dateStart: dateStr,
+        timeOfDay: ["09:00"],
+      }),
+    );
+
+    // Should still return 201 even if generation fails
+    expect(res.status).toBe(201);
+    expect(GenerateRoute.generateScheduleEntries).toHaveBeenCalled();
+  });
+
+  it("calculates dateEnd correctly when durationDays > 0", async () => {
+    jest.mocked(getSessionUserFromRequest).mockResolvedValueOnce(mockUser);
+
+    const futureDate = new Date();
+    futureDate.setDate(futureDate.getDate() + 7);
+    const dateStr = futureDate.toISOString().split("T")[0];
+
+    const mockSchedule = {
+      id: "s1",
+      medicationId: "m1",
+      userId: mockUser.id,
+      quantity: 1,
+      units: "pill",
+      frequencyDays: [1],
+      durationDays: 14,
+      dateStart: new Date(dateStr + "T00:00:00.000Z"),
+      dateEnd: new Date(dateStr + "T00:00:00.000Z"),
+      timeOfDay: ["09:00"],
+      mealTiming: "before",
+      createdAt: new Date(),
+      updatedAt: new Date(),
+    };
+
+    // Calculate expected end date
+    const expectedEndDate = new Date(futureDate);
+    expectedEndDate.setDate(expectedEndDate.getDate() + 14);
+
+    prismaMock.schedule.create.mockResolvedValueOnce(mockSchedule);
+
+    await ScheduleRoute.POST(
+      makePostRequest({
+        medicationId: "m1",
+        frequencyDays: [1],
+        durationDays: 14,
+        dateStart: dateStr,
+        timeOfDay: ["09:00"],
+      }),
+    );
+
+    expect(prismaMock.schedule.create).toHaveBeenCalledWith(
+      expect.objectContaining({
+        data: expect.objectContaining({
+          durationDays: 14,
+          dateEnd: expect.any(Date),
+        }),
+      }),
+    );
+  });
+
+  it("sets dateEnd to null when durationDays is 0", async () => {
+    jest.mocked(getSessionUserFromRequest).mockResolvedValueOnce(mockUser);
+
+    const futureDate = new Date();
+    futureDate.setDate(futureDate.getDate() + 7);
+    const dateStr = futureDate.toISOString().split("T")[0];
+
+    const mockSchedule = {
+      id: "s1",
+      medicationId: "m1",
+      userId: mockUser.id,
+      quantity: 1,
+      units: "pill",
+      frequencyDays: [1],
+      durationDays: 0,
+      dateStart: new Date(dateStr + "T00:00:00.000Z"),
+      dateEnd: null,
+      timeOfDay: ["09:00"],
+      mealTiming: "before",
+      createdAt: new Date(),
+      updatedAt: new Date(),
+    };
+
+    prismaMock.schedule.create.mockResolvedValueOnce(mockSchedule);
+
+    await ScheduleRoute.POST(
+      makePostRequest({
+        medicationId: "m1",
+        frequencyDays: [1],
+        durationDays: 0,
+        dateStart: dateStr,
+        timeOfDay: ["09:00"],
+      }),
+    );
+
+    expect(prismaMock.schedule.create).toHaveBeenCalledWith(
+      expect.objectContaining({
+        data: expect.objectContaining({
+          durationDays: 0,
+          dateEnd: null,
+        }),
+      }),
+    );
+  });
+
+  it("returns 500 when database create fails", async () => {
+    jest.mocked(getSessionUserFromRequest).mockResolvedValueOnce(mockUser);
+
+    const futureDate = new Date();
+    futureDate.setDate(futureDate.getDate() + 7);
+    const dateStr = futureDate.toISOString().split("T")[0];
+
+    prismaMock.schedule.create.mockRejectedValueOnce(
+      new Error("Database error"),
+    );
+
+    const res = await ScheduleRoute.POST(
+      makePostRequest({
+        medicationId: "m1",
+        frequencyDays: [1],
+        durationDays: 7,
+        dateStart: dateStr,
+        timeOfDay: ["09:00"],
+      }),
+    );
+
     expect(res.status).toBe(500);
     await expect(res.json()).resolves.toEqual(
       expect.objectContaining({ error: "Internal server error" }),
