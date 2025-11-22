@@ -64,11 +64,11 @@ export default function TimeOfDayChips({ selected, onToggle, error }: Props) {
   const [customTimeValue, setCustomTimeValue] = useState("08:00");
 
   const required = Number(freq || 1) || 1;
+  const maxCustomTimes = 6;
   const label =
     required === 1 ? "Select 1 Time of Day" : `Select ${required} Times of Day`;
-  const totalSelected = selected.length + customTimes.length;
-  const selectedCount = totalSelected;
-  const isComplete = totalSelected === required;
+  const selectedCount = selected.length;
+  const isComplete = selectedCount === required;
   const statusClass = isComplete
     ? stepStyles.statusSuccess
     : stepStyles.statusWarning;
@@ -79,6 +79,9 @@ export default function TimeOfDayChips({ selected, onToggle, error }: Props) {
   };
 
   const handleCustomSave = () => {
+    if (customTimes.length >= maxCustomTimes) {
+      return;
+    }
     const normalized = normalizeCustomTime(customTimeValue) ?? "08:00";
     setValue("customTimes", [...customTimes, normalized], {
       shouldDirty: true,
@@ -108,7 +111,8 @@ export default function TimeOfDayChips({ selected, onToggle, error }: Props) {
         <span className={stepStyles.labelText}>{label}</span>
         <span className={stepStyles.required}>*</span>
         <HelpTooltip>
-          Select all the times you take this medication each day.
+          Select the preset times of day you take this medication. You can also
+          add up to 6 custom times.
         </HelpTooltip>
       </div>
       <div
@@ -229,9 +233,15 @@ export default function TimeOfDayChips({ selected, onToggle, error }: Props) {
             </div>
           ))}
           <p className="text-[13px] text-[#6B7280]">
-            Custom reminders count toward your daily total.
+            You can add up to 6 custom reminders in addition to the preset
+            times.
           </p>
         </div>
+      )}
+      {customTimes.length >= maxCustomTimes && (
+        <p className="mt-2 text-[13px] text-[#B91C1C]">
+          You&apos;ve added the maximum of 6 custom reminders.
+        </p>
       )}
       {showCustomPicker && (
         <div className="mt-4 rounded-[28px] border border-[#E0E7FF] bg-white px-6 py-6 shadow-[0_24px_60px_rgba(15,23,42,0.08)]">

@@ -298,11 +298,12 @@ export default function NewMedicationForm({
     if (step === 2) {
       const expected = Number(allValues.frequency || 1);
       const customCount = customTimes.length;
-      const totalSelected = timesOfDay.length + customCount;
-      const countsMatch =
-        expected > 0 && totalSelected === expected && !timeError;
+      const hasAnyTimeSelected =
+        timesOfDay.length > 0 || customCount > 0 || !timeError;
+      const presetsMatchFrequency =
+        expected > 0 && timesOfDay.length === expected && !timeError;
 
-      if (!countsMatch) {
+      if (!hasAnyTimeSelected || !presetsMatchFrequency) {
         validator.lastErrorMessage = "Please complete the dosing schedule.";
         return false;
       }
@@ -388,8 +389,11 @@ export default function NewMedicationForm({
       onValidate(Boolean(nameValue));
       return;
     }
-    validateCurrentStep().then(onValidate);
-  }, [allValues.name, onValidate, step, validateCurrentStep]);
+    // For steps 2+, rely on explicit validation via validateStepRef
+    // (triggered from the "Next" button) to avoid scrolling and
+    // error highlighting while the user is still filling the form.
+    onValidate(true);
+  }, [allValues.name, onValidate, step]);
 
   useEffect(() => {
     if (!validateStepRef) return;
@@ -557,10 +561,17 @@ export default function NewMedicationForm({
     isSubmittingRef.current = true;
     onSubmittingChange?.(true);
     const runner = handleSubmit(async (data) => {
-      const expected = Number(data.frequency || 1);
       const customSelections = sanitizeCustomTimes(data.customTimes);
-      if (timesOfDay.length + customSelections.length !== expected) {
-        toast("Please complete the dosing schedule", { variant: "error" });
+      if (timesOfDay.length === 0 && customSelections.length === 0) {
+        toast("Please select at least one time of day", {
+          variant: "error",
+        });
+        return;
+      }
+      if (customSelections.length > 6) {
+        toast("You can add up to 6 custom reminders per day", {
+          variant: "error",
+        });
         return;
       }
       if (!data.medicationId) {

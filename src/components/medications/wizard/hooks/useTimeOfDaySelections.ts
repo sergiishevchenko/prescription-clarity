@@ -27,9 +27,11 @@ export const useTimeOfDaySelections = ({
     [frequency],
   );
 
+  // Preset (morning/afternoon/evening) selections are controlled only
+  // by the chosen frequency, not by the number of custom times.
   const maxPresets = useMemo(
-    () => Math.max(0, required - Math.max(0, customTimesCount)),
-    [customTimesCount, required],
+    () => Math.max(0, Math.min(required, 3)),
+    [required],
   );
 
   const timesOfDay = useMemo(
@@ -38,18 +40,20 @@ export const useTimeOfDaySelections = ({
   );
 
   const timeError = useMemo(() => {
-    if (customTimesCount > required) {
-      return "Too many custom reminders for this frequency. Remove one.";
+    if (customTimesCount > 6) {
+      return "You can add up to 6 custom reminders per day.";
     }
-    if (maxPresets === 0) return "";
-    if (timesOfDay.length < maxPresets) {
-      const remaining = maxPresets - timesOfDay.length;
+    if (timesOfDay.length === 0 && customTimesCount === 0) {
+      return "Please select at least one time of day.";
+    }
+    if (required > 0 && timesOfDay.length < required) {
+      const remaining = required - timesOfDay.length;
       return remaining === 1
-        ? "Please select 1 more time of day."
-        : `Please select ${remaining} more times of day.`;
+        ? "Please select 1 more preset time of day."
+        : `Please select ${remaining} more preset times of day.`;
     }
     return "";
-  }, [customTimesCount, required, maxPresets, timesOfDay.length]);
+  }, [customTimesCount, required, timesOfDay.length]);
 
   const toggleTime = useCallback(
     (slot: TimeOfDay) => {
