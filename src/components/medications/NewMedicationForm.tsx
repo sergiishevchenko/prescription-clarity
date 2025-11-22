@@ -453,8 +453,7 @@ export default function NewMedicationForm({
               return false;
             }
 
-            const hitDose =
-              typeof hit.dose === "number" ? hit.dose : undefined;
+            const hitDose = typeof hit.dose === "number" ? hit.dose : undefined;
             const hitForm = hit.form ? hit.form.toLowerCase() : undefined;
 
             const doseMatches =

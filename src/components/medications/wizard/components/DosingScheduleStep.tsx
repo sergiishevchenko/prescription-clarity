@@ -1,10 +1,7 @@
 "use client";
 
 import type { ReactNode } from "react";
-import {
-  useFormContext,
-  type UseFormRegisterReturn,
-} from "react-hook-form";
+import { useFormContext, type UseFormRegisterReturn } from "react-hook-form";
 
 import TimeInputs from "../../TimeInputs";
 import TimeOfDayChips from "../../TimeOfDayChips";

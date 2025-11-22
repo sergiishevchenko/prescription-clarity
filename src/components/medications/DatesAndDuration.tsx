@@ -368,8 +368,7 @@ export default function DatesAndDuration() {
         </div>
         {!ongoing && startDate && endDate && (
           <p className="mt-4 rounded-2xl bg-[#F9FAFB] px-4 py-3 text-sm text-[#1F2937]">
-            Schedule:{" "}
-            <strong>{formatDateDisplay(String(startDate))}</strong> →{" "}
+            Schedule: <strong>{formatDateDisplay(String(startDate))}</strong> →{" "}
             <strong>{formatDateDisplay(String(endDate))}</strong>
           </p>
         )}

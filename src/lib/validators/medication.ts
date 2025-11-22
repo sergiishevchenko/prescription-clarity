@@ -24,8 +24,7 @@ export const createMedicationSchema = z.object({
     .string()
     .min(1, "Name is required")
     .max(150, "Medication name must not exceed 150 characters"),
-  dose: z
-    .coerce
+  dose: z.coerce
     .number()
     .int()
     .positive("Dose must be a positive integer")
