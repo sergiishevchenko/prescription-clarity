@@ -1,7 +1,10 @@
 "use client";
 
 import type { ReactNode } from "react";
-import type { UseFormRegisterReturn } from "react-hook-form";
+import {
+  useFormContext,
+  type UseFormRegisterReturn,
+} from "react-hook-form";
 
 import TimeInputs from "../../TimeInputs";
 import TimeOfDayChips from "../../TimeOfDayChips";
@@ -63,6 +66,10 @@ export function DosingScheduleStep({
   timeError,
   onToggleTime,
 }: Props) {
+  const {
+    formState: { errors },
+  } = useFormContext<FormValues>();
+
   return (
     <section className={stepStyles.step}>
       <div className={stepStyles.surface}>
@@ -135,14 +142,14 @@ export function DosingScheduleStep({
 
             <div className={stepStyles.quantityField}>
               <label
-                htmlFor="quantity-form"
+                htmlFor="medication-units"
                 className={stepStyles.quantityLabel}
               >
                 Units
               </label>
               <div className={stepStyles.selectWrapper}>
                 <select
-                  id="quantity-form"
+                  id="medication-units"
                   className={stepStyles.select}
                   value={unitsValue ?? ""}
                   onChange={(event) =>
@@ -151,6 +158,15 @@ export function DosingScheduleStep({
                         ? (event.target.value as MedicationForm)
                         : undefined,
                     )
+                  }
+                  aria-invalid={Boolean(errors.form) || undefined}
+                  style={
+                    errors.form
+                      ? {
+                          borderColor: "#ef4444",
+                          boxShadow: "0 0 0 1px #fecaca",
+                        }
+                      : undefined
                   }
                 >
                   <option value="">Select a form</option>
@@ -178,6 +194,11 @@ export function DosingScheduleStep({
               <p className={stepStyles.helperText}>
                 Same list as the medication form
               </p>
+              {errors.form && (
+                <p className={stepStyles.errorText}>
+                  {errors.form.message as string}
+                </p>
+              )}
             </div>
           </div>
 
