@@ -1,19 +1,10 @@
 import { cookies } from "next/headers";
-import Link from "next/link";
 
-import MedicationsTable from "@/components/medications/MedicationsTable";
+import MedicationsOverview from "@/components/medications/MedicationsOverview";
 import { absoluteUrl } from "@/lib/url";
+import type { MedicationListItem } from "@/lib/medicationsListTypes";
 
-type Medication = {
-  id: string;
-  name: string;
-  dose: string;
-  frequency: number;
-  startDate: string;
-  endDate: string;
-};
-
-async function getMedications(): Promise<Medication[]> {
+async function getMedications(): Promise<MedicationListItem[]> {
   const store = await cookies();
 
   const cookieHeader = store
@@ -36,29 +27,12 @@ async function getMedications(): Promise<Medication[]> {
     throw new Error("Failed to load medications");
   }
 
-  const data = (await res.json()) as { medications: Medication[] };
+  const data = (await res.json()) as { medications: MedicationListItem[] };
   return data.medications;
 }
 
 export default async function MedicationsListPage() {
   const medications = await getMedications();
 
-  return (
-    <div className="min-h-[calc(100vh-4rem)] bg-gray-50">
-      <div className="mx-auto max-w-6xl px-4 py-6 sm:px-6 lg:px-8">
-        <div className="mb-4 flex items-center justify-between">
-          <h1 className="text-2xl font-semibold text-gray-900">Medications</h1>
-          <Link
-            href="/medications/new"
-            className="rounded-md bg-indigo-600 px-4 py-2 text-sm font-medium text-white hover:bg-indigo-700"
-          >
-            Add
-          </Link>
-        </div>
-        <div className="rounded-lg bg-white p-4 shadow">
-          <MedicationsTable initial={medications} />
-        </div>
-      </div>
-    </div>
-  );
+  return <MedicationsOverview initial={medications} />;
 }

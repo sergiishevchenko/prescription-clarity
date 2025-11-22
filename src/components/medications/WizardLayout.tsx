@@ -18,6 +18,7 @@ type WizardLayoutProps = {
   helpText?: string;
   children: React.ReactNode;
   showActions?: boolean;
+  showProgressBar?: boolean;
   actionButtons?: React.ReactNode;
 };
 
@@ -32,6 +33,7 @@ export function WizardLayout({
   stepTitle,
   stepSubtitle,
   stepIcon,
+  showProgressBar = true,
   helpText,
   children,
   showActions = true,
@@ -75,23 +77,27 @@ export function WizardLayout({
         {/* Main Title */}
         <h1 className={styles.title}>{title}</h1>
 
-        {/* Progress Header */}
-        <div className={styles.progressHeader}>
-          <span className={styles.stepIndicator}>
-            Step {step} of {totalSteps}
-          </span>
-          <span className={styles.progressPercentage}>
-            {Math.round(progress)}% Complete
-          </span>
-        </div>
+        {showProgressBar && (
+          <>
+            {/* Progress Header */}
+            <div className={styles.progressHeader}>
+              <span className={styles.stepIndicator}>
+                Step {step} of {totalSteps}
+              </span>
+              <span className={styles.progressPercentage}>
+                {Math.round(progress)}% Complete
+              </span>
+            </div>
 
-        {/* Progress Bar */}
-        <div className={styles.progressBar}>
-          <div
-            className={styles.progressFill}
-            style={{ width: `${progress}%` }}
-          />
-        </div>
+            {/* Progress Bar */}
+            <div className={styles.progressBar}>
+              <div
+                className={styles.progressFill}
+                style={{ width: `${progress}%` }}
+              />
+            </div>
+          </>
+        )}
 
         {/* Step Header with Icon */}
         {(stepIcon || stepTitle || stepSubtitle) && (
