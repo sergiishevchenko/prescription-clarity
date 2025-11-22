@@ -74,6 +74,30 @@ export async function POST(request: NextRequest) {
     const validatedData: CreateMedicationInput =
       createMedicationSchema.parse(body);
 
+    // Check for duplicate medication (same name + dose + form for active medications)
+    const existingMedication = await prisma.medication.findFirst({
+      where: {
+        userId: user.id,
+        deletedAt: null,
+        name: {
+          equals: validatedData.name,
+          mode: "insensitive",
+        },
+        dose: validatedData.dose,
+        form: {
+          equals: validatedData.form,
+          mode: "insensitive",
+        },
+      },
+    });
+
+    if (existingMedication) {
+      return NextResponse.json(
+        { error: "Medication already exists" },
+        { status: 409 },
+      );
+    }
+
     // Create medication
     const medication = await prisma.medication.create({
       data: {
