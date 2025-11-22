@@ -281,6 +281,7 @@ describe("POST /api/medications", () => {
       updatedAt: new Date(),
     };
 
+    prismaMock.medication.findFirst.mockResolvedValueOnce(null);
     prismaMock.medication.create.mockResolvedValueOnce(mockCreatedMedication);
 
     const res = await MedicationsRoute.POST(
@@ -324,11 +325,189 @@ describe("POST /api/medications", () => {
     expect(data.error).toBe("Invalid input data");
   });
 
+  it("should return 409 when duplicate medication exists (same name + dose + form)", async () => {
+    jest
+      .spyOn(SessionModule, "getSessionUserFromRequest")
+      .mockResolvedValueOnce(mockUser);
+
+    const existingMedication = {
+      id: "med1",
+      userId: "user123",
+      name: "Aspirin",
+      dose: 100,
+      form: "tablets",
+      deletedAt: null,
+      createdAt: new Date(),
+      updatedAt: new Date(),
+    };
+
+    prismaMock.medication.findFirst.mockResolvedValueOnce(existingMedication);
+
+    const res = await MedicationsRoute.POST(
+      makePostReq({
+        name: "Aspirin",
+        dose: 100,
+        form: "tablets",
+      }),
+    );
+    const data = await res.json();
+
+    expect(res.status).toBe(409);
+    expect(data.error).toBe("Medication already exists");
+    expect(prismaMock.medication.findFirst).toHaveBeenCalledWith({
+      where: {
+        userId: "user123",
+        deletedAt: null,
+        name: {
+          equals: "Aspirin",
+          mode: "insensitive",
+        },
+        dose: 100,
+        form: {
+          equals: "tablets",
+          mode: "insensitive",
+        },
+      },
+    });
+  });
+
+  it("should return 409 for case-insensitive duplicate name", async () => {
+    jest
+      .spyOn(SessionModule, "getSessionUserFromRequest")
+      .mockResolvedValueOnce(mockUser);
+
+    const existingMedication = {
+      id: "med1",
+      userId: "user123",
+      name: "Aspirin",
+      dose: 100,
+      form: "tablets",
+      deletedAt: null,
+      createdAt: new Date(),
+      updatedAt: new Date(),
+    };
+
+    prismaMock.medication.findFirst.mockResolvedValueOnce(existingMedication);
+
+    const res = await MedicationsRoute.POST(
+      makePostReq({
+        name: "ASPIRIN",
+        dose: 100,
+        form: "tablets",
+      }),
+    );
+    const data = await res.json();
+
+    expect(res.status).toBe(409);
+    expect(data.error).toBe("Medication already exists");
+  });
+
+  it("should allow creation when different dose", async () => {
+    jest
+      .spyOn(SessionModule, "getSessionUserFromRequest")
+      .mockResolvedValueOnce(mockUser);
+
+    prismaMock.medication.findFirst.mockResolvedValueOnce(null);
+
+    const mockCreatedMedication = {
+      id: "med2",
+      userId: "user123",
+      name: "Aspirin",
+      dose: 200,
+      form: "tablets",
+      deletedAt: null,
+      createdAt: new Date(),
+      updatedAt: new Date(),
+    };
+
+    prismaMock.medication.create.mockResolvedValueOnce(mockCreatedMedication);
+
+    const res = await MedicationsRoute.POST(
+      makePostReq({
+        name: "Aspirin",
+        dose: 200,
+        form: "tablets",
+      }),
+    );
+    const data = await res.json();
+
+    expect(res.status).toBe(201);
+    expect(data.medication.dose).toBe(200);
+  });
+
+  it("should allow creation when different form", async () => {
+    jest
+      .spyOn(SessionModule, "getSessionUserFromRequest")
+      .mockResolvedValueOnce(mockUser);
+
+    prismaMock.medication.findFirst.mockResolvedValueOnce(null);
+
+    const mockCreatedMedication = {
+      id: "med2",
+      userId: "user123",
+      name: "Aspirin",
+      dose: 100,
+      form: "capsules",
+      deletedAt: null,
+      createdAt: new Date(),
+      updatedAt: new Date(),
+    };
+
+    prismaMock.medication.create.mockResolvedValueOnce(mockCreatedMedication);
+
+    const res = await MedicationsRoute.POST(
+      makePostReq({
+        name: "Aspirin",
+        dose: 100,
+        form: "capsules",
+      }),
+    );
+    const data = await res.json();
+
+    expect(res.status).toBe(201);
+    expect(data.medication.form).toBe("capsules");
+  });
+
+  it("should allow creation when same medication was soft-deleted", async () => {
+    jest
+      .spyOn(SessionModule, "getSessionUserFromRequest")
+      .mockResolvedValueOnce(mockUser);
+
+    // findFirst returns null because deletedAt filter excludes soft-deleted
+    prismaMock.medication.findFirst.mockResolvedValueOnce(null);
+
+    const mockCreatedMedication = {
+      id: "med2",
+      userId: "user123",
+      name: "Aspirin",
+      dose: 100,
+      form: "tablets",
+      deletedAt: null,
+      createdAt: new Date(),
+      updatedAt: new Date(),
+    };
+
+    prismaMock.medication.create.mockResolvedValueOnce(mockCreatedMedication);
+
+    const res = await MedicationsRoute.POST(
+      makePostReq({
+        name: "Aspirin",
+        dose: 100,
+        form: "tablets",
+      }),
+    );
+    const data = await res.json();
+
+    expect(res.status).toBe(201);
+    expect(data.medication.name).toBe("Aspirin");
+  });
+
   it("should return 500 on database error", async () => {
     jest
       .spyOn(SessionModule, "getSessionUserFromRequest")
       .mockResolvedValueOnce(mockUser);
 
+    prismaMock.medication.findFirst.mockResolvedValueOnce(null);
     prismaMock.medication.create.mockRejectedValueOnce(
       new Error("Database error"),
     );
