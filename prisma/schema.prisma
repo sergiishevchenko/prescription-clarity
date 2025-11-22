@@ -47,8 +47,8 @@ model Medication {
   id        String    @id @default(cuid()) @db.VarChar(32)
   userId    String    @db.VarChar(32)
   name      String    @db.VarChar(150)
-  dose      Int
-  form      String    @db.VarChar(50)
+  dose      Int?                     // <= робимо необов'язковим
+  form      String?   @db.VarChar(50) // <= теж необов'язкове
   deletedAt DateTime?
   createdAt DateTime  @default(now())
   updatedAt DateTime  @updatedAt

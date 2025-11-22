@@ -19,18 +19,30 @@ export default function NewMedicationFormPage() {
   const router = useRouter();
   const toast = useToast();
   const totalSteps = 5;
-  const [step, setStep] = useState(() => readWizardStep(totalSteps));
+
+  // Початково завжди 1 — без читання localStorage / readWizardStep у SSR
+  const [step, setStep] = useState(1);
   const [isStepValid, setIsStepValid] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const validateStepRef = useRef<StepValidatorFn | null>(null);
   const ensureMedicationRef = useRef<(() => Promise<boolean>) | null>(null);
   const submitFormRef = useRef<(() => Promise<void> | void) | null>(null);
+
+  // Після гідратації відновлюємо крок з storage
+  useEffect(() => {
+    const stored = readWizardStep(totalSteps);
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    setStep(stored);
+  }, [totalSteps]);
+
+  // Зберігаємо поточний крок
   useEffect(() => {
     persistWizardStep(step);
-  }, [step]);
+  }, [step, totalSteps]);
 
   const handleNext = async () => {
     if (step >= totalSteps) return;
+
     if (validateStepRef.current) {
       const validator = validateStepRef.current;
       const valid = await validator();
@@ -46,12 +58,14 @@ export default function NewMedicationFormPage() {
       showStepError(step);
       return;
     }
+
     if (step === 1 && ensureMedicationRef.current) {
       const ensured = await ensureMedicationRef.current();
       if (!ensured) {
         return;
       }
     }
+
     setStep((prev) => prev + 1);
   };
 
@@ -151,9 +165,11 @@ export default function NewMedicationFormPage() {
 
   const getActionButtons = () => {
     if (step !== 5) return undefined;
+
     const handleAddSchedule = () => {
       submitFormRef.current?.();
     };
+
     return (
       <div className={styles.buttonGroup}>
         <button
