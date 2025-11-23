@@ -122,9 +122,7 @@ describe("POST /api/medications/search", () => {
       .spyOn(SessionModule, "getSessionUserFromRequest")
       .mockResolvedValueOnce(mockUser);
 
-    prismaMock.medication.findMany.mockRejectedValueOnce(
-      new Error("DB fail"),
-    );
+    prismaMock.medication.findMany.mockRejectedValueOnce(new Error("DB fail"));
 
     const res = await MedicationSearchRoute.POST(
       makeSearchRequest({ name: "asp" }),

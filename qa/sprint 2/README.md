@@ -11,12 +11,12 @@
 
 ## 🧰 Tools Used
 
-| Tool                | Purpose                                                                     |
-| ------------------- | --------------------------------------------------------------------------- |
-| **Qase.io**         | Test case management (Medications CRUD, Schedule flow, Calendar tests)      |
-| **Postman**         | API tests for `/api/medications`, `/api/medications/search`, `/api/schedule`|
-| **Chrome DevTools** | Inspect cookies/timezones, verify schedule rendering via API responses      |
-| **GitHub**          | Version control for QA assets + pull-request reviews                        |
+| Tool                | Purpose                                                                      |
+| ------------------- | ---------------------------------------------------------------------------- |
+| **Qase.io**         | Test case management (Medications CRUD, Schedule flow, Calendar tests)       |
+| **Postman**         | API tests for `/api/medications`, `/api/medications/search`, `/api/schedule` |
+| **Chrome DevTools** | Inspect cookies/timezones, verify schedule rendering via API responses       |
+| **GitHub**          | Version control for QA assets + pull-request reviews                         |
 
 ---
 
@@ -48,12 +48,12 @@ Validate the new medication search + wizard flow, ensure schedule creation gener
 
 ## ✅ QA Artifacts Summary
 
-| Category   | Artifact                                                              | Format | Location                         |
-| ---------- | --------------------------------------------------------------------- | ------ | --------------------------------- |
-| Test Suite | `Sprint2_Medications_Schedule.xlsx`                                   | XLSX   | `qa/sprint 2/test-suite/`        |
-| Test Run   | `Sprint2_Run_Results.csv`                                             | CSV    | `qa/sprint 2/test-runs/`         |
-| Defects    | `PC-2025-11-23.csv`                                                   | CSV    | `qa/sprint 2/defects/`           |
-| API Tests  | `mcs_mvp_medications_schedule.postman_collection.json`                | JSON   | `qa/sprint 2/postman/`           |
+| Category   | Artifact                                               | Format | Location                  |
+| ---------- | ------------------------------------------------------ | ------ | ------------------------- |
+| Test Suite | `Sprint2_Medications_Schedule.xlsx`                    | XLSX   | `qa/sprint 2/test-suite/` |
+| Test Run   | `Sprint2_Run_Results.csv`                              | CSV    | `qa/sprint 2/test-runs/`  |
+| Defects    | `PC-2025-11-23.csv`                                    | CSV    | `qa/sprint 2/defects/`    |
+| API Tests  | `mcs_mvp_medications_schedule.postman_collection.json` | JSON   | `qa/sprint 2/postman/`    |
 
 ---
 
