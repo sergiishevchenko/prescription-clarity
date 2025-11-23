@@ -45,13 +45,12 @@ Validate API response codes, session handling, and data persistence across auth 
 
 ## ✅ QA Artifacts Summary
 
-| Category    | Artifact                                                              | Format |
-| ----------- | --------------------------------------------------------------------- | ------ |
-| Test Suite  | `Sprint1_Auth_Profile_Smoke.xlsx`                                     | XLSX   |
-| Test Run    | `Sprint1_Run_Results.csv`                                             | CSV    |
-| Defects     | `BUG-001_Registration_400_vs_409.md`<br>`BUG-002_Login_NoRedirect.md` | MD     |
-| API Tests   | `mcs_mvp_api_collection.json`                                         | JSON   |
-| Environment | `mcs_mvp_environment.json`                                            | JSON   |
+| Category   | Artifact                                                              | Format | Location                  |
+| ---------- | --------------------------------------------------------------------- | ------ | ------------------------- |
+| Test Suite | `Sprint1_Auth_Profile_Smoke.xlsx`                                     | XLSX   | `qa/sprint 1/test-suite/` |
+| Test Run   | `Sprint1_Run_Results.csv`                                             | CSV    | `qa/sprint 1/test-runs/`  |
+| Defects    | `BUG-001_Registration_400_vs_409.md`<br>`BUG-002_Login_NoRedirect.md` | MD     | `qa/sprint 1/defects/`    |
+| API Tests  | `mcs_mvp_api_collection.json`                                         | JSON   | `qa/sprint 1/postman/`    |
 
 ---
 

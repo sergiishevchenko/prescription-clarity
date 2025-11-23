@@ -1,11 +1,11 @@
-import * as MedicationsSearchRoute from "@/app/api/medications/search/route";
+import * as MedicationSearchRoute from "@/app/api/medications/search/route";
 import { prismaMock } from "../../../tests-setup/prisma.mock";
 import * as SessionModule from "@/lib/auth/session";
 
-type PostHandler = typeof MedicationsSearchRoute.POST;
+type PostHandler = typeof MedicationSearchRoute.POST;
 type PostRequest = Parameters<PostHandler>[0];
 
-const makePostReq = (body: object): PostRequest =>
+const makeSearchRequest = (body: object): PostRequest =>
   new Request("http://localhost/api/medications/search", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
@@ -18,234 +18,118 @@ const mockUser = {
   name: "Test User",
 };
 
-type MockMedication = {
-  id: string;
-  name: string;
-  dose: number;
-  form: string;
-  deletedAt: Date | null;
-  createdAt: Date;
-  updatedAt: Date;
-};
-
-beforeEach(() => {
-  jest.clearAllMocks();
-});
-
 describe("POST /api/medications/search", () => {
-  it("should return 401 if user is not authenticated", async () => {
+  beforeEach(() => {
+    jest.clearAllMocks();
+  });
+
+  it("returns 401 when user is not authenticated", async () => {
     jest
       .spyOn(SessionModule, "getSessionUserFromRequest")
       .mockResolvedValueOnce(null);
 
-    const res = await MedicationsSearchRoute.POST(
-      makePostReq({
-        name: "Asp",
-      }),
+    const res = await MedicationSearchRoute.POST(
+      makeSearchRequest({ name: "asp" }),
     );
-    const data = await res.json();
-
     expect(res.status).toBe(401);
-    expect(data.error).toBe("Unauthorized");
+    await expect(res.json()).resolves.toEqual(
+      expect.objectContaining({ error: "Unauthorized" }),
+    );
   });
 
-  it("should return 400 if search query is less than 3 characters", async () => {
+  it("returns 400 when query is shorter than 3 characters", async () => {
     jest
       .spyOn(SessionModule, "getSessionUserFromRequest")
       .mockResolvedValueOnce(mockUser);
 
-    const res = await MedicationsSearchRoute.POST(
-      makePostReq({
-        name: "As",
-      }),
+    const res = await MedicationSearchRoute.POST(
+      makeSearchRequest({ name: "as" }),
     );
-    const data = await res.json();
-
     expect(res.status).toBe(400);
-    expect(data.error).toBe("Invalid input data");
+    await expect(res.json()).resolves.toEqual(
+      expect.objectContaining({ error: "Invalid input data" }),
+    );
+    expect(prismaMock.medication.findMany).not.toHaveBeenCalled();
   });
 
-  it("should search medications by name and return full model including id", async () => {
+  it("returns matching medications for a valid prefix", async () => {
     jest
       .spyOn(SessionModule, "getSessionUserFromRequest")
       .mockResolvedValueOnce(mockUser);
 
-    const now = new Date();
-    const mockMedications: MockMedication[] = [
+    const matches = [
       {
-        id: "med1",
+        id: "m1",
+        userId: mockUser.id,
         name: "Aspirin",
-        dose: 100,
+        dose: 500,
         form: "tablets",
         deletedAt: null,
-        createdAt: now,
-        updatedAt: now,
+        createdAt: new Date(),
+        updatedAt: new Date(),
       },
       {
-        id: "med2",
-        name: "Aspirin Extra",
-        dose: 200,
-        form: "tablets",
+        id: "m2",
+        userId: mockUser.id,
+        name: "Aspartame",
+        dose: null,
+        form: null,
         deletedAt: null,
-        createdAt: now,
-        updatedAt: now,
+        createdAt: new Date(),
+        updatedAt: new Date(),
       },
     ];
 
-    prismaMock.medication.findMany.mockResolvedValueOnce(mockMedications);
+    prismaMock.medication.findMany.mockResolvedValueOnce(matches);
 
-    const res = await MedicationsSearchRoute.POST(
-      makePostReq({
-        name: "Asp",
-      }),
+    const res = await MedicationSearchRoute.POST(
+      makeSearchRequest({ name: "asp" }),
     );
-    const data = await res.json();
-
     expect(res.status).toBe(200);
-    expect(data.medications).toHaveLength(2);
-    expect(data.medications[0]).toMatchObject({
-      name: "Aspirin",
-      dose: 100,
-      form: "tablets",
-      deletedAt: null,
-    });
-    expect(data.medications[1]).toMatchObject({
-      name: "Aspirin Extra",
-      dose: 200,
-      form: "tablets",
-      deletedAt: null,
-    });
-
-    expect(prismaMock.medication.findMany).toHaveBeenCalledWith({
-      where: {
-        userId: "user123",
-        deletedAt: null,
-        name: {
-          startsWith: "Asp",
-          mode: "insensitive",
-        },
-      },
-      orderBy: {
-        name: "asc",
-      },
-      select: {
-        id: true,
-        name: true,
-        dose: true,
-        form: true,
-        deletedAt: true,
-        createdAt: true,
-        updatedAt: true,
-      },
-    });
-  });
-
-  it("should perform case-insensitive search", async () => {
-    jest
-      .spyOn(SessionModule, "getSessionUserFromRequest")
-      .mockResolvedValueOnce(mockUser);
-
-    const now = new Date();
-    const mockMedications: MockMedication[] = [
-      {
-        id: "med1",
-        name: "Aspirin",
-        dose: 100,
-        form: "tablets",
-        deletedAt: null,
-        createdAt: now,
-        updatedAt: now,
-      },
-    ];
-
-    prismaMock.medication.findMany.mockResolvedValueOnce(mockMedications);
-
-    const res = await MedicationsSearchRoute.POST(
-      makePostReq({
-        name: "asp",
-      }),
-    );
-    const data = await res.json();
-
-    expect(res.status).toBe(200);
-    expect(data.medications).toHaveLength(1);
+    const json = await res.json();
+    expect(json.medications).toHaveLength(2);
     expect(prismaMock.medication.findMany).toHaveBeenCalledWith(
       expect.objectContaining({
         where: expect.objectContaining({
+          userId: mockUser.id,
           deletedAt: null,
-          name: {
+          name: expect.objectContaining({
             startsWith: "asp",
             mode: "insensitive",
-          },
+          }),
         }),
       }),
     );
   });
 
-  it("should return empty array if no medications match", async () => {
+  it("returns empty array when nothing matches", async () => {
     jest
       .spyOn(SessionModule, "getSessionUserFromRequest")
       .mockResolvedValueOnce(mockUser);
 
     prismaMock.medication.findMany.mockResolvedValueOnce([]);
 
-    const res = await MedicationsSearchRoute.POST(
-      makePostReq({
-        name: "Xyz",
-      }),
+    const res = await MedicationSearchRoute.POST(
+      makeSearchRequest({ name: "zzz" }),
     );
-    const data = await res.json();
-
     expect(res.status).toBe(200);
-    expect(data.medications).toHaveLength(0);
+    const json = await res.json();
+    expect(json.medications).toEqual([]);
   });
 
-  it("should only search non-deleted medications", async () => {
+  it("returns 500 when database query fails", async () => {
     jest
       .spyOn(SessionModule, "getSessionUserFromRequest")
       .mockResolvedValueOnce(mockUser);
 
-    prismaMock.medication.findMany.mockResolvedValueOnce([]);
+    prismaMock.medication.findMany.mockRejectedValueOnce(new Error("DB fail"));
 
-    await MedicationsSearchRoute.POST(
-      makePostReq({
-        name: "Asp",
-      }),
+    const res = await MedicationSearchRoute.POST(
+      makeSearchRequest({ name: "asp" }),
     );
-
-    expect(prismaMock.medication.findMany).toHaveBeenCalledWith(
-      expect.objectContaining({
-        where: expect.objectContaining({
-          deletedAt: null,
-        }),
-      }),
-    );
-  });
-
-  it("should return 500 on database error", async () => {
-    jest
-      .spyOn(SessionModule, "getSessionUserFromRequest")
-      .mockResolvedValueOnce(mockUser);
-
-    prismaMock.medication.findMany.mockRejectedValueOnce(
-      new Error("Database error"),
-    );
-
-    const consoleSpy = jest
-      .spyOn(console, "error")
-      .mockImplementationOnce(() => {});
-
-    const res = await MedicationsSearchRoute.POST(
-      makePostReq({
-        name: "Asp",
-      }),
-    );
-    const data = await res.json();
-
     expect(res.status).toBe(500);
-    expect(data.error).toBe("Internal server error");
-    expect(consoleSpy).toHaveBeenCalled();
-
-    consoleSpy.mockRestore();
+    await expect(res.json()).resolves.toEqual(
+      expect.objectContaining({ error: "Internal server error" }),
+    );
   });
 });

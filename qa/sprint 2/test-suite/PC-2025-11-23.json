@@ -1,0 +1,758 @@
+{
+  "suites": [
+    {
+      "id": 2,
+      "title": "Sprint 2 \u2013 Medications & Schedule (UI manual)",
+      "description": null,
+      "preconditions": null,
+      "suites": [],
+      "cases": [
+        {
+          "id": 9,
+          "title": "New medication is created when no search result is found",
+          "description": "Verify that when no search result is found for a medication name, the system creates a new medication and moves the user to the Schedule step.",
+          "preconditions": "* User is logged in.\n* There is no existing medication named `TestMedUniqueXYZ`.",
+          "postconditions": null,
+          "priority": "high",
+          "severity": "major",
+          "type": "functional",
+          "behavior": "positive",
+          "automation": "is-not-automated",
+          "status": "actual",
+          "is_flaky": "no",
+          "layer": "e2e",
+          "milestone": null,
+          "custom_fields": [],
+          "steps_type": "classic",
+          "steps": [
+            {
+              "position": 1,
+              "action": "Open \u201cAdd medication\u201d flow (step 1).",
+              "expected_result": "Medication step is displayed and ready for input.",
+              "data": "",
+              "steps": []
+            },
+            {
+              "position": 2,
+              "action": "Enter `TestMedUniqueXYZ` into the **Medication Name field**.",
+              "expected_result": "No suggestions are displayed in the search dropdown",
+              "data": "`TestMedUniqueXYZ`",
+              "steps": []
+            },
+            {
+              "position": 3,
+              "action": "Optionally fill **Dose** = `500`, **Form** = `tablets`, upload a photo.",
+              "expected_result": "Dose and Form fields accept the values without validation errors.",
+              "data": "**Dose** = `500`, **Form** = `tablets`",
+              "steps": []
+            },
+            {
+              "position": 4,
+              "action": "Click **Next.**",
+              "expected_result": "New medication `TestMedUniqueXYZ` is created (a new record is added to the Medication DB table), and the user is navigated to the Schedule step with the entered name/dose/form visible in the summary. No error messages are shown.",
+              "data": "",
+              "steps": []
+            }
+          ],
+          "tags": ["medications", "create"],
+          "params": [],
+          "is_muted": "no"
+        },
+        {
+          "id": 10,
+          "title": "Medication creation via search result pre-fills schedule step correctly",
+          "description": "Verify that selecting an existing medication from the search dropdown on the Medication step correctly fills the fields and passes medication data to the Schedule step.",
+          "preconditions": "* User is logged in.\n* \u201cAdd medication\u201d wizard is available.\n* Medication dictionary contains `Aspirin 500 tablets` as a searchable item.",
+          "postconditions": null,
+          "priority": "high",
+          "severity": "major",
+          "type": "functional",
+          "behavior": "positive",
+          "automation": "is-not-automated",
+          "status": "actual",
+          "is_flaky": "no",
+          "layer": "e2e",
+          "milestone": null,
+          "custom_fields": [],
+          "steps_type": "classic",
+          "steps": [
+            {
+              "position": 1,
+              "action": "Open the \u201cAdd medication\u201d flow and ensure you are on step 1 (Medication).",
+              "expected_result": "The medication step is displayed with fields including Medication Name, Dose, Form, and Photo.",
+              "data": "",
+              "steps": []
+            },
+            {
+              "position": 2,
+              "action": "n the **Medication Name** field, start typing `Asp` (at least 3 characters).",
+              "expected_result": "A search dropdown appears with suggestions matching the prefix, including `Aspirin 500 tablets`.",
+              "data": "",
+              "steps": []
+            },
+            {
+              "position": 3,
+              "action": "From the search dropdown, select `Aspirin 500 tablets`.",
+              "expected_result": "The Medication Name is filled with `Aspirin 500 tablets`, and related fields (e.g., Dose, Form) are populated if available.",
+              "data": "",
+              "steps": []
+            },
+            {
+              "position": 4,
+              "action": "Click **Next** to go to the Schedule step.",
+              "expected_result": "**Expected result:** User is navigated to step 2 (Schedule), and the selected medication (name/dose/form) is visible without validation errors.",
+              "data": "",
+              "steps": []
+            }
+          ],
+          "tags": ["medications", "create"],
+          "params": [],
+          "is_muted": "no"
+        },
+        {
+          "id": 11,
+          "title": "Medication name is required while dose and form are optional",
+          "description": "Verify that Medication Name is mandatory, and that empty Dose and Form do not block the user from proceeding.",
+          "preconditions": "* User is logged in.\n* \u201cAdd medication\u201d wizard is available.",
+          "postconditions": null,
+          "priority": "high",
+          "severity": "major",
+          "type": "functional",
+          "behavior": "negative",
+          "automation": "is-not-automated",
+          "status": "actual",
+          "is_flaky": "no",
+          "layer": "unknown",
+          "milestone": null,
+          "custom_fields": [],
+          "steps_type": "classic",
+          "steps": [
+            {
+              "position": 1,
+              "action": "On step 1 (Medication), leave **Medication Name** empty.",
+              "expected_result": "Medication Name input is blank.",
+              "data": "",
+              "steps": []
+            },
+            {
+              "position": 2,
+              "action": "Fill **Dose** and **Form** with any valid values (e.g. `500`, `tablets`)",
+              "expected_result": "Dose and Form fields accept the values.",
+              "data": "",
+              "steps": []
+            },
+            {
+              "position": 3,
+              "action": "Click **Next**.",
+              "expected_result": "* User remains on step 1. \n* A validation error is displayed for Medication Name (\"Please fill in the medication name.\u201d). \n* No medication is created, and no navigation to the Schedule step occurs.\n\n\n<br>",
+              "data": "",
+              "steps": []
+            }
+          ],
+          "tags": ["medications", "create"],
+          "params": [],
+          "is_muted": "no"
+        },
+        {
+          "id": 12,
+          "title": "Form and Units dropdowns use consistent predefined options",
+          "description": "Verify that the Form dropdown on the Medication step and the Units dropdown on the Schedule step show the same, consistent set of options.",
+          "preconditions": "* User is logged in.\n* \u201cAdd medication\u201d wizard is available.",
+          "postconditions": null,
+          "priority": "medium",
+          "severity": "normal",
+          "type": "functional",
+          "behavior": "positive",
+          "automation": "is-not-automated",
+          "status": "actual",
+          "is_flaky": "no",
+          "layer": "e2e",
+          "milestone": null,
+          "custom_fields": [],
+          "steps_type": "classic",
+          "steps": [
+            {
+              "position": 1,
+              "action": "On step 1 (Medication), open the **Form** dropdown.",
+              "expected_result": "**Expected result:** \nThe Form dropdown appears and shows a list of options including at least: `tablets, capsules, lozenges, candy, drops, ampoule, syringe, packet, sachet, stick, g, mg, ml, dose, teaspoon, tablespoon`.",
+              "data": "",
+              "steps": []
+            },
+            {
+              "position": 2,
+              "action": "Note the full list of Form options.",
+              "expected_result": "All required options are present and correctly spelled.",
+              "data": "",
+              "steps": []
+            },
+            {
+              "position": 3,
+              "action": "Proceed to step 2 (Schedule) by clicking **Next** with any valid medication.",
+              "expected_result": "User is successfully navigated to the Schedule step.",
+              "data": "",
+              "steps": []
+            },
+            {
+              "position": 4,
+              "action": "On the Schedule step, open the **Units** dropdown.",
+              "expected_result": "Units dropdown appears and contains the same set of values as the Form dropdown (no missing or extra items).",
+              "data": "",
+              "steps": []
+            },
+            {
+              "position": 5,
+              "action": "Compare the options between Form and Units.",
+              "expected_result": "* Lists match in content. \n* There are no mismatched labels, missing units, or duplicates.",
+              "data": "",
+              "steps": []
+            }
+          ],
+          "tags": ["medications", "create"],
+          "params": [],
+          "is_muted": "no"
+        },
+        {
+          "id": 13,
+          "title": "Quantity integer and fraction fields validate supported values",
+          "description": "Verify that the Quantity integer field enforces the allowed range and that valid integer + fraction combinations are accepted.",
+          "preconditions": "* User is logged in.\n* Step 2 (Schedule) is accessible for any medication.",
+          "postconditions": null,
+          "priority": "medium",
+          "severity": "normal",
+          "type": "functional",
+          "behavior": "negative",
+          "automation": "is-not-automated",
+          "status": "actual",
+          "is_flaky": "no",
+          "layer": "e2e",
+          "milestone": null,
+          "custom_fields": [],
+          "steps_type": "classic",
+          "steps": [
+            {
+              "position": 1,
+              "action": "On the Schedule step, try to set **Quantity** field to `-1`.",
+              "expected_result": "* The field does not accept input and became \"0\"\n* A validation error is shown: \u201c<span style=\"color:var(--md-font-color-failed)\">Please enter the quantity or fractional amount.</span>\u201d\n* The form indicates an error state.",
+              "data": "",
+              "steps": []
+            },
+            {
+              "position": 2,
+              "action": "Change the **Quantity** integer value to `1001`.",
+              "expected_result": "The enetered value automaticaly transforms to `1000`.",
+              "data": "",
+              "steps": []
+            }
+          ],
+          "tags": ["medications", "create"],
+          "params": [],
+          "is_muted": "no"
+        },
+        {
+          "id": 14,
+          "title": "Changing duration updates end date and calendar preview",
+          "description": "Verify that changing Duration on the Treatment duration step recalculates End date correctly.",
+          "preconditions": "* User is logged in.\n* System current date is known (e.g. `2025-11-23`).\n* The treatment duration step is accessible for a medication.",
+          "postconditions": null,
+          "priority": "high",
+          "severity": "major",
+          "type": "functional",
+          "behavior": "positive",
+          "automation": "is-not-automated",
+          "status": "actual",
+          "is_flaky": "no",
+          "layer": "e2e",
+          "milestone": null,
+          "custom_fields": [],
+          "steps_type": "classic",
+          "steps": [
+            {
+              "position": 1,
+              "action": "On the Schedule step, set **Start date** to today (e.g. `2025-11-23`).",
+              "expected_result": "Start date is accepted and displayed without error.",
+              "data": "",
+              "steps": []
+            },
+            {
+              "position": 2,
+              "action": "Set **Duration** to`5` days.",
+              "expected_result": "End date field is automatically updated based on Start date and Duration.",
+              "data": "",
+              "steps": []
+            },
+            {
+              "position": 3,
+              "action": "Observe the calendar preview for the selected range.",
+              "expected_result": "Calendar preview highlights the correct span of days based on Start date and Duration.",
+              "data": "",
+              "steps": []
+            },
+            {
+              "position": 4,
+              "action": "Change **Duration** to `30` days.",
+              "expected_result": "End date is recalculated to reflect 30 days duration and displayed immediately.",
+              "data": "",
+              "steps": []
+            }
+          ],
+          "tags": ["medications", "create"],
+          "params": [],
+          "is_muted": "no"
+        },
+        {
+          "id": 15,
+          "title": "End-to-end wizard creates medication and full schedule across",
+          "description": "This test verifies the complete 5-step medication creation wizard: entering medication data, defining dose frequency, selecting weekly pattern, choosing duration, and confirming. The flow must successfully save Medication, Schedule, and ScheduleEntry records, and display the generated summary correctly.",
+          "preconditions": "* User is logged in as a Patient.\n* The wizard \u201cAdd Medication\u201d is available.\n* No existing medication named e.g., **\u201cTest Aspirin\u201d**.\n* System date assumed: **23.11.2025** (for expected date validation).",
+          "postconditions": "* Medication appears in Dashboard \u2192 Medications list.\n* Calendar Day/Week views display all generated entries correctly.\n* No duplicate schedules created.",
+          "priority": "high",
+          "severity": "critical",
+          "type": "functional",
+          "behavior": "positive",
+          "automation": "is-not-automated",
+          "status": "actual",
+          "is_flaky": "no",
+          "layer": "e2e",
+          "milestone": null,
+          "custom_fields": [],
+          "steps_type": "classic",
+          "steps": [
+            {
+              "position": 1,
+              "action": "Click \u201cAdd Medication\u201d",
+              "expected_result": "Wizard opens at **Step 1 of 5 \u2013 Basic Information**; progress bar at **20%**.",
+              "data": "",
+              "steps": []
+            },
+            {
+              "position": 2,
+              "action": "### **Fill medication fields:**\n\n* **Medication Name:** `Test Aspirin`\n* **Medication Form:** `Tablets`\n* **Dosage (mg):** `1000`\n* (Optional) Do not upload photo.",
+              "expected_result": "* Name required \u2192 accepted.\n* Form optional \u2192 accepted.\n* Dosage optional but validated \u2192 accepted.\n* No validation errors.",
+              "data": "",
+              "steps": []
+            },
+            {
+              "position": 3,
+              "action": "Click **\u201cNext\u201d**",
+              "expected_result": "* User navigates to **Step 2 of 5 \u2013 Dosing Schedule**.\n* Medication created in DB (Medication table).\n* Medication summary label (\u201cYou are scheduling: Test Aspirin \u2013 Tablets 1000 mg\u201d) appears at the top.",
+              "data": "",
+              "steps": []
+            },
+            {
+              "position": 4,
+              "action": "### **Fill dose fields:**\n\n* **Quantity:** `2`\n* **Fraction:** `1/2`\n* **Units:** `Tablets`",
+              "expected_result": "* Quantity accepts whole numbers 0\u20131000.\n* Fraction dropdown contains: -, 1/2, 1/4, 3/4.\n* Units dropdown equals list from Step 1 Form.\n* Calculated display: **2.5 Tablets** appears in summary header.",
+              "data": "",
+              "steps": []
+            },
+            {
+              "position": 5,
+              "action": "Select \u201cHow many times per day?\u201d \u2192 `2x`",
+              "expected_result": "* Exactly 2 time slots must be selected.\n* \u201c2 of 2 selected\u201d indicator becomes green.",
+              "data": "",
+              "steps": []
+            },
+            {
+              "position": 6,
+              "action": "Select times of day:\n\n* **Morning (07:30)**\n* **Evening (18:30)**",
+              "expected_result": "* Time inputs appear with editable fields: 07:30 and 18:30.\n* No validation errors.",
+              "data": "",
+              "steps": []
+            },
+            {
+              "position": 7,
+              "action": "Choose Meal Timing \u2192 `With Meal`",
+              "expected_result": "Selection highlighted; only one meal timing can be active.\n\n###",
+              "data": "",
+              "steps": []
+            },
+            {
+              "position": 8,
+              "action": "Click \u201cNext\u201d",
+              "expected_result": "Navigate to **Step 3 of 5 \u2013 Weekly Frequency**.\n\nMedication summary remains visible (top-right: 1000 mg bubble).",
+              "data": "",
+              "steps": []
+            },
+            {
+              "position": 9,
+              "action": "Select frequency \u2192 \u201cAll Days\u201d",
+              "expected_result": "* All 7 days highlighted.\n* \u201cSelected Days\u201d block shows: Mon Tue Wed Thu Fri Sat Sun.",
+              "data": "",
+              "steps": []
+            },
+            {
+              "position": 10,
+              "action": "Click \u201cNext\u201d",
+              "expected_result": "Navigate to **Step 4 of 5 \u2013 Treatment Duration**.",
+              "data": "",
+              "steps": []
+            },
+            {
+              "position": 11,
+              "action": "**Select duration and units:**\n\n* **Duration:** `2`\n\n\n* **Units:** `Weeks`",
+              "expected_result": "* Units dropdown supports Days / Weeks / Months.\n* Duration auto-calculates dates beneath.",
+              "data": "",
+              "steps": []
+            },
+            {
+              "position": 12,
+              "action": "Validate date autocalculation:\n\n* Start date default (from system): **23.11.2025**\n* End date auto-calculated: **06.12.2025** (14 days)",
+              "expected_result": "* Start date is today or system default.\n* End date updates LIVE when duration changes.\n* Summary line at the bottom shows:\n    **Schedule: 23.11.2025 \u2192 06.12.2025**",
+              "data": "",
+              "steps": []
+            },
+            {
+              "position": 13,
+              "action": "Click \u201cNext\u201d",
+              "expected_result": "* Navigate to **Step 5 \u2013 Review & Confirm**.\n* Progress bar shows **100%**.",
+              "data": "",
+              "steps": []
+            },
+            {
+              "position": 14,
+              "action": "### **Review summary sections:**\n\n**Medication**\n\n* Test Aspirin\n* 2.5 Tablets, 1000 mg\n\n**Schedule**\n\n* Morning 07:30 (With Meal)\n* Evening 18:30\n\n**Weekly Frequency**\n\n* Mon\u2013Sun\n* \u201c2x daily\u201d\n\n**Duration**\n\n* 14 days total\n* 23.11.2025 \u2192 06.12.2025",
+              "expected_result": "All values exactly match user input from previous steps.",
+              "data": "",
+              "steps": []
+            },
+            {
+              "position": 15,
+              "action": "Click \u201cAdd Schedule\u201d",
+              "expected_result": "* Success state.\n* Schedule rules saved (Schedule table).\n* Individual entries created via `/api/schedule/generate` into the **ScheduleEntry** table \u2014 for 14 days \u00d7 2 daily = **28 entries**.",
+              "data": "",
+              "steps": []
+            }
+          ],
+          "tags": ["medications", "create"],
+          "params": [],
+          "is_muted": "no"
+        },
+        {
+          "id": 16,
+          "title": "Calendar Today View and Week View correctly display generated schedule events",
+          "description": "Verify that all schedule events generated for a medication correctly appear in **Today** view and **Week View**, with proper grouping, styling, time slots, meal timing labels, and status icons. Ensure that both views synchronize with actual ScheduleEntry data and reflect LIVE statuses (PLANNED / DONE).",
+          "preconditions": "* User is logged in as Patient.\n* A medication such as **Test Aspirin 1000 mg** exists with a generated schedule for the week (e.g., 07:30 and 18:30 daily).\n* At least one dose already marked as **DONE** (to validate Completed grouping).\n* Calendar data is already visible.\n* System date: **November 23, 2025** (matches \u201cSun 23\u201d in Week View).",
+          "postconditions": null,
+          "priority": "high",
+          "severity": "critical",
+          "type": "functional",
+          "behavior": "positive",
+          "automation": "is-not-automated",
+          "status": "actual",
+          "is_flaky": "no",
+          "layer": "e2e",
+          "milestone": null,
+          "custom_fields": [],
+          "steps_type": "classic",
+          "steps": [
+            {
+              "position": 1,
+              "action": "TODAY VIEW",
+              "expected_result": "",
+              "data": "",
+              "steps": []
+            },
+            {
+              "position": 2,
+              "action": "Navigate to: Sidebar \u2192 Today",
+              "expected_result": "* Header displays **Today\u2019s Schedule** + current date.\n* Two summary counters visible:\n    * \u201cX medications pending\u201d\n    * \u201cY completed\u201d\n* A \u201cMark All\u201d button is visible (top-right).",
+              "data": "",
+              "steps": []
+            },
+            {
+              "position": 3,
+              "action": "Verify pending list\nPending doses should appear at the top, each in an expanded card showing:\n\n* **Medication name** (e.g., Test Aspirin)\n* **Dose amount** (3 tablets, 1 candy, etc.)\n* **Dosage** (1000 mg, 497 mg, etc.)\n* **Time** (e.g., 07:30, 12:30, 18:30)\n* **Meal timing label** (e.g., WITH MEAL, BEFORE MEAL)\n* **Status icon** = **empty circle** (PLANNED)",
+              "expected_result": "All pending events for the current day are listed in chronological order.",
+              "data": "",
+              "steps": []
+            },
+            {
+              "position": 4,
+              "action": "Scroll down to \u201cDONE\u201d section.\nEach completed dose shows:\n\n* Blue checkmark icon\n* Green background (light green card)\n* Gray, crossed text for medication name or dose (e.g., *Mg+Zn 500 mg*)\n* Time slot (07:30, etc.)\n* Status label: **TAKEN**",
+              "expected_result": "Completed events appear separately from pending ones.",
+              "data": "",
+              "steps": []
+            },
+            {
+              "position": 5,
+              "action": "Mark a pending event (e.g., Test Aspirin 07:30) as DONE.",
+              "expected_result": "* It moves from \u201cPending\u201d group to \u201cDone\u201d group\n* Instant state update\n* After page refresh \u2192 state persists",
+              "data": "",
+              "steps": []
+            },
+            {
+              "position": 6,
+              "action": "WEEK VIEW",
+              "expected_result": "",
+              "data": "",
+              "steps": []
+            },
+            {
+              "position": 7,
+              "action": "Navigate to: Sidebar \u2192 Week View",
+              "expected_result": "* Header shows week range: **Nov 17 \u2013 Nov 23**\n* Current day (Sun 23) column is highlighted with a blue border\n* Filters visible at top:\n    * All, Taken, Missed, All Meals, Before, With, After",
+              "data": "",
+              "steps": []
+            },
+            {
+              "position": 8,
+              "action": "The calendar grid shows hours on left (07:30 / 12:30 / 18:30), days across top: Mon\u2013Sun.",
+              "expected_result": "* Empty time slots show blank grid boxes\n* Medication events fill correct time rows",
+              "data": "",
+              "steps": []
+            },
+            {
+              "position": 9,
+              "action": "Check each event card:\n\n* **Medication name** (e.g., Mg+Zn, Test Aspirin, Vitamin C)\n* **Dose** (1 tablet, 1 candy, 3 tablets, 1 ml)\n* **Dosage** (500 mg, 1000 mg, etc.)\n* **Meal timing** (with / before / after / anytime)\n* **Status**:\n    * PLANNED \u2192 white background + empty checkbox\n    * DONE \u2192 green background + checkmark",
+              "expected_result": "All events appear in correct day/time slots.",
+              "data": "",
+              "steps": []
+            },
+            {
+              "position": 10,
+              "action": "Example: Mg+Zn repeated across several days.",
+              "expected_result": "* Repeated doses appear separately\n* Each retains its own status (some DONE, some PLANNED)",
+              "data": "",
+              "steps": []
+            },
+            {
+              "position": 11,
+              "action": "Apply each filter in the Week View (Taken \u2192 Missed \u2192 With Meals \u2192 All) one by one.",
+              "expected_result": "* When **Taken** is selected \u2192 only green DONE events are visible.\n* When **Missed** is selected \u2192 only uncompleted events are visible.\n* When **With** (meal timing) is selected \u2192 only events labeled \u201cwith meal\u201d remain visible.\n* When **All** is selected \u2192 the full schedule grid becomes visible again with all events displayed.",
+              "data": "",
+              "steps": []
+            },
+            {
+              "position": 12,
+              "action": "Select any PLANNED dose in Week View and mark it as DONE using the checkbox.",
+              "expected_result": "* The dose immediately updates its visual state to DONE (green background + checkmark).\n* The dose remains in the *same time slot* but changes appearance.\n* No errors or reloading occur.",
+              "data": "",
+              "steps": []
+            },
+            {
+              "position": 13,
+              "action": "Click **Next**/**Previous**",
+              "expected_result": "* The calendar moves one week forward.\n* Returns to the current week range.",
+              "data": "",
+              "steps": []
+            },
+            {
+              "position": 14,
+              "action": "Reload the Week View page.",
+              "expected_result": "* All events reappear correctly\n* DONE items stay green\n* Time/day placements remain correct",
+              "data": "",
+              "steps": []
+            }
+          ],
+          "tags": ["medications", "calendar", "schedule"],
+          "params": [],
+          "is_muted": "no"
+        },
+        {
+          "id": 17,
+          "title": "Search and filters correctly refine the medications list",
+          "description": null,
+          "preconditions": "* User is logged in as Patient.\n* Page: **Tracking \u2192 Medications** (All Medications list).\n* Medications dataset loaded.",
+          "postconditions": null,
+          "priority": "high",
+          "severity": "major",
+          "type": "functional",
+          "behavior": "positive",
+          "automation": "is-not-automated",
+          "status": "actual",
+          "is_flaky": "no",
+          "layer": "e2e",
+          "milestone": null,
+          "custom_fields": [],
+          "steps_type": "classic",
+          "steps": [
+            {
+              "position": 1,
+              "action": "Enter existing medication in search field.",
+              "expected_result": "* Only medications with names containing *entered letters* appear.\n* Result count updates accordingly.",
+              "data": "",
+              "steps": []
+            },
+            {
+              "position": 2,
+              "action": "Enter \u201c500\u201d in search field.",
+              "expected_result": "Only medications with dosage 500 remain visible.",
+              "data": "",
+              "steps": []
+            },
+            {
+              "position": 3,
+              "action": "Enter \u201ctablets\u201d in search field.",
+              "expected_result": "List shows only medications with Form = Tablets.",
+              "data": "",
+              "steps": []
+            },
+            {
+              "position": 4,
+              "action": "Clear the search field.",
+              "expected_result": "Full medication list reappears.",
+              "data": "",
+              "steps": []
+            },
+            {
+              "position": 5,
+              "action": "Open Filters \u2192 enable \u201cOnly medications with dosage\u201d.",
+              "expected_result": "* Medications without dosage disappear from the list.\n* Filter icon shows badge \u201c1\u201d.",
+              "data": "",
+              "steps": []
+            },
+            {
+              "position": 6,
+              "action": "Disable the filter.",
+              "expected_result": "Full medication list returns.",
+              "data": "",
+              "steps": []
+            }
+          ],
+          "tags": ["medications"],
+          "params": [],
+          "is_muted": "no"
+        },
+        {
+          "id": 18,
+          "title": "Export to CSV and JSON generates valid files with complete dataset",
+          "description": "Verify that both export formats (CSV and JSON) are correctly generated, downloaded, and contain accurate data fields for all medications.",
+          "preconditions": "* \u201cExport\u201d button is visible on All Medications page.\n* Reference export files available:\n    * `medications.json`\n    * CSV",
+          "postconditions": null,
+          "priority": "medium",
+          "severity": "normal",
+          "type": "functional",
+          "behavior": "positive",
+          "automation": "is-not-automated",
+          "status": "actual",
+          "is_flaky": "no",
+          "layer": "e2e",
+          "milestone": null,
+          "custom_fields": [],
+          "steps_type": "classic",
+          "steps": [
+            {
+              "position": 1,
+              "action": "Click Export \u2192 CSV.",
+              "expected_result": "* A file named `medications.csv` is downloaded.\n* File opens without errors.\n* Column structure includes:\n    `id, name, dose, form, createdAt, updatedAt`\n* Number of rows matches number of medications displayed.",
+              "data": "",
+              "steps": []
+            },
+            {
+              "position": 2,
+              "action": "Click Export \u2192 JSON.",
+              "expected_result": "* A file named `medications.json` downloads.\n* File contains an array of objects (one per medication).\n* Structure matches reference file fields.\n* Sample values appear correctly.",
+              "data": "",
+              "steps": []
+            },
+            {
+              "position": 3,
+              "action": "Compare downloaded JSON to reference JSON file.",
+              "expected_result": "* Field names and value types match exactly.\n* No empty objects.\n* Records reflect the latest state.",
+              "data": "",
+              "steps": []
+            }
+          ],
+          "tags": ["medications"],
+          "params": [],
+          "is_muted": "no"
+        },
+        {
+          "id": 19,
+          "title": "Editing an existing medication updates its details correctly.",
+          "description": "Verify that a user can open the Edit Medication page, modify medication details, save the changes, and see the updated information in the All Medications list.",
+          "preconditions": "* The user is logged in.\n* At least one active medication exists (e.g., *Aspirin*).\n* The user is on the **Medications \u2192 All Medications** page.",
+          "postconditions": "Medication is updated and displayed with the new data.",
+          "priority": "high",
+          "severity": "normal",
+          "type": "functional",
+          "behavior": "positive",
+          "automation": "is-not-automated",
+          "status": "actual",
+          "is_flaky": "no",
+          "layer": "e2e",
+          "milestone": null,
+          "custom_fields": [],
+          "steps_type": "classic",
+          "steps": [
+            {
+              "position": 1,
+              "action": "Click **Edit** on any medication card.",
+              "expected_result": "The **Edit Medication** page opens, and all fields (Medication Name, Form, Dosage) are pre-filled with existing values.",
+              "data": "",
+              "steps": []
+            },
+            {
+              "position": 2,
+              "action": "Update the **Medication Name**.\nOptionally modify Form or Dosage.",
+              "expected_result": "Fields accept new values without validation errors.",
+              "data": "",
+              "steps": []
+            },
+            {
+              "position": 3,
+              "action": "Click **Save changes**.",
+              "expected_result": "* The user is redirected back to **All Medications**.\n* The medication card displays updated details.\n* No duplicate medication appears.",
+              "data": "",
+              "steps": []
+            },
+            {
+              "position": 4,
+              "action": "Refresh the page.",
+              "expected_result": "Updated values persist, confirming the changes were successfully saved.",
+              "data": "",
+              "steps": []
+            }
+          ],
+          "tags": [],
+          "params": [],
+          "is_muted": "no"
+        },
+        {
+          "id": 20,
+          "title": "Deleting a medication removes it from the list successfully.",
+          "description": "Verify that a user can delete a medication through the delete confirmation modal and that the medication is no longer visible after deletion.",
+          "preconditions": "* The user is logged in.\n* At least one active medication exists.\n* The user is on the **All Medications** page.",
+          "postconditions": null,
+          "priority": "high",
+          "severity": "normal",
+          "type": "functional",
+          "behavior": "positive",
+          "automation": "is-not-automated",
+          "status": "actual",
+          "is_flaky": "no",
+          "layer": "e2e",
+          "milestone": null,
+          "custom_fields": [],
+          "steps_type": "classic",
+          "steps": [
+            {
+              "position": 1,
+              "action": "Click **Delete** on a medication card.",
+              "expected_result": "* A modal appears with the message:\n* *\u201cDelete medication \u2014 This action will mark the medication as deleted.\u201d*\n* Buttons **Cancel** and **Delete** are visible.",
+              "data": "",
+              "steps": []
+            },
+            {
+              "position": 2,
+              "action": "Click the red **Delete** button in the modal.",
+              "expected_result": "* The medication disappears from the list.\n* The total count of medications updates accordingly.",
+              "data": "",
+              "steps": []
+            },
+            {
+              "position": 3,
+              "action": "Refresh the page.",
+              "expected_result": "* The deleted medication does not reappear. \n* In the DB table Medication, for the deleted one in the \"deletedAt\" column appeared a timestamp record.",
+              "data": "",
+              "steps": []
+            }
+          ],
+          "tags": [],
+          "params": [],
+          "is_muted": "no"
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,478 @@
+{
+  "info": {
+    "_postman_id": "f50bf757-74fd-47f2-8ebc-3195876d6dc6",
+    "name": "goit-capstone-project-g5",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "_exporter_id": "36004044",
+    "_collection_link": "https://diploma-project-g5.postman.co/workspace/Team-Workspace~433d938c-eabe-4edb-883d-75f2a0f28c6a/collection/48698089-f50bf757-74fd-47f2-8ebc-3195876d6dc6?action=share&source=collection_link&creator=36004044"
+  },
+  "item": [
+    {
+      "name": "registration & autherization",
+      "item": [
+        {
+          "name": "api/auth/register",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"sergey@gmail.com\",\n  \"password\": \"Passw0rd!123\",\n  \"name\": \"Sergey Shevchenko\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/auth/register/",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "auth", "register", ""]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "api/auth/login",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"sergey-updated@gmail.com\",\n  \"password\": \"Passw0rd!123\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/auth/login/",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "auth", "login", ""]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "api/profile",
+          "protocolProfileBehavior": {
+            "disableBodyPruning": true
+          },
+          "request": {
+            "method": "GET",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": ""
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/profile/",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "profile", ""]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "api/auth/logout",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": ""
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/auth/logout",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "auth", "logout"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "api/profile",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"name\": \"Sergey Shevchenko updated\",\n    \"email\": \"sergey-updated@gmail.com\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/profile/",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "profile", ""]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "scheduler",
+      "item": [
+        {
+          "name": "api/schedule",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"medicineId\": \"cmhjl1ot80000vjtncm9yfm3k\",\n    \"quantity\": 1,\n    \"units\": \"pill\",\n    \"frequencyDays\": [1, 2, 3, 4, 5, 6, 7],\n    \"durationDays\": 30,\n    \"dateStart\": \"2025-11-15\",\n    \"timeOfDay\": [\"08:00\", \"13:00\", \"18:00\"],\n    \"mealTiming\": \"before\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/schedule",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "schedule"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "api/schedule/:id",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"status\": \"DONE\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}} /api/schedule/cmhzdounk0004rs6vvghznhub/",
+              "host": ["{{baseUrl}} "],
+              "path": ["api", "schedule", "cmhzdounk0004rs6vvghznhub", ""]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "api/schedule/generate",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"scheduleId\": \"cmhzdoun50003rs6vhln856z0\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}} /api/schedule/generate/",
+              "host": ["{{baseUrl}} "],
+              "path": ["api", "schedule", "generate", ""]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "api/schedule",
+          "protocolProfileBehavior": {
+            "disableBodyPruning": true
+          },
+          "request": {
+            "method": "GET",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": ""
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/schedule?from=2025-11-15T00:00:00Z&to=2025-11-25T23:59:59Z&tz=Europe/Kyiv",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "schedule"],
+              "query": [
+                {
+                  "key": "from",
+                  "value": "2025-11-15T00:00:00Z"
+                },
+                {
+                  "key": "to",
+                  "value": "2025-11-25T23:59:59Z"
+                },
+                {
+                  "key": "tz",
+                  "value": "Europe/Kyiv"
+                }
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "medications",
+      "item": [
+        {
+          "name": "Get All Medications (Active)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/medications",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "medications"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get All Medications (Deleted)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/medications?status=DELETED",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "medications"],
+              "query": [
+                {
+                  "key": "status",
+                  "value": "DELETED"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get All Medications (All Statuses)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/medications?status=ACTIVE",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "medications"],
+              "query": [
+                {
+                  "key": "status",
+                  "value": "ACTIVE",
+                  "description": "Remove this param to get ACTIVE by default"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Create Medication",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "// Extract the medication ID from the response",
+                  "const responseData = pm.response.json();",
+                  "const medicationId = responseData.medication.id;",
+                  "",
+                  "// Save the ID to a collection variable",
+                  "pm.collectionVariables.set(\"medicationId\", medicationId);",
+                  "",
+                  "// Log confirmation message",
+                  "console.log(`Medication ID \"${medicationId}\" has been saved to collection variable \"medicationId\"`);"
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Aspirin\",\n  \"dose\": \"100mg\",\n  \"frequency\": 24,\n  \"startDate\": \"2025-01-01T00:00:00Z\",\n  \"endDate\": \"2025-12-31T23:59:59Z\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/medications",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "medications"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Search Medication",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "// Extract the medication ID from the response",
+                  "const responseData = pm.response.json();",
+                  "const medicationId = responseData.medication.id;",
+                  "",
+                  "// Save the ID to a collection variable",
+                  "pm.collectionVariables.set(\"medicationId\", medicationId);",
+                  "",
+                  "// Log confirmation message",
+                  "console.log(`Medication ID \"${medicationId}\" has been saved to collection variable \"medicationId\"`);"
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Aspirin\",\n  \"dose\": \"100mg\",\n  \"frequency\": 24,\n  \"startDate\": \"2025-01-01T00:00:00Z\",\n  \"endDate\": \"2025-12-31T23:59:59Z\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/medications",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "medications"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get Medication by ID",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/medications/{{medicationId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "medications", "{{medicationId}}"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Update Medication",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Updated Aspirin\",\n  \"dose\": \"200mg\",\n  \"frequency\": 12\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/medications/{{medicationId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "medications", "{{medicationId}}"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Delete Medication (Soft Delete)",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/medications/{{medicationId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "medications", "{{medicationId}}"]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "share",
+      "item": [
+        {
+          "name": "api/export/pdf",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"from\": \"2025-11-01T00:00:00Z\",\n  \"to\": \"2025-11-07T23:59:59Z\",\n  \"tz\": \"Europe/Kyiv\",\n  \"orientation\": \"portrait\",\n  \"format\": \"A4\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}} /api/export/pdf",
+              "host": ["{{baseUrl}} "],
+              "path": ["api", "export", "pdf"]
+            }
+          },
+          "response": []
+        }
+      ]
+    }
+  ],
+  "variable": [
+    {
+      "key": "medicationId",
+      "value": ""
+    }
+  ]
+}
