@@ -1,17 +1,16 @@
 import { notFound, redirect } from "next/navigation";
 import { cookies } from "next/headers";
 import { absoluteUrl } from "@/lib/url";
+import EditMedicationDetailsForm from "@/components/medications/EditMedicationDetailsForm";
 
 type Medication = {
   id: string;
   name: string;
-  dose: string;
-  frequency: number;
-  startDate: string;
-  endDate: string;
+  dose: number | null;
+  form: string | null;
 };
 
-async function getMedication(id: string) {
+async function getMedication(id: string): Promise<Medication> {
   const store = await cookies();
   const cookieHeader = store
     .getAll()
@@ -28,8 +27,6 @@ async function getMedication(id: string) {
   return data.medication;
 }
 
-import EditMedicationForm from "@/components/medications/EditMedicationForm";
-
 export default async function EditMedicationPage({
   params,
 }: {
@@ -37,5 +34,5 @@ export default async function EditMedicationPage({
 }) {
   const { id } = await params;
   const medication = await getMedication(id);
-  return <EditMedicationForm medication={medication} />;
+  return <EditMedicationDetailsForm medication={medication} />;
 }
