@@ -1,0 +1,467 @@
+case_id,title,suite,suite_id,assignee,time_spent_ms,status,finish_time,steps,steps_input_data,steps_expected_result,steps_status,steps_comments,comment,stacktrace,priority,severity,automation,type,tags,is_muted,case_parameter
+9,"New medication is created when no search result is found","Sprint 2 – Medications & Schedule (UI manual)",2,"Vladyslav Mazur",9590,Passed,"2025-11-23 14:40:39","1. Open “Add medication” flow (step 1).
+2. Enter `TestMedUniqueXYZ` into the **Medication Name field**.
+3. Optionally fill **Dose** = `500`, **Form** = `tablets`, upload a photo.
+4. Click **Next.**
+","1. 
+2. `TestMedUniqueXYZ`
+3. **Dose** = `500`, **Form** = `tablets`
+4. 
+","1. Medication step is displayed and ready for input.
+2. No suggestions are displayed in the search dropdown
+3. Dose and Form fields accept the values without validation errors.
+4. New medication `TestMedUniqueXYZ` is created (a new record is added to the Medication DB table), and the user is navigated to the Schedule step with the entered name/dose/form visible in the summary. No error messages are shown.
+","1. Untested
+2. Untested
+3. Untested
+4. Untested
+","1. 
+2. 
+3. 
+4. ",,,High,Major,Manual,Functional,"medications,create",false,
+10,"Medication creation via search result pre-fills schedule step correctly","Sprint 2 – Medications & Schedule (UI manual)",2,"Vladyslav Mazur",6755,Passed,"2025-11-23 14:40:47","1. Open the “Add medication” flow and ensure you are on step 1 (Medication).
+2. n the **Medication Name** field, start typing `Asp` (at least 3 characters).
+3. From the search dropdown, select `Aspirin 500 tablets`.
+4. Click **Next** to go to the Schedule step.
+","1. 
+2. 
+3. 
+4. 
+","1. The medication step is displayed with fields including Medication Name, Dose, Form, and Photo.
+2. A search dropdown appears with suggestions matching the prefix, including `Aspirin 500 tablets`.
+3. The Medication Name is filled with `Aspirin 500 tablets`, and related fields (e.g., Dose, Form) are populated if available.
+4. **Expected result:** User is navigated to step 2 (Schedule), and the selected medication (name/dose/form) is visible without validation errors.
+","1. Untested
+2. Untested
+3. Untested
+4. Untested
+","1. 
+2. 
+3. 
+4. ",,,High,Major,Manual,Functional,"medications,create",false,
+11,"Medication name is required while dose and form are optional","Sprint 2 – Medications & Schedule (UI manual)",2,"Vladyslav Mazur",1524,Passed,"2025-11-23 14:40:49","1. On step 1 (Medication), leave **Medication Name** empty.
+2. Fill **Dose** and **Form** with any valid values (e.g. `500`, `tablets`)
+3. Click **Next**.
+","1. 
+2. 
+3. 
+","1. Medication Name input is blank.
+2. Dose and Form fields accept the values.
+3. * User remains on step 1. 
+* A validation error is displayed for Medication Name (""Please fill in the medication name.”). 
+* No medication is created, and no navigation to the Schedule step occurs.
+
+
+<br>
+","1. Untested
+2. Untested
+3. Untested
+","1. 
+2. 
+3. ",,,High,Major,Manual,Functional,"medications,create",false,
+12,"Form and Units dropdowns use consistent predefined options","Sprint 2 – Medications & Schedule (UI manual)",2,"Vladyslav Mazur",6322,Passed,"2025-11-23 14:40:56","1. On step 1 (Medication), open the **Form** dropdown.
+2. Note the full list of Form options.
+3. Proceed to step 2 (Schedule) by clicking **Next** with any valid medication.
+4. On the Schedule step, open the **Units** dropdown.
+5. Compare the options between Form and Units.
+","1. 
+2. 
+3. 
+4. 
+5. 
+","1. **Expected result:** 
+The Form dropdown appears and shows a list of options including at least: `tablets, capsules, lozenges, candy, drops, ampoule, syringe, packet, sachet, stick, g, mg, ml, dose, teaspoon, tablespoon`.
+2. All required options are present and correctly spelled.
+3. User is successfully navigated to the Schedule step.
+4. Units dropdown appears and contains the same set of values as the Form dropdown (no missing or extra items).
+5. * Lists match in content. 
+* There are no mismatched labels, missing units, or duplicates.
+","1. Untested
+2. Untested
+3. Untested
+4. Untested
+5. Untested
+","1. 
+2. 
+3. 
+4. 
+5. ",,,Medium,Normal,Manual,Functional,"medications,create",false,
+13,"Quantity integer and fraction fields validate supported values","Sprint 2 – Medications & Schedule (UI manual)",2,"Vladyslav Mazur",4070,Passed,"2025-11-23 14:41:01","1. On the Schedule step, try to set **Quantity** field to `-1`.
+2. Change the **Quantity** integer value to `1001`.
+","1. 
+2. 
+","1. * The field does not accept input and became ""0""
+* A validation error is shown: “<span style=""color:var(--md-font-color-failed)"">Please enter the quantity or fractional amount.</span>”
+* The form indicates an error state.
+2. The enetered value automaticaly transforms to `1000`.
+","1. Untested
+2. Untested
+","1. 
+2. ",,,Medium,Normal,Manual,Functional,"medications,create",false,
+14,"Changing duration updates end date and calendar preview","Sprint 2 – Medications & Schedule (UI manual)",2,"Vladyslav Mazur",3530,Passed,"2025-11-23 14:41:06","1. On the Schedule step, set **Start date** to today (e.g. `2025-11-23`).
+2. Set **Duration** to`5` days.
+3. Observe the calendar preview for the selected range.
+4. Change **Duration** to `30` days.
+","1. 
+2. 
+3. 
+4. 
+","1. Start date is accepted and displayed without error.
+2. End date field is automatically updated based on Start date and Duration.
+3. Calendar preview highlights the correct span of days based on Start date and Duration.
+4. End date is recalculated to reflect 30 days duration and displayed immediately.
+","1. Untested
+2. Untested
+3. Untested
+4. Untested
+","1. 
+2. 
+3. 
+4. ",,,High,Major,Manual,Functional,"medications,create",false,
+15,"End-to-end wizard creates medication and full schedule across","Sprint 2 – Medications & Schedule (UI manual)",2,"Vladyslav Mazur",3661,Passed,"2025-11-23 14:41:10","1. Click “Add Medication”
+2. ### **Fill medication fields:**
+
+* **Medication Name:** `Test Aspirin`
+* **Medication Form:** `Tablets`
+* **Dosage (mg):** `1000`
+* (Optional) Do not upload photo.
+3. Click **“Next”**
+4. ### **Fill dose fields:**
+
+* **Quantity:** `2`
+* **Fraction:** `1/2`
+* **Units:** `Tablets`
+5. Select “How many times per day?” → `2x`
+6. Select times of day:
+
+* **Morning (07:30)**
+* **Evening (18:30)**
+7. Choose Meal Timing → `With Meal`
+8. Click “Next”
+9. Select frequency → “All Days”
+10. Click “Next”
+11. **Select duration and units:**
+
+* **Duration:** `2`
+
+
+* **Units:** `Weeks`
+12. Validate date autocalculation:
+
+* Start date default (from system): **23.11.2025**
+* End date auto-calculated: **06.12.2025** (14 days)
+13. Click “Next”
+14. ### **Review summary sections:**
+
+**Medication**
+
+* Test Aspirin
+* 2.5 Tablets, 1000 mg
+
+**Schedule**
+
+* Morning 07:30 (With Meal)
+* Evening 18:30
+
+**Weekly Frequency**
+
+* Mon–Sun
+* “2x daily”
+
+**Duration**
+
+* 14 days total
+* 23.11.2025 → 06.12.2025
+15. Click “Add Schedule”
+","1. 
+2. 
+3. 
+4. 
+5. 
+6. 
+7. 
+8. 
+9. 
+10. 
+11. 
+12. 
+13. 
+14. 
+15. 
+","1. Wizard opens at **Step 1 of 5 – Basic Information**; progress bar at **20%**.
+2. * Name required → accepted.
+* Form optional → accepted.
+* Dosage optional but validated → accepted.
+* No validation errors.
+3. * User navigates to **Step 2 of 5 – Dosing Schedule**.
+* Medication created in DB (Medication table).
+* Medication summary label (“You are scheduling: Test Aspirin – Tablets 1000 mg”) appears at the top.
+4. * Quantity accepts whole numbers 0–1000.
+* Fraction dropdown contains: -, 1/2, 1/4, 3/4.
+* Units dropdown equals list from Step 1 Form.
+* Calculated display: **2.5 Tablets** appears in summary header.
+5. * Exactly 2 time slots must be selected.
+* “2 of 2 selected” indicator becomes green.
+6. * Time inputs appear with editable fields: 07:30 and 18:30.
+* No validation errors.
+7. Selection highlighted; only one meal timing can be active.
+
+###
+8. Navigate to **Step 3 of 5 – Weekly Frequency**.
+
+Medication summary remains visible (top-right: 1000 mg bubble).
+9. * All 7 days highlighted.
+* “Selected Days” block shows: Mon Tue Wed Thu Fri Sat Sun.
+10. Navigate to **Step 4 of 5 – Treatment Duration**.
+11. * Units dropdown supports Days / Weeks / Months.
+* Duration auto-calculates dates beneath.
+12. * Start date is today or system default.
+* End date updates LIVE when duration changes.
+* Summary line at the bottom shows:
+    **Schedule: 23.11.2025 → 06.12.2025**
+13. * Navigate to **Step 5 – Review & Confirm**.
+* Progress bar shows **100%**.
+14. All values exactly match user input from previous steps.
+15. * Success state.
+* Schedule rules saved (Schedule table).
+* Individual entries created via `/api/schedule/generate` into the **ScheduleEntry** table — for 14 days × 2 daily = **28 entries**.
+","1. Untested
+2. Untested
+3. Untested
+4. Untested
+5. Untested
+6. Untested
+7. Untested
+8. Untested
+9. Untested
+10. Untested
+11. Untested
+12. Untested
+13. Untested
+14. Untested
+15. Untested
+","1. 
+2. 
+3. 
+4. 
+5. 
+6. 
+7. 
+8. 
+9. 
+10. 
+11. 
+12. 
+13. 
+14. 
+15. ",,,High,Critical,Manual,Functional,"medications,create",false,
+16,"Calendar Today View and Week View correctly display generated schedule events","Sprint 2 – Medications & Schedule (UI manual)",2,"Vladyslav Mazur",20423,Passed,"2025-11-23 14:41:32","1. TODAY VIEW
+2. Navigate to: Sidebar → Today
+3. Verify pending list
+Pending doses should appear at the top, each in an expanded card showing:
+
+* **Medication name** (e.g., Test Aspirin)
+* **Dose amount** (3 tablets, 1 candy, etc.)
+* **Dosage** (1000 mg, 497 mg, etc.)
+* **Time** (e.g., 07:30, 12:30, 18:30)
+* **Meal timing label** (e.g., WITH MEAL, BEFORE MEAL)
+* **Status icon** = **empty circle** (PLANNED)
+4. Scroll down to “DONE” section.
+Each completed dose shows:
+
+* Blue checkmark icon
+* Green background (light green card)
+* Gray, crossed text for medication name or dose (e.g., *Mg+Zn 500 mg*)
+* Time slot (07:30, etc.)
+* Status label: **TAKEN**
+5. Mark a pending event (e.g., Test Aspirin 07:30) as DONE.
+6. WEEK VIEW
+7. Navigate to: Sidebar → Week View
+8. The calendar grid shows hours on left (07:30 / 12:30 / 18:30), days across top: Mon–Sun.
+9. Check each event card:
+
+* **Medication name** (e.g., Mg+Zn, Test Aspirin, Vitamin C)
+* **Dose** (1 tablet, 1 candy, 3 tablets, 1 ml)
+* **Dosage** (500 mg, 1000 mg, etc.)
+* **Meal timing** (with / before / after / anytime)
+* **Status**:
+    * PLANNED → white background + empty checkbox
+    * DONE → green background + checkmark
+10. Example: Mg+Zn repeated across several days.
+11. Apply each filter in the Week View (Taken → Missed → With Meals → All) one by one.
+12. Select any PLANNED dose in Week View and mark it as DONE using the checkbox.
+13. Click **Next**/**Previous**
+14. Reload the Week View page.
+","1. 
+2. 
+3. 
+4. 
+5. 
+6. 
+7. 
+8. 
+9. 
+10. 
+11. 
+12. 
+13. 
+14. 
+","1. 
+2. * Header displays **Today’s Schedule** + current date.
+* Two summary counters visible:
+    * “X medications pending”
+    * “Y completed”
+* A “Mark All” button is visible (top-right).
+3. All pending events for the current day are listed in chronological order.
+4. Completed events appear separately from pending ones.
+5. * It moves from “Pending” group to “Done” group
+* Instant state update
+* After page refresh → state persists
+6. 
+7. * Header shows week range: **Nov 17 – Nov 23**
+* Current day (Sun 23) column is highlighted with a blue border
+* Filters visible at top:
+    * All, Taken, Missed, All Meals, Before, With, After
+8. * Empty time slots show blank grid boxes
+* Medication events fill correct time rows
+9. All events appear in correct day/time slots.
+10. * Repeated doses appear separately
+* Each retains its own status (some DONE, some PLANNED)
+11. * When **Taken** is selected → only green DONE events are visible.
+* When **Missed** is selected → only uncompleted events are visible.
+* When **With** (meal timing) is selected → only events labeled “with meal” remain visible.
+* When **All** is selected → the full schedule grid becomes visible again with all events displayed.
+12. * The dose immediately updates its visual state to DONE (green background + checkmark).
+* The dose remains in the *same time slot* but changes appearance.
+* No errors or reloading occur.
+13. * The calendar moves one week forward.
+* Returns to the current week range.
+14. * All events reappear correctly
+* DONE items stay green
+* Time/day placements remain correct
+","1. Untested
+2. Untested
+3. Untested
+4. Untested
+5. Untested
+6. Untested
+7. Untested
+8. Untested
+9. Untested
+10. Untested
+11. Untested
+12. Untested
+13. Untested
+14. Untested
+","1. 
+2. 
+3. 
+4. 
+5. 
+6. 
+7. 
+8. 
+9. 
+10. 
+11. 
+12. 
+13. 
+14. ",,,High,Critical,Manual,Functional,"medications,calendar,schedule",false,
+17,"Search and filters correctly refine the medications list","Sprint 2 – Medications & Schedule (UI manual)",2,"Vladyslav Mazur",2882,Passed,"2025-11-23 14:41:36","1. Enter existing medication in search field.
+2. Enter “500” in search field.
+3. Enter “tablets” in search field.
+4. Clear the search field.
+5. Open Filters → enable “Only medications with dosage”.
+6. Disable the filter.
+","1. 
+2. 
+3. 
+4. 
+5. 
+6. 
+","1. * Only medications with names containing *entered letters* appear.
+* Result count updates accordingly.
+2. Only medications with dosage 500 remain visible.
+3. List shows only medications with Form = Tablets.
+4. Full medication list reappears.
+5. * Medications without dosage disappear from the list.
+* Filter icon shows badge “1”.
+6. Full medication list returns.
+","1. Untested
+2. Untested
+3. Untested
+4. Untested
+5. Untested
+6. Untested
+","1. 
+2. 
+3. 
+4. 
+5. 
+6. ",,,High,Major,Manual,Functional,medications,false,
+18,"Export to CSV and JSON generates valid files with complete dataset","Sprint 2 – Medications & Schedule (UI manual)",2,"Vladyslav Mazur",3296,Passed,"2025-11-23 14:41:40","1. Click Export → CSV.
+2. Click Export → JSON.
+3. Compare downloaded JSON to reference JSON file.
+","1. 
+2. 
+3. 
+","1. * A file named `medications.csv` is downloaded.
+* File opens without errors.
+* Column structure includes:
+    `id, name, dose, form, createdAt, updatedAt`
+* Number of rows matches number of medications displayed.
+2. * A file named `medications.json` downloads.
+* File contains an array of objects (one per medication).
+* Structure matches reference file fields.
+* Sample values appear correctly.
+3. * Field names and value types match exactly.
+* No empty objects.
+* Records reflect the latest state.
+","1. Untested
+2. Untested
+3. Untested
+","1. 
+2. 
+3. ",,,Medium,Normal,Manual,Functional,medications,false,
+19,"Editing an existing medication updates its details correctly.","Sprint 2 – Medications & Schedule (UI manual)",2,"Vladyslav Mazur",6665,Passed,"2025-11-23 14:41:48","1. Click **Edit** on any medication card.
+2. Update the **Medication Name**.
+Optionally modify Form or Dosage.
+3. Click **Save changes**.
+4. Refresh the page.
+","1. 
+2. 
+3. 
+4. 
+","1. The **Edit Medication** page opens, and all fields (Medication Name, Form, Dosage) are pre-filled with existing values.
+2. Fields accept new values without validation errors.
+3. * The user is redirected back to **All Medications**.
+* The medication card displays updated details.
+* No duplicate medication appears.
+4. Updated values persist, confirming the changes were successfully saved.
+","1. Untested
+2. Untested
+3. Untested
+4. Untested
+","1. 
+2. 
+3. 
+4. ",,,High,Normal,Manual,Functional,,false,
+20,"Deleting a medication removes it from the list successfully.","Sprint 2 – Medications & Schedule (UI manual)",2,"Vladyslav Mazur",5301,Passed,"2025-11-23 14:41:54","1. Click **Delete** on a medication card.
+2. Click the red **Delete** button in the modal.
+3. Refresh the page.
+","1. 
+2. 
+3. 
+","1. * A modal appears with the message:
+* *“Delete medication — This action will mark the medication as deleted.”*
+* Buttons **Cancel** and **Delete** are visible.
+2. * The medication disappears from the list.
+* The total count of medications updates accordingly.
+3. * The deleted medication does not reappear. 
+* In the DB table Medication, for the deleted one in the ""deletedAt"" column appeared a timestamp record.
+","1. Untested
+2. Untested
+3. Untested
+","1. 
+2. 
+3. ",,,High,Normal,Manual,Functional,,false,

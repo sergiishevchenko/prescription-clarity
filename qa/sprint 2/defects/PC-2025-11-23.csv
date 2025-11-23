@@ -1,0 +1,312 @@
+"id","title","test case id","author","assignee","actual result","status","milestone","severity","external issues","attachments","tags"
+"11","UI Medication order unexpectedly changes after marking entries as “Taken” in Week View","","Vladyslav Mazur","Unassigned","## **Description**
+
+When the user marks a medication as **Taken** in **Week View**, the system unexpectedly changes the position of the medication cards on the schedule grid. The visual ordering of events is altered, making it difficult to follow the original sequence.
+
+## **Steps to Reproduce**
+
+1. Log in as a patient.
+2. Open **Tracking → Week View**.
+3. Locate any medication entry that is not marked as taken.
+4. Click the checkbox to mark it as **Taken**.
+5. Observe the updated schedule.
+
+
+## **Actual Result**
+
+* After selecting **Taken**, the event **jumps to another position** in the weekly grid.
+* The visual order becomes inconsistent with the chronological or alphabetical grouping.
+* This disrupts usability and makes the weekly schedule confusing.
+
+
+## **Expected Result**
+
+* Marking a dose as **Taken** should **not change its position** on the calendar.
+* The order of entries should remain stable and predictable.
+
+
+## **QA Notes**
+
+* The issue **does not always reproduce**, making the root cause unclear.","Open","","Normal","","",""
+"10","UI Clicking Edit on the All Medications page results in a client-side exception and a blank screen","","Vladyslav Mazur","Unassigned","## **Description**
+
+When the user navigates to **All Medications** and clicks **Edit** on any medication card, the application throws a client-side exception and loads a blank white page instead of opening the edit form.
+
+## **Steps to Reproduce**
+
+1. Log in as a patient.
+2. Go to **Medications → All Medications**.
+3. Click **Edit** on any medication in the list.
+4. Observe the page.
+
+
+## **Actual Result**
+
+* The screen turns completely white.
+* A client-side exception is displayed in the console:
+    *“Application error: a client-side exception has occurred while loading prescription-clarity.vercel.app (see the browser console for more information).”*
+* Navigation to the edit form does not occur.
+
+
+## **Expected Result**
+
+The medication edit form (`/medications/:id/edit`) should open without errors and allow the user to update medication details.","Resolved","","Major","","",""
+"9","UI Custom Time is not applied to the selected schedule configuration","","Vladyslav Mazur","Unassigned","## **Summary**
+
+Custom Time can be added visually, but it is **not applied** to the medication schedule and **cannot be selected** as one of the required times of day.
+
+## **Steps to Reproduce**
+
+1. Open **Add Medication** → proceed to **Step 2 (Dosing Schedule)**.
+2. Select **2x per day** (requires selecting *two* times of day).
+3. Click **Add custom time** and enter a valid time (e.g., `08:07`).
+4. Observe that:
+    * The custom time appears in the UI under “Custom time 1”.
+    * The yellow warning still says: **“Please select 1 more preset time of day.”**
+5. Try clicking/selecting the custom time.
+
+## **Actual Result**
+
+* Custom time appears only in the list below but is **not selectable**.
+* Custom time **does NOT count** toward the required number of times per day.
+* Schedule cannot be completed unless user selects preset Morning/Afternoon/Evening.
+* Custom time does **not apply** to the reminder configuration.
+
+## **Expected Result**
+
+* Custom time should behave as a **valid selectable reminder**, equal to preset times.
+* When user adds a custom time:
+    * It should appear as a selectable tile/button.
+    * User should be able to **use it toward the required dose count**.
+    * It should apply to schedule generation and appear in reminders.","Resolved","","Major","","",""
+"8","UI – Error occurs when clicking “Previous” on Step 2 during medication creation","","Vladyslav Mazur","Unassigned","## **Description**
+
+When the user is on **Step 2 (Dosing Schedule)** of the medication creation flow and clicks **""Previous""** to return to Step 1, the page crashes with a **client-side exception** (`TypeError: c.includes is not a function`).
+The screen becomes fully blank, and no navigation is possible until the page is refreshed.
+This breaks the stepper navigation and blocks users from correcting entered data.
+
+## **Steps to Reproduce**
+
+1. Go to:
+    `https://prescription-clarity.vercel.app/medications/new`
+2. Complete Step 1 with valid data (Medication name, optional fields)
+3. Click **Next** → move to **Step 2 – Dosing Schedule**
+4. Click **Previous**
+
+
+## **Actual Result**
+
+* The application crashes.
+* A blank page appears.
+* Console shows error:
+
+```
+Uncaught TypeError: c.includes is not a function
+```
+
+## **Expected Result**
+
+* User is navigated back to **Step 1** without errors.
+* Previously entered data should remain pre-filled.","Resolved","","Major","","",""
+"7","End Date is calculated as (Duration − 1 day)","","Vladyslav Mazur","Unassigned","## **Summary**
+
+The **End Date** is calculated incorrectly — it is set to **Duration − 1 day**, which results in an end date earlier than expected.
+
+## **Steps to Reproduce**
+
+1. Go to **Add Medication → Step 4 (Treatment Duration)**
+2. Enter:
+    * Duration = **1**
+    * Units = **Days**
+3. Observe automatically generated Start Date and End Date.
+4. Change Units to Weeks → still incorrect.
+5. Notice End Date = Start Date − 1 day.
+
+
+## **Actual Result**
+
+When the user enters Duration = **1 Day**, Start Date = **19.11.2025**,
+the system automatically sets End Date = **18.11.2025** (one day earlier).
+When switching Units to **Weeks**, the same incorrect shift happens — the End Date is *duration minus one day*.
+
+## **Expected Result**
+
+End Date should be:
+
+* **Start Date + Duration (in selected units)**
+* Example:
+    * Duration = 1 Day → End Date = 18.11.2025
+
+The End Date should never be earlier than the Start Date.","Resolved","","Major","","",""
+"6","UI / Validation Invalid dosage value (-2 mg) does not block navigation to Step 2, even though medication cannot be created.","","Vladyslav Mazur","Unassigned","## **Description**
+
+When a user enters an invalid negative dosage (e.g., `-2`), the UI correctly shows the validation message (“Please enter a value of at least 1”), and API creation fails — but the **Next** button remains active, allowing the user to proceed to Step 2 of the medication creation wizard.
+This leads to inconsistent UX and a broken flow because the medication is not created, yet the wizard continues as if it was.
+
+## **Steps to Reproduce**
+
+1. Open **Add Medication** (`/medications/new`).
+2. Enter a valid **Medication Name**.
+3. Select any form (optional).
+4. In the **Dosage (mg)** field, enter `-2`.
+5. Click **Next**.
+
+
+## **Actual Result**
+
+* Validation message appears: “Please enter a value of at least 1”.
+* API call fails on Step 5 (POST `/api/medications`).
+* **But user can still proceed to Step 2**, even though the medication is invalid and not created.
+
+
+## **Expected Result**
+
+* User must not be able to move to Step 2 until dosage value is valid (≥1).","Resolved","","Major","","",""
+"5","UI / API — User cannot create a medication when optional fields (“Form”, “Dosage”) are not provided","","Vladyslav Mazur","Unassigned","### **Description**
+
+Although *Medication Form* and *Dosage (mg)* are marked as **Optional**, the system returns **400 Bad Request** when the user tries to create a medication without filling them.
+This contradicts the UI indication and prevents valid medication entries from being created.
+
+### **Steps to Reproduce**
+
+1. Navigate to: **Add Medication → Step 1 (Basic Information)**
+2. Enter **Medication Name** only (e.g., *“Fish oil”*)
+3. Leave **Medication Form** and **Dosage (mg)** empty (they are shown as optional)
+4. Click **Next**
+5. Observe the backend request in **Network → POST /api/medications**
+
+
+### **Actual Result**
+
+* Backend returns **400 Bad Request**
+* Medication is **not created**
+* UI does not show a meaningful validation message
+* Optional fields behave as **required**
+
+
+### **Expected Result**
+
+* User should be able to create a medication **with only the required field “Medication Name”**
+* Optional fields should not trigger backend validation errors
+* API should accept payload such as:
+
+```
+{
+  ""name"": ""Fish oil""
+}
+```
+
+###","Resolved","","Major","","https://d2cxucsjd6xvsd.cloudfront.net/public/team/453c759f4fc4747a5f0685f91e70eb842ff9a078/attachment/87d3dfa1bb84349120fc7ee75a55a293cb17af7e/photo_2025-11-23%2015.02.52.jpeg",""
+"4","UI Medication Search sends failing requests when medication does not exist","","Vladyslav Mazur","Unassigned","## **Description**
+
+When entering a medication name that does not exist in the database, the UI triggers a series of repeated failing `search` API calls. These requests return errors and appear in the network log with red indicators.
+Expected behaviour: the system should display “No results found” without generating multiple failing API calls.
+
+## **Steps to Reproduce**
+
+1. Navigate to **Add Medication → Step 1 (Basic Information)**.
+2. In the **Medication Name** field, type a non-existing medication name (e.g., `""Paracetam""`).
+3. Open **DevTools → Network tab**.
+4. Observe multiple failing `/search` requests being triggered on each keystroke.
+
+
+## **Actual Result**
+
+* Several failed `POST /api/medications/search` requests appear in the Network tab.
+* Each request returns an error.
+* The UI does not notify the user; only network errors are visible.
+
+
+## **Expected Result**
+
+* The system should make at most **one** request per debounce interval.
+* If no matching medication is found, the UI should show a clean **“No results found”** state.
+* No repeated failing API calls should be generated.
+
+
+## **QA Notes**
+
+* Error spam may impact performance and server load.","Open","","Minor","","","API,medications"
+"3","API /api/medications allows creating identical medications (all fields identical except id)","","Vladyslav Mazur","Unassigned","**Steps to Reproduce:**
+
+1. Open Postman or another API client.
+2. Send a `POST /api/medications` request with the following body:
+    {
+     ""name"": ""Vitamin B2"",
+     ""dose"": ""1200mg"",
+     ""frequency"": 3,
+     ""startDate"": ""2025-11-01T00:00:00.000Z"",
+     ""endDate"": ""2025-11-09T13:59:59.000Z"",
+     ""status"": ""ACTIVE""
+    }
+3. Repeat the same request again without changing any data.
+4. Execute `GET /api/medications` to view the list.
+
+
+**Expected Result:**
+If all fields (except `id`) are identical, the server should return an error message, for example:
+
+```
+409 Conflict – Medication already exists
+```
+
+or another validation response indicating duplication.
+
+***
+
+**Actual Result:**
+API successfully creates two identical medication records, differing only by their `id` value.
+
+### 🧪 **QA Notes**
+
+**Current Validation Rules:**
+At this stage, medication duplication validation can rely on **two key parameters**:
+
+1. **Medication name** – textual identifier (e.g., “Vitamin B2”).
+2. **Dosage** – defined strength or amount (e.g., “1200mg”).
+
+These two fields combined form the current unique constraint for medication records.
+
+***
+
+**Proposed Improvement (Future Validation Enhancement):**
+To improve validation accuracy and avoid false duplicates, it is recommended to add a **third distinguishing field** — **`form`** (e.g., tablet, cream, drops).
+This will allow differentiating between medications with the same name and dose but different forms of administration.","Resolved","","Major","","","API,medications"
+"2","After successful login, refreshing a duplicated /login tab does not redirect the authorized user to /dashboard.","","Vladyslav Mazur","Unassigned","**Preconditions:**
+
+* User exists in the database (e.g., `user@example.com`).
+
+**Steps to Reproduce:**
+
+1. Open `/login` page in a browser.
+2. Duplicate the login tab (Ctrl + T → right-click → “Duplicate”).
+3. In the **first tab**, enter valid credentials and click **Login**.
+    → User successfully logs in and is redirected to `/dashboard`.
+4. Switch to the **duplicated** `/login` tab.
+5. Refresh the duplicated `/login` page.
+
+**Expected Result:**
+
+* Since the user already has a valid session (cookie set), the app should automatically redirect to `/dashboard`.
+* Login page should not be accessible for authorized users.
+
+**Actual Result:**
+
+* The duplicated `/login` page remains visible even after refresh.
+* Only after manually navigating to `/dashboard`, user is redirected correctly.","Resolved","","Minor","","",""
+"1","User registration with an already registered email returns status code 400 (Bad Request) instead of 409 (Conflict).","","Vladyslav Mazur","Unassigned","**Steps to Reproduce:**
+
+1. Navigate to `/register`.
+2. Enter an email that is already registered (`abolic@meta.com`).
+3. Fill in all required fields (name, password).
+4. Click **Register**.
+
+**Expected Result:**
+
+* The API should return HTTP **409 Conflict** with an error message:
+    `""Email already exists""`
+* User account should **not** be created again.
+
+**Actual Result:**
+
+* API returns HTTP **400 Bad Request**.","Resolved","","Normal","","",""
