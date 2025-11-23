@@ -40,17 +40,20 @@ export const useTimeOfDaySelections = ({
   );
 
   const timeError = useMemo(() => {
+    const presetCount = timesOfDay.length;
+    const totalSelected = presetCount + customTimesCount;
+
     if (customTimesCount > 6) {
       return "You can add up to 6 custom reminders per day.";
     }
-    if (timesOfDay.length === 0 && customTimesCount === 0) {
+    if (totalSelected === 0) {
       return "Please select at least one time of day.";
     }
-    if (required > 0 && timesOfDay.length < required) {
-      const remaining = required - timesOfDay.length;
+    if (required > 0 && totalSelected < required) {
+      const remaining = required - totalSelected;
       return remaining === 1
-        ? "Please select 1 more preset time of day."
-        : `Please select ${remaining} more preset times of day.`;
+        ? "Please select 1 more time of day."
+        : `Please select ${remaining} more times of day.`;
     }
     return "";
   }, [customTimesCount, required, timesOfDay.length]);

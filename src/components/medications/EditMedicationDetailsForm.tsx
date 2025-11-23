@@ -106,13 +106,23 @@ function FieldLabel({
 }
 
 const dosageValidationRules = {
-  setValueAs: (value: string) => {
-    if (value === "") return undefined;
-    if (value.includes(",")) return Number.NaN;
-    const numeric = Number(value);
-    if (!Number.isFinite(numeric)) return Number.NaN;
-    if (numeric === 0) return undefined;
-    return numeric;
+  setValueAs: (value: unknown) => {
+    if (value === "" || value == null) return undefined;
+    if (typeof value === "number") {
+      if (!Number.isFinite(value)) return Number.NaN;
+      if (value === 0) return undefined;
+      return value;
+    }
+    if (typeof value === "string") {
+      const trimmed = value.trim();
+      if (trimmed === "") return undefined;
+      if (trimmed.includes(",")) return Number.NaN;
+      const numeric = Number(trimmed);
+      if (!Number.isFinite(numeric)) return Number.NaN;
+      if (numeric === 0) return undefined;
+      return numeric;
+    }
+    return Number.NaN;
   },
   validate: (value?: number) => {
     if (value === undefined) return true;

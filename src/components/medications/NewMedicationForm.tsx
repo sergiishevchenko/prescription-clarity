@@ -296,14 +296,41 @@ export default function NewMedicationForm({
     }
 
     if (step === 2) {
-      const expected = Number(allValues.frequency || 1);
-      const customCount = customTimes.length;
-      const hasAnyTimeSelected =
-        timesOfDay.length > 0 || customCount > 0 || !timeError;
-      const presetsMatchFrequency =
-        expected > 0 && timesOfDay.length === expected && !timeError;
+      // 1) Quantity / fraction (top of the form)
+      const quantityValidSecond = await trigger("quantity");
+      if (!quantityValidSecond) {
+        validator.lastErrorMessage =
+          "Enter the dose amount (quantity or fraction) before continuing.";
+        scrollToQuantityInputs();
+        return false;
+      }
 
-      if (!hasAnyTimeSelected || !presetsMatchFrequency) {
+      const expected = Number(allValues.frequency || 1) || 1;
+      const customCount = customTimes.length;
+      const presetCount = timesOfDay.length;
+      const totalSelected = presetCount + customCount;
+
+      // 2) Units selector
+      if (!allValues.form) {
+        validator.lastErrorMessage =
+          "Please select a unit for this medication.";
+        setError("form", {
+          type: "manual",
+          message: "Please select a unit for this medication.",
+        });
+        scrollToUnitsField();
+        return false;
+      }
+      clearErrors("form");
+
+      // 3) Times of day (preset + custom)
+      if (timeError) {
+        validator.lastErrorMessage =
+          timeError || "Please complete the dosing schedule.";
+        return false;
+      }
+
+      if (totalSelected === 0 || totalSelected < expected) {
         validator.lastErrorMessage = "Please complete the dosing schedule.";
         return false;
       }

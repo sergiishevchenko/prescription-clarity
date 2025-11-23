@@ -67,8 +67,9 @@ export default function TimeOfDayChips({ selected, onToggle, error }: Props) {
   const maxCustomTimes = 6;
   const label =
     required === 1 ? "Select 1 Time of Day" : `Select ${required} Times of Day`;
-  const selectedCount = selected.length;
-  const isComplete = selectedCount === required;
+  const totalSelections = selected.length + customTimes.length;
+  const selectedCount = Math.min(totalSelections, required);
+  const isComplete = totalSelections >= required;
   const statusClass = isComplete
     ? stepStyles.statusSuccess
     : stepStyles.statusWarning;
