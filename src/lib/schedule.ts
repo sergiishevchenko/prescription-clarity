@@ -18,6 +18,28 @@ export type ScheduleEntryItem = {
   } | null;
 };
 
+export type ScheduleTemplateItem = {
+  id: string;
+  medicationId: string;
+  userId: string;
+  quantity: number;
+  units: string;
+  frequencyDays: number[];
+  durationDays: number;
+  dateStart: string;
+  dateEnd: string | null;
+  timeOfDay: string[];
+  mealTiming: "before" | "with" | "after" | "anytime";
+  createdAt: string;
+  updatedAt: string;
+  medication: {
+    id: string;
+    name: string;
+    dose: number | null;
+    form?: string | null;
+  } | null;
+};
+
 export async function getScheduleEntries(
   from: Date,
   to: Date,
@@ -51,6 +73,31 @@ export async function getScheduleEntries(
   }
 
   const data = (await res.json()) as { items: ScheduleEntryItem[] };
+  return data.items;
+}
+
+export async function getScheduleTemplates(): Promise<ScheduleTemplateItem[]> {
+  const store = await cookies();
+  const cookieHeader = store
+    .getAll()
+    .map((c) => `${c.name}=${encodeURIComponent(c.value)}`)
+    .join("; ");
+
+  const url = new URL(absoluteUrl("/api/schedule/templates"));
+  const res = await fetch(url.toString(), {
+    headers: cookieHeader ? { cookie: cookieHeader } : undefined,
+    cache: "no-store",
+  });
+
+  if (res.status === 401 || res.status === 403) {
+    return [];
+  }
+
+  if (!res.ok) {
+    throw new Error(`Failed to load schedule templates: ${res.statusText}`);
+  }
+
+  const data = (await res.json()) as { items: ScheduleTemplateItem[] };
   return data.items;
 }
 

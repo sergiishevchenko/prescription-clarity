@@ -28,6 +28,7 @@ const mockScheduleEntry = {
   findFirst: jest.fn() as AsyncMockFn<[unknown], unknown>,
   createMany: jest.fn() as AsyncMockFn<[unknown], unknown>,
   update: jest.fn() as AsyncMockFn<[unknown], unknown>,
+  deleteMany: jest.fn() as AsyncMockFn<[unknown], unknown>,
 };
 
 const mockDayStatus = {

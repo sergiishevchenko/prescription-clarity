@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState, type ReactNode } from "react";
+import { useEffect, useMemo, useState, type ReactNode } from "react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import clsx from "clsx";
@@ -36,7 +36,6 @@ const NAV_GROUPS: NavGroup[] = [
   {
     id: "overview",
     label: "Overview",
-    defaultOpen: true,
     items: [
       {
         id: "dashboard",
@@ -107,15 +106,46 @@ const NAV_GROUPS: NavGroup[] = [
 ];
 
 export function SidebarNav({ user }: SidebarNavProps) {
-  const pathname = usePathname();
+  const pathname = usePathname() ?? "/";
   const router = useRouter();
-  const [openGroups, setOpenGroups] = useState<Set<string>>(() => {
-    const defaults = NAV_GROUPS.filter((group) => group.defaultOpen).map(
-      (group) => group.id,
+  const computeMatchesPath = (item: NavItem, path: string) => {
+    const normalize = (value: string) =>
+      value === "/" ? value : value.replace(/\/$/, "");
+    const normalizedPath = normalize(path);
+    const normalizedTarget = normalize(item.href);
+    if (item.match === "startsWith") {
+      return (
+        normalizedPath === normalizedTarget ||
+        normalizedPath.startsWith(`${normalizedTarget}/`)
+      );
+    }
+    return normalizedPath === normalizedTarget;
+  };
+  const findActiveGroup = (path: string) =>
+    NAV_GROUPS.find((group) =>
+      group.items.some((item) => computeMatchesPath(item, path)),
     );
-    return new Set(defaults);
+
+  const activeGroupOnLoad = findActiveGroup(pathname);
+  const [openGroups, setOpenGroups] = useState<Set<string>>(() => {
+    const initial = new Set<string>();
+    if (activeGroupOnLoad) {
+      initial.add(activeGroupOnLoad.id);
+    }
+    return initial;
   });
   const [signingOut, setSigningOut] = useState(false);
+
+  useEffect(() => {
+    const activeGroup = findActiveGroup(pathname);
+    setOpenGroups(() => {
+      const next = new Set<string>();
+      if (activeGroup) {
+        next.add(activeGroup.id);
+      }
+      return next;
+    });
+  }, [pathname]);
 
   const preferredName = user?.name?.trim() || user?.email?.split("@")[0] || "";
   const initials = useMemo(() => {
@@ -142,22 +172,7 @@ export function SidebarNav({ user }: SidebarNavProps) {
 
   const isGroupOpen = (groupId: string) => openGroups.has(groupId);
 
-  const isItemActive = (item: NavItem) => {
-    if (!pathname) return false;
-
-    const normalizedPath =
-      pathname === "/" ? pathname : pathname.replace(/\/$/, "");
-    const normalizedTarget =
-      item.href === "/" ? item.href : item.href.replace(/\/$/, "");
-
-    const matchesPath =
-      item.match === "startsWith"
-        ? normalizedPath === normalizedTarget ||
-          normalizedPath.startsWith(`${normalizedTarget}/`)
-        : normalizedPath === normalizedTarget;
-
-    return matchesPath;
-  };
+  const isItemActive = (item: NavItem) => computeMatchesPath(item, pathname);
 
   const handleAddMedication = () => {
     clearMedicationWizard();
@@ -245,6 +260,8 @@ export function SidebarNav({ user }: SidebarNavProps) {
                   >
                     {group.items.map((item) => {
                       const active = isItemActive(item);
+                      const TrailingIcon =
+                        item.trailingIcon ?? ChevronRightIcon;
 
                       return (
                         <Link
@@ -259,11 +276,9 @@ export function SidebarNav({ user }: SidebarNavProps) {
                           <span className={styles.navItemLabel}>
                             {item.label}
                           </span>
-                          {item.trailingIcon
-                            ? item.trailingIcon({
-                                className: styles.navItemTrailing,
-                              })
-                            : null}
+                          {active ? (
+                            <TrailingIcon className={styles.navItemTrailing} />
+                          ) : null}
                         </Link>
                       );
                     })}
