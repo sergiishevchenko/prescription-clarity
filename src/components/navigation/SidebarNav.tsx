@@ -89,6 +89,13 @@ const NAV_GROUPS: NavGroup[] = [
     defaultOpen: false,
     items: [
       {
+        id: "data-sharing",
+        label: "Data Sharing",
+        href: "/share",
+        icon: ShieldIcon,
+        match: "startsWith",
+      },
+      {
         id: "profile",
         label: "Profile",
         href: "/profile",
@@ -462,6 +469,24 @@ function UserIcon({ className }: IconProps) {
     >
       <circle cx="12" cy="8" r="4" />
       <path d="M6 20c0-3.314 2.686-6 6-6s6 2.686 6 6" />
+    </svg>
+  );
+}
+
+function ShieldIcon({ className }: IconProps) {
+  return (
+    <svg
+      className={className}
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth={2.5}
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      aria-hidden="true"
+    >
+      <path d="M12 3 5 6v6c0 4.243 2.657 6.938 7 9 4.343-2.062 7-4.757 7-9V6l-7-3Z" />
+      <path d="M9 12.5 11 14l4-4" />
     </svg>
   );
 }
