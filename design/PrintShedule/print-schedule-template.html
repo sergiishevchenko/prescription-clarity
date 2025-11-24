@@ -1,0 +1,659 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Weekly Medication Schedule</title>
+  <style>
+    @media print {
+      @page {
+        size: A4 portrait;
+        margin: 0mm 6mm 5mm 6mm;
+      }
+      
+      nav, header, .no-print, [role="status"], [data-sonner-toaster], [data-sonner-toast], button, .lg\:left-\[280px\] {
+        display: none !important;
+        visibility: hidden !important;
+      }
+      
+      html, body {
+        width: 100%;
+        height: 100%;
+        background: white !important;
+        margin: 0;
+        padding: 0;
+        color: #000 !important;
+        overflow: hidden !important;
+      }
+      
+      body * {
+        page-break-after: avoid !important;
+        page-break-before: avoid !important;
+        page-break-inside: avoid !important;
+      }
+      
+      .print-container {
+        width: 100% !important;
+        max-width: none !important;
+        padding: 0 !important;
+        margin: 0 !important;
+        max-height: 100vh !important;
+        overflow: hidden !important;
+        display: flex !important;
+        flex-direction: column !important;
+      }
+      
+      .print-header {
+        margin-bottom: 1mm !important;
+        padding: 0 !important;
+        background: white !important;
+        display: flex !important;
+        justify-content: space-between !important;
+        align-items: flex-start !important;
+        border-bottom: none !important;
+        flex-shrink: 0 !important;
+      }
+      
+      .print-header-left h1 {
+        font-size: 16pt !important;
+        font-weight: bold !important;
+        margin: 0 !important;
+        color: #000 !important;
+        text-transform: uppercase !important;
+        letter-spacing: 0.5px !important;
+      }
+      
+      .print-header-left img, .print-header-left svg {
+        background: transparent !important;
+        filter: none !important;
+      }
+      
+      .print-header-left p {
+        font-size: 8pt !important;
+        color: #000 !important;
+        margin: 1mm 0 0 0 !important;
+      }
+      
+      .print-week-info {
+        font-size: 11pt !important;
+        font-weight: bold !important;
+        color: #000 !important;
+        margin: 0 !important;
+        line-height: 1.3 !important;
+      }
+      
+      .print-date {
+        font-size: 8pt !important;
+        font-weight: normal !important;
+        color: #000 !important;
+      }
+      
+      .print-qr-wrapper {
+        display: block !important;
+        width: 20mm !important;
+        height: 20mm !important;
+        border: 2px solid #000 !important;
+        padding: 1mm !important;
+        background: white !important;
+        flex-shrink: 0 !important;
+      }
+      
+      .print-qr-wrapper svg {
+        width: 18mm !important;
+        height: 18mm !important;
+      }
+      
+      .print-table-wrapper {
+        margin: 0 !important;
+        padding: 0 !important;
+        border: 1px solid #000 !important;
+        border-radius: 3mm !important;
+        flex: 1 !important;
+        overflow: hidden !important;
+      }
+
+      .print-table tr:first-child th { border-top: none !important; }
+      .print-table tr:last-child td { border-bottom: none !important; }
+      .print-table th:first-child, .print-table td:first-child { border-left: none !important; }
+      .print-table th:last-child, .print-table td:last-child { border-right: none !important; }
+      
+      .print-table {
+        width: 100% !important;
+        table-layout: fixed !important;
+        font-size: 11pt !important;
+        border-collapse: collapse !important;
+        border-spacing: 0 !important;
+        margin: 0 !important;
+        border: none !important;
+        border-radius: 0 !important;
+        overflow: hidden !important;
+      }
+      
+      .print-table th {
+        padding: 1.5mm !important;
+        font-size: 11pt !important;
+        font-weight: bold !important;
+        background-color: #e0e0e0 !important;
+        color: #000 !important;
+        border: 1px solid #000 !important;
+        text-align: center !important;
+        white-space: nowrap !important;
+      }
+      
+      .print-table td {
+        padding: 1mm !important;
+        font-size: 9pt !important;
+        color: #000 !important;
+        border: 1px solid #000 !important;
+        vertical-align: top !important;
+        line-height: 1.1 !important;
+      }
+      
+      .print-table th.time-col {
+        width: 14mm !important;
+      }
+      
+      .print-table td.time-col {
+        font-weight: bold !important;
+        background-color: #f0f0f0 !important;
+        text-align: center !important;
+        vertical-align: middle !important;
+        font-size: 12pt !important;
+        border: 1px solid #000 !important;
+      }
+      
+      .print-table th.meal-col, .print-table td.meal-col {
+        width: 7mm !important;
+        text-align: center !important;
+        font-size: 14pt !important;
+        font-weight: bold !important;
+        padding: 0 !important;
+        vertical-align: middle !important;
+        font-family: 'Arial Unicode MS', 'Segoe UI Symbol', monospace !important;
+        border: 1px solid #000 !important;
+      }
+      
+      .print-table th.meal-col {
+        font-size: 14pt !important;
+        line-height: 1.1 !important;
+      }
+      
+      .print-table td.meal-col {
+        line-height: 1 !important;
+      }
+      
+      .meal-symbol {
+        display: inline-flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+        width: 5mm !important;
+        height: 5mm !important;
+        border-radius: 50% !important;
+        border: 2px solid #000 !important;
+        background: white !important;
+        position: relative !important;
+        font-size: 0 !important;
+      }
+      
+      .meal-symbol.before {
+        background: white !important;
+      }
+      
+      .meal-symbol.with {
+        background: linear-gradient(90deg, #000 0%, #000 50%, white 50%, white 100%) !important;
+      }
+      
+      .meal-symbol.after {
+        background: #000 !important;
+      }
+      
+      .meal-symbol.anytime {
+        border-radius: 0 !important;
+        background: #000 !important;
+        height: 1.5px !important;
+      }
+      
+      .med-item {
+        margin-bottom: 0.8mm !important;
+        padding-bottom: 0.8mm !important;
+        border-bottom: 1px dashed #000 !important;
+      }
+      
+      .med-item:last-child {
+        margin-bottom: 0 !important;
+        padding-bottom: 0 !important;
+        border-bottom: none !important;
+      }
+      
+      .med-name {
+        font-weight: 700 !important;
+        font-size: 10pt !important;
+        color: #000 !important;
+        display: block !important;
+        line-height: 1.15 !important;
+        white-space: normal !important;
+        word-wrap: break-word !important;
+        overflow-wrap: break-word !important;
+        word-break: break-word !important;
+        hyphens: auto !important;
+      }
+      
+      .med-details {
+        font-size: 9pt !important;
+        color: #333 !important;
+        display: block !important;
+        margin: 0.2mm 0 !important;
+        line-height: 1.1 !important;
+      }
+      
+      .med-instruction {
+        font-size: 10pt !important;
+        font-weight: 700 !important;
+        color: #000 !important;
+        display: flex !important;
+        justify-content: space-between !important;
+        align-items: center !important;
+        margin: 0.3mm 0 0 0 !important;
+        line-height: 1.15 !important;
+      }
+      
+      .med-checkbox-row {
+        display: flex !important;
+        align-items: center !important;
+        gap: 1.5mm !important;
+        margin-top: 1mm !important;
+      }
+      
+      input[type="checkbox"] {
+        border: 1px solid #000 !important;
+        width: 4.5mm !important;
+        height: 4.5mm !important;
+        min-width: 4.5mm !important;
+        min-height: 4.5mm !important;
+        margin: 0 !important;
+        -webkit-appearance: none !important;
+        appearance: none !important;
+        background: white !important;
+        border-radius: 1px !important;
+      }
+      
+      input[type="checkbox"]:checked {
+        background: #000 !important;
+      }
+      
+      .checkbox-label {
+        font-size: 8pt !important;
+        color: #000 !important;
+        font-weight: 600 !important;
+      }
+      
+      .print-footer {
+        margin-top: 1.5mm !important;
+        padding: 1.5mm 0 !important;
+        border-top: 1.5px solid #000 !important;
+        text-align: center !important;
+        font-size: 8pt !important;
+        color: #666 !important;
+        flex-shrink: 0 !important;
+      }
+      
+      .print-doctor {
+        display: inline !important;
+        font-size: 8pt !important;
+        color: #000 !important;
+        margin-right: 5mm !important;
+      }
+      
+      .print-legend {
+        margin-top: 2mm !important;
+        padding: 2mm 2mm !important;
+        background-color: #f5f5f5 !important;
+        border: 1px solid #000 !important;
+        border-radius: 3mm !important;
+        text-align: center !important;
+        font-size: 11pt !important;
+        color: #000 !important;
+        font-weight: normal !important;
+        flex-shrink: 0 !important;
+        line-height: 1.4 !important;
+      }
+      
+      .print-legend strong {
+        font-weight: bold !important;
+      }
+      
+      .legend-symbol {
+        display: inline-flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+        width: 5mm !important;
+        height: 5mm !important;
+        border-radius: 50% !important;
+        border: 2px solid #000 !important;
+        background: white !important;
+        position: relative !important;
+        font-size: 0 !important;
+        vertical-align: middle !important;
+        margin: 0 1mm !important;
+      }
+      
+      .legend-symbol.before {
+        background: white !important;
+      }
+      
+      .legend-symbol.with {
+        background: linear-gradient(90deg, #000 0%, #000 50%, white 50%, white 100%) !important;
+      }
+      
+      .legend-symbol.after {
+        background: #000 !important;
+      }
+      
+      .legend-symbol.anytime {
+        border-radius: 0 !important;
+        background: #000 !important;
+        height: 2px !important;
+        width: 5mm !important;
+      }
+      
+      .empty-cell {
+        background-color: #fafafa !important;
+        color: #ccc !important;
+        text-align: center !important;
+        font-size: 9pt !important;
+      }
+      
+      * {
+        color-adjust: exact !important;
+        -webkit-print-color-adjust: exact !important;
+        print-color-adjust: exact !important;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- NO-PRINT BUTTON (видно тільки на екрані) -->
+  <div class="no-print" style="text-align: center; padding: 20px; background: #f0f0f0;">
+    <button onclick="window.print()" style="padding: 15px 30px; font-size: 18px; background: #2196F3; color: white; border: none; border-radius: 8px; cursor: pointer;">
+      🖨️ Print Schedule
+    </button>
+    <p style="margin-top: 10px; color: #666;">
+      This button will be hidden when printing
+    </p>
+  </div>
+
+  <!-- PRINT CONTAINER (це друкується) -->
+  <div class="print-container">
+    
+    <!-- HEADER -->
+    <div class="print-header">
+      <div class="print-header-left">
+        <!-- LOGO - замініть на своє зображення -->
+        <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='48' height='48' viewBox='0 0 48 48'%3E%3Crect width='48' height='48' fill='%232196F3' rx='8'/%3E%3Ctext x='24' y='32' font-family='Arial' font-size='24' font-weight='bold' fill='white' text-anchor='middle'%3ERx%3C/text%3E%3C/svg%3E" alt="Logo" style="width: 48px; height: 48px;">
+        <h1>Weekly Medication Schedule</h1>
+        <p>Margaret Williams • Week: Dec 18 - Dec 24, 2025</p>
+      </div>
+      
+      <!-- QR CODE - замініть на свою бібліотеку QR -->
+      <div class="print-qr-wrapper">
+        <svg width="64" height="64" viewBox="0 0 100 100">
+          <rect width="100" height="100" fill="white"/>
+          <rect x="10" y="10" width="10" height="10" fill="black"/>
+          <rect x="30" y="10" width="10" height="10" fill="black"/>
+          <rect x="50" y="10" width="10" height="10" fill="black"/>
+          <rect x="70" y="10" width="10" height="10" fill="black"/>
+          <rect x="10" y="30" width="10" height="10" fill="black"/>
+          <rect x="70" y="30" width="10" height="10" fill="black"/>
+          <rect x="10" y="50" width="10" height="10" fill="black"/>
+          <rect x="30" y="50" width="10" height="10" fill="black"/>
+          <rect x="50" y="50" width="10" height="10" fill="black"/>
+          <rect x="70" y="50" width="10" height="10" fill="black"/>
+          <rect x="10" y="70" width="10" height="10" fill="black"/>
+          <rect x="30" y="70" width="10" height="10" fill="black"/>
+          <rect x="50" y="70" width="10" height="10" fill="black"/>
+          <rect x="70" y="70" width="10" height="10" fill="black"/>
+        </svg>
+      </div>
+    </div>
+    
+    <!-- TABLE -->
+    <div class="print-table-wrapper">
+      <table class="print-table">
+        <thead>
+          <tr>
+            <th class="time-col">Time</th>
+            <th class="meal-col">🍽️</th>
+            <th>Mon</th>
+            <th>Tue</th>
+            <th>Wed</th>
+            <th>Thu</th>
+            <th>Fri</th>
+            <th>Sat</th>
+            <th>Sun</th>
+          </tr>
+        </thead>
+        <tbody>
+          
+          <!-- ROW 1: 08:00 - Before meal -->
+          <tr>
+            <td class="time-col">08:00</td>
+            <td class="meal-col">
+              <span class="meal-symbol before"></span>
+            </td>
+            <!-- Monday -->
+            <td>
+              <div class="med-item">
+                <span class="med-name">Aspirin</span>
+                <span class="med-details">100mg • tab</span>
+              </div>
+            </td>
+            <!-- Tuesday -->
+            <td>
+              <div class="med-item">
+                <span class="med-name">Aspirin</span>
+                <span class="med-details">100mg • tab</span>
+              </div>
+            </td>
+            <!-- Wednesday -->
+            <td>
+              <div class="med-item">
+                <span class="med-name">Aspirin</span>
+                <span class="med-details">100mg • tab</span>
+              </div>
+            </td>
+            <!-- Thursday -->
+            <td>
+              <div class="med-item">
+                <span class="med-name">Aspirin</span>
+                <span class="med-details">100mg • tab</span>
+              </div>
+            </td>
+            <!-- Friday -->
+            <td>
+              <div class="med-item">
+                <span class="med-name">Aspirin</span>
+                <span class="med-details">100mg • tab</span>
+              </div>
+            </td>
+            <!-- Saturday -->
+            <td>
+              <div class="med-item">
+                <span class="med-name">Aspirin</span>
+                <span class="med-details">100mg • tab</span>
+              </div>
+            </td>
+            <!-- Sunday -->
+            <td>
+              <div class="med-item">
+                <span class="med-name">Aspirin</span>
+                <span class="med-details">100mg • tab</span>
+              </div>
+            </td>
+          </tr>
+          
+          <!-- ROW 2: 12:00 - With meal -->
+          <tr>
+            <td class="time-col">12:00</td>
+            <td class="meal-col">
+              <span class="meal-symbol with"></span>
+            </td>
+            <!-- Monday -->
+            <td>
+              <div class="med-item">
+                <span class="med-name">Metformin</span>
+                <span class="med-details">500mg • tab</span>
+              </div>
+              <div class="med-item">
+                <span class="med-name">Vitamin D</span>
+                <span class="med-details">1000 IU • cap</span>
+              </div>
+            </td>
+            <!-- Tuesday -->
+            <td>
+              <div class="med-item">
+                <span class="med-name">Metformin</span>
+                <span class="med-details">500mg • tab</span>
+              </div>
+              <div class="med-item">
+                <span class="med-name">Vitamin D</span>
+                <span class="med-details">1000 IU • cap</span>
+              </div>
+            </td>
+            <!-- Wednesday -->
+            <td>
+              <div class="med-item">
+                <span class="med-name">Metformin</span>
+                <span class="med-details">500mg • tab</span>
+              </div>
+              <div class="med-item">
+                <span class="med-name">Vitamin D</span>
+                <span class="med-details">1000 IU • cap</span>
+              </div>
+            </td>
+            <!-- Thursday -->
+            <td>
+              <div class="med-item">
+                <span class="med-name">Metformin</span>
+                <span class="med-details">500mg • tab</span>
+              </div>
+              <div class="med-item">
+                <span class="med-name">Vitamin D</span>
+                <span class="med-details">1000 IU • cap</span>
+              </div>
+            </td>
+            <!-- Friday -->
+            <td>
+              <div class="med-item">
+                <span class="med-name">Metformin</span>
+                <span class="med-details">500mg • tab</span>
+              </div>
+              <div class="med-item">
+                <span class="med-name">Vitamin D</span>
+                <span class="med-details">1000 IU • cap</span>
+              </div>
+            </td>
+            <!-- Saturday -->
+            <td>
+              <div class="med-item">
+                <span class="med-name">Metformin</span>
+                <span class="med-details">500mg • tab</span>
+              </div>
+              <div class="med-item">
+                <span class="med-name">Vitamin D</span>
+                <span class="med-details">1000 IU • cap</span>
+              </div>
+            </td>
+            <!-- Sunday -->
+            <td>
+              <div class="med-item">
+                <span class="med-name">Metformin</span>
+                <span class="med-details">500mg • tab</span>
+              </div>
+              <div class="med-item">
+                <span class="med-name">Vitamin D</span>
+                <span class="med-details">1000 IU • cap</span>
+              </div>
+            </td>
+          </tr>
+          
+          <!-- ROW 3: 20:00 - After meal -->
+          <tr>
+            <td class="time-col">20:00</td>
+            <td class="meal-col">
+              <span class="meal-symbol after"></span>
+            </td>
+            <!-- Monday -->
+            <td>
+              <div class="med-item">
+                <span class="med-name">Lisinopril</span>
+                <span class="med-details">10mg • tab</span>
+              </div>
+            </td>
+            <!-- Tuesday -->
+            <td>
+              <div class="med-item">
+                <span class="med-name">Lisinopril</span>
+                <span class="med-details">10mg • tab</span>
+              </div>
+            </td>
+            <!-- Wednesday -->
+            <td>
+              <div class="med-item">
+                <span class="med-name">Lisinopril</span>
+                <span class="med-details">10mg • tab</span>
+              </div>
+            </td>
+            <!-- Thursday -->
+            <td>
+              <div class="med-item">
+                <span class="med-name">Lisinopril</span>
+                <span class="med-details">10mg • tab</span>
+              </div>
+            </td>
+            <!-- Friday -->
+            <td>
+              <div class="med-item">
+                <span class="med-name">Lisinopril</span>
+                <span class="med-details">10mg • tab</span>
+              </div>
+            </td>
+            <!-- Saturday -->
+            <td>
+              <div class="med-item">
+                <span class="med-name">Lisinopril</span>
+                <span class="med-details">10mg • tab</span>
+              </div>
+            </td>
+            <!-- Sunday -->
+            <td>
+              <div class="med-item">
+                <span class="med-name">Lisinopril</span>
+                <span class="med-details">10mg • tab</span>
+              </div>
+            </td>
+          </tr>
+          
+        </tbody>
+      </table>
+    </div>
+    
+    <!-- LEGEND -->
+    <div class="print-legend">
+      <strong>Meal Timing:</strong>
+      <span class="legend-symbol before"></span> Before meal
+      <span class="legend-symbol with"></span> With meal
+      <span class="legend-symbol after"></span> After meal
+      <span class="legend-symbol anytime"></span> Anytime
+    </div>
+    
+    <!-- FOOTER -->
+    <div class="print-footer">
+      <span class="print-doctor">Prescribed by: Dr. James Anderson</span>
+      © 2025 Prescription Clarity
+    </div>
+    
+  </div>
+
+</body>
+</html>
