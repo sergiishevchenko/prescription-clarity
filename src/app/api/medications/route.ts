@@ -6,10 +6,6 @@ import {
   createMedicationSchema,
   type CreateMedicationInput,
 } from "@/lib/validators/medication";
-import type { Prisma } from "@prisma/client";
-
-// Derive the exact where input type from Prisma
-type MedicationWhere = Prisma.MedicationWhereInput;
 
 export const runtime = "nodejs";
 
@@ -26,7 +22,7 @@ export async function GET(request: NextRequest) {
     }
 
     // Build where clause - only return non-deleted medications
-    const where: MedicationWhere = {
+    const where = {
       userId: user.id,
       deletedAt: null,
     };
@@ -98,24 +94,18 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const medicationData: Prisma.MedicationCreateInput = {
-      user: {
-        connect: { id: user.id },
-      },
-      name: validatedData.name,
-    };
-
-    if (validatedData.dose !== undefined) {
-      medicationData.dose = validatedData.dose;
-    }
-
-    if (validatedData.form !== undefined) {
-      medicationData.form = validatedData.form;
-    }
-
     // Create medication
     const medication = await prisma.medication.create({
-      data: medicationData,
+      data: {
+        userId: user.id,
+        name: validatedData.name,
+        ...(validatedData.dose !== undefined
+          ? { dose: validatedData.dose }
+          : {}),
+        ...(validatedData.form !== undefined
+          ? { form: validatedData.form }
+          : {}),
+      },
       select: {
         id: true,
         name: true,
