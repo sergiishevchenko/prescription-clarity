@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useRef, useEffect } from "react";
 import { usePathname } from "next/navigation";
 import { MobileHeader } from "./MobileHeader";
 import { MobileSidebarWrapper } from "./MobileSidebarWrapper";
@@ -13,10 +13,22 @@ type MobileLayoutClientProps = {
 export function MobileLayoutClient({ user }: MobileLayoutClientProps) {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const pathname = usePathname();
+  const prevPathnameRef = useRef(pathname);
+  const isMenuOpenRef = useRef(isMenuOpen);
+
+  // Keep ref in sync with state
+  useEffect(() => {
+    isMenuOpenRef.current = isMenuOpen;
+  }, [isMenuOpen]);
 
   // Close menu when route changes
+  // This is a valid use case: closing UI state when navigation occurs
   useEffect(() => {
-    setIsMenuOpen(false);
+    if (prevPathnameRef.current !== pathname && isMenuOpenRef.current) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
+      setIsMenuOpen(false);
+    }
+    prevPathnameRef.current = pathname;
   }, [pathname]);
 
   const toggleMenu = () => setIsMenuOpen((prev) => !prev);

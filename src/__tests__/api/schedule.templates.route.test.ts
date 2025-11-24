@@ -11,11 +11,6 @@ jest.mock("@/app/api/schedule/generate/route", () => ({
 
 const mockUser = { id: "user1", email: "test@example.com", name: "Test" };
 
-const makeGetRequest = () =>
-  new Request(
-    "http://localhost/api/schedule/templates",
-  ) as unknown as Parameters<typeof TemplatesRoute.GET>[0];
-
 const makePatchRequest = (body: object) =>
   new Request("http://localhost/api/schedule/templates/s1", {
     method: "PATCH",
@@ -36,7 +31,7 @@ describe("GET /api/schedule/templates", () => {
   it("returns 401 when no session cookie", async () => {
     jest.mocked(getSessionCookie).mockResolvedValueOnce(null);
 
-    const res = await TemplatesRoute.GET(makeGetRequest());
+    const res = await TemplatesRoute.GET();
     expect(res.status).toBe(401);
   });
 
@@ -44,7 +39,7 @@ describe("GET /api/schedule/templates", () => {
     jest.mocked(getSessionCookie).mockResolvedValueOnce("token");
     jest.mocked(verifySession).mockResolvedValueOnce(null);
 
-    const res = await TemplatesRoute.GET(makeGetRequest());
+    const res = await TemplatesRoute.GET();
     expect(res.status).toBe(401);
   });
 
@@ -71,7 +66,7 @@ describe("GET /api/schedule/templates", () => {
       },
     ]);
 
-    const res = await TemplatesRoute.GET(makeGetRequest());
+    const res = await TemplatesRoute.GET();
     expect(res.status).toBe(200);
     const json = await res.json();
     expect(json.items).toHaveLength(1);
@@ -90,7 +85,7 @@ describe("GET /api/schedule/templates", () => {
     jest.mocked(verifySession).mockResolvedValueOnce(mockUser);
     prismaMock.schedule.findMany.mockRejectedValueOnce(new Error("boom"));
 
-    const res = await TemplatesRoute.GET(makeGetRequest());
+    const res = await TemplatesRoute.GET();
     expect(res.status).toBe(500);
   });
 });

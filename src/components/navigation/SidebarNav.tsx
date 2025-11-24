@@ -106,26 +106,29 @@ const NAV_GROUPS: NavGroup[] = [
   },
 ];
 
+function computeMatchesPath(item: NavItem, path: string) {
+  const normalize = (value: string) =>
+    value === "/" ? value : value.replace(/\/$/, "");
+  const normalizedPath = normalize(path);
+  const normalizedTarget = normalize(item.href);
+  if (item.match === "startsWith") {
+    return (
+      normalizedPath === normalizedTarget ||
+      normalizedPath.startsWith(`${normalizedTarget}/`)
+    );
+  }
+  return normalizedPath === normalizedTarget;
+}
+
+function findActiveGroup(path: string) {
+  return NAV_GROUPS.find((group) =>
+    group.items.some((item) => computeMatchesPath(item, path)),
+  );
+}
+
 export function SidebarNav({ user, onClose }: SidebarNavProps) {
   const pathname = usePathname() ?? "/";
   const router = useRouter();
-  const computeMatchesPath = (item: NavItem, path: string) => {
-    const normalize = (value: string) =>
-      value === "/" ? value : value.replace(/\/$/, "");
-    const normalizedPath = normalize(path);
-    const normalizedTarget = normalize(item.href);
-    if (item.match === "startsWith") {
-      return (
-        normalizedPath === normalizedTarget ||
-        normalizedPath.startsWith(`${normalizedTarget}/`)
-      );
-    }
-    return normalizedPath === normalizedTarget;
-  };
-  const findActiveGroup = (path: string) =>
-    NAV_GROUPS.find((group) =>
-      group.items.some((item) => computeMatchesPath(item, path)),
-    );
 
   const activeGroupOnLoad = findActiveGroup(pathname);
   const [openGroups, setOpenGroups] = useState<Set<string>>(() => {
