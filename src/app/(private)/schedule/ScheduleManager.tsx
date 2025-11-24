@@ -48,11 +48,6 @@ function formatFrequency(days: number[]) {
     .join(", ");
 }
 
-function formatTimes(times: string[]) {
-  if (!times.length) return "—";
-  return times.join(", ");
-}
-
 function formatDose(schedule: ScheduleCardData) {
   const dose = schedule.medication?.dose
     ? `${schedule.medication.dose}mg`

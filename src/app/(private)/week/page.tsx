@@ -1,6 +1,5 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
-import clsx from "clsx";
 import { getCurrentUser } from "@/lib/auth/current-user";
 import styles from "./week.module.css";
 import { getScheduleEntries, type ScheduleEntryItem } from "@/lib/schedule";
@@ -87,7 +86,6 @@ export default async function WeekPage({ searchParams }: WeekPageProps) {
   const weekStart = weekDays[0];
   const weekEnd = weekDays[6];
   const weekRange = `${formatDate(weekStart, "MMM d")} - ${formatDate(weekEnd, "MMM d")}`;
-  const currentWeekParam = formatDate(weekStart, "yyyy-MM-dd");
 
   const prevWeekStart = new Date(weekStart);
   prevWeekStart.setDate(prevWeekStart.getDate() - 7);

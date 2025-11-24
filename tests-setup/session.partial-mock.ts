@@ -7,7 +7,7 @@ jest.mock("@/lib/auth/session", () => {
     return mockUser;
   });
 
-  const getSessionUserFromRequestMock = jest.fn(async (req: Request) => {
+  const getSessionUserFromRequestMock = jest.fn(async () => {
     return verifySessionMock("");
   });
 
