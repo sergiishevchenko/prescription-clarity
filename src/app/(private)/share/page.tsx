@@ -31,9 +31,8 @@ const INITIAL_ACCESS_LIST: ShareAccess[] = [
 ];
 
 export default function DataSharingPage() {
-  const [accessList, setAccessList] = useState<ShareAccess[]>(
-    INITIAL_ACCESS_LIST,
-  );
+  const [accessList, setAccessList] =
+    useState<ShareAccess[]>(INITIAL_ACCESS_LIST);
 
   const handleRevoke = (id: string) => {
     setAccessList((prev) =>
@@ -43,8 +42,9 @@ export default function DataSharingPage() {
     );
   };
 
-  const activeCount = accessList.filter((item) => item.status === "active")
-    .length;
+  const activeCount = accessList.filter(
+    (item) => item.status === "active",
+  ).length;
 
   return (
     <div className="min-h-[calc(100vh-4rem)] bg-gray-50">
@@ -65,7 +65,7 @@ export default function DataSharingPage() {
             </div>
             <button
               type="button"
-              className="inline-flex items-center gap-2 rounded-xl bg-indigo-600 px-4 py-2 text-sm font-semibold text-white shadow-sm hover:bg-indigo-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 focus-visible:ring-offset-2"
+              className="inline-flex items-center gap-2 rounded-xl bg-indigo-600 px-4 py-2 text-sm font-semibold text-white shadow-sm hover:bg-indigo-700 focus-visible:ring-2 focus-visible:ring-indigo-500 focus-visible:ring-offset-2 focus-visible:outline-none"
             >
               <span className="text-lg leading-none">＋</span>
               Invite
@@ -98,7 +98,7 @@ export default function DataSharingPage() {
                     <button
                       type="button"
                       onClick={() => handleRevoke(item.id)}
-                      className="inline-flex items-center gap-2 rounded-xl border border-red-200 px-4 py-2 text-sm font-semibold text-red-600 hover:bg-red-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-red-500 focus-visible:ring-offset-2"
+                      className="inline-flex items-center gap-2 rounded-xl border border-red-200 px-4 py-2 text-sm font-semibold text-red-600 hover:bg-red-50 focus-visible:ring-2 focus-visible:ring-red-500 focus-visible:ring-offset-2 focus-visible:outline-none"
                     >
                       <span className="text-base leading-none">🧍‍♂️</span>
                       Revoke
@@ -117,4 +117,3 @@ export default function DataSharingPage() {
     </div>
   );
 }
-
