@@ -14,11 +14,27 @@
   -webkit-overflow-scrolling: touch;
 }
 
+/* Mobile: sidebar is handled by MobileSidebarWrapper */
+@media (max-width: 768px) {
+  .sidebar {
+    position: static;
+    height: auto;
+    overflow: visible;
+  }
+}
+
 .main {
   flex: 1;
   min-height: 100vh;
   overflow-y: auto;
   -webkit-overflow-scrolling: touch;
+}
+
+/* Mobile: add top padding for mobile header */
+@media (max-width: 768px) {
+  .main {
+    padding-top: 64px;
+  }
 }
 
 .mainContent {

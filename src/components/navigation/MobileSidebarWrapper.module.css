@@ -1,0 +1,61 @@
+/* Overlay - Mobile Only */
+.overlay {
+  display: none;
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 999;
+  background-color: rgba(15, 23, 42, 0.5);
+  backdrop-filter: blur(4px);
+  animation: fadeIn 0.2s ease;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+/* Sidebar Wrapper - Mobile Drawer */
+.sidebarWrapper {
+  position: fixed;
+  top: 0;
+  right: 0;
+  height: 100vh;
+  z-index: 1000;
+  transform: translateX(100%);
+  transition: transform 0.3s ease;
+}
+
+.sidebarOpen {
+  transform: translateX(0);
+}
+
+/* Mobile Styles */
+@media (max-width: 768px) {
+  .overlay {
+    display: block;
+  }
+
+  .sidebarWrapper {
+    width: 320px;
+    max-width: 90vw;
+  }
+}
+
+/* Desktop Styles - Sidebar always visible */
+@media (min-width: 769px) {
+  .overlay {
+    display: none !important;
+  }
+
+  .sidebarWrapper {
+    position: relative;
+    transform: translateX(0) !important;
+  }
+}

@@ -1,5 +1,5 @@
 import type { ReactNode } from "react";
-import { SidebarNav } from "@/components/navigation/SidebarNav";
+import { MobileLayoutClient } from "@/components/navigation/MobileLayoutClient";
 import { getCurrentUser } from "@/lib/auth/current-user";
 import styles from "./layout.module.css";
 
@@ -15,7 +15,7 @@ export default async function PrivateLayout({
   return (
     <div className={styles.layout}>
       <div className={styles.sidebar}>
-        <SidebarNav user={currentUser} />
+        <MobileLayoutClient user={currentUser} />
       </div>
       <main className={styles.main}>
         <div className={styles.mainContent}>{children}</div>

@@ -30,6 +30,7 @@ type NavGroup = {
 
 type SidebarNavProps = {
   user: SessionUser | null;
+  onClose?: () => void;
 };
 
 const NAV_GROUPS: NavGroup[] = [
@@ -105,7 +106,7 @@ const NAV_GROUPS: NavGroup[] = [
   },
 ];
 
-export function SidebarNav({ user }: SidebarNavProps) {
+export function SidebarNav({ user, onClose }: SidebarNavProps) {
   const pathname = usePathname() ?? "/";
   const router = useRouter();
   const computeMatchesPath = (item: NavItem, path: string) => {
@@ -211,6 +212,16 @@ export function SidebarNav({ user }: SidebarNavProps) {
             <h1>Prescription</h1>
             <p>Clarity</p>
           </div>
+          {onClose && (
+            <button
+              type="button"
+              className={styles.closeButton}
+              onClick={onClose}
+              aria-label="Close menu"
+            >
+              <XIcon className={styles.closeIcon} />
+            </button>
+          )}
         </div>
       </div>
 
@@ -271,6 +282,7 @@ export function SidebarNav({ user }: SidebarNavProps) {
                             styles.navItem,
                             active && styles.navItemActive,
                           )}
+                          onClick={onClose}
                         >
                           {item.icon({ className: styles.navItemIcon })}
                           <span className={styles.navItemLabel}>
@@ -292,7 +304,10 @@ export function SidebarNav({ user }: SidebarNavProps) {
             <button
               type="button"
               className={styles.ctaButton}
-              onClick={handleAddMedication}
+              onClick={() => {
+                handleAddMedication();
+                onClose?.();
+              }}
             >
               <PlusIcon className={styles.navItemIcon} />
               Add Medication
@@ -537,6 +552,24 @@ function LogOutIcon({ className }: IconProps) {
       <path d="m16 17 5-5-5-5" />
       <path d="M21 12H9" />
       <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />
+    </svg>
+  );
+}
+
+function XIcon({ className }: IconProps) {
+  return (
+    <svg
+      className={className}
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth={2.5}
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      aria-hidden="true"
+    >
+      <path d="M18 6L6 18" />
+      <path d="M6 6l12 12" />
     </svg>
   );
 }
