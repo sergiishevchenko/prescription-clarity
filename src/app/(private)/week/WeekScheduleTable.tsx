@@ -74,10 +74,27 @@ export function WeekScheduleTable({
     return true;
   });
 
+  // Ensure deterministic ordering so UI never reshuffles after updates
+  const sortedEntries = filteredEntries.slice().sort((a, b) => {
+    const timeCompare = a.localDateTime.localeCompare(b.localDateTime);
+    if (timeCompare !== 0) {
+      return timeCompare;
+    }
+
+    const nameA = a.medication?.name ?? "";
+    const nameB = b.medication?.name ?? "";
+    const nameCompare = nameA.localeCompare(nameB);
+    if (nameCompare !== 0) {
+      return nameCompare;
+    }
+
+    return a.id.localeCompare(b.id);
+  });
+
   // Transform API response to week data format: Record<date, TimeSlot[]>
   const weekData: Record<string, TimeSlot[]> = {};
 
-  filteredEntries.forEach((entry) => {
+  sortedEntries.forEach((entry) => {
     const date = extractDateFromLocalDateTime(entry.localDateTime);
     const time = extractTimeFromLocalDateTime(entry.localDateTime);
 
