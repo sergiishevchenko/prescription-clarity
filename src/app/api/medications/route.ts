@@ -98,14 +98,24 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    const medicationData: Prisma.MedicationCreateInput = {
+      user: {
+        connect: { id: user.id },
+      },
+      name: validatedData.name,
+    };
+
+    if (validatedData.dose !== undefined) {
+      medicationData.dose = validatedData.dose;
+    }
+
+    if (validatedData.form !== undefined) {
+      medicationData.form = validatedData.form;
+    }
+
     // Create medication
     const medication = await prisma.medication.create({
-      data: {
-        userId: user.id,
-        name: validatedData.name,
-        dose: validatedData.dose ?? null,
-        form: validatedData.form ?? null,
-      },
+      data: medicationData,
       select: {
         id: true,
         name: true,

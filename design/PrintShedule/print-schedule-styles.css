@@ -4,7 +4,7 @@
     size: A4 portrait;
     margin: 0mm 6mm 5mm 6mm;
   }
-  
+
   /* ==================== HIDE UI ELEMENTS ==================== */
   nav,
   header,
@@ -17,9 +17,10 @@
     display: none !important;
     visibility: hidden !important;
   }
-  
+
   /* ==================== HTML & BODY ==================== */
-  html, body {
+  html,
+  body {
     width: 100%;
     height: 100%;
     background: white !important;
@@ -28,13 +29,13 @@
     color: #000 !important;
     overflow: hidden !important;
   }
-  
+
   body * {
     page-break-after: avoid !important;
     page-break-before: avoid !important;
     page-break-inside: avoid !important;
   }
-  
+
   /* ==================== MAIN CONTAINER ==================== */
   .print-container {
     width: 100% !important;
@@ -46,7 +47,7 @@
     display: flex !important;
     flex-direction: column !important;
   }
-  
+
   /* ==================== HEADER ==================== */
   .print-header {
     margin-bottom: 1mm !important;
@@ -58,7 +59,7 @@
     border-bottom: none !important;
     flex-shrink: 0 !important;
   }
-  
+
   .print-header-left h1 {
     font-size: 16pt !important;
     font-weight: bold !important;
@@ -67,19 +68,19 @@
     text-transform: uppercase !important;
     letter-spacing: 0.5px !important;
   }
-  
+
   .print-header-left img,
   .print-header-left svg {
     background: transparent !important;
     filter: none !important;
   }
-  
+
   .print-header-left p {
     font-size: 8pt !important;
     color: #000 !important;
     margin: 1mm 0 0 0 !important;
   }
-  
+
   .print-week-info {
     font-size: 11pt !important;
     font-weight: bold !important;
@@ -87,13 +88,13 @@
     margin: 0 !important;
     line-height: 1.3 !important;
   }
-  
+
   .print-date {
     font-size: 8pt !important;
     font-weight: normal !important;
     color: #000 !important;
   }
-  
+
   /* ==================== QR CODE ==================== */
   .print-qr-wrapper {
     display: block !important;
@@ -104,12 +105,12 @@
     background: white !important;
     flex-shrink: 0 !important;
   }
-  
+
   .print-qr-wrapper svg {
     width: 18mm !important;
     height: 18mm !important;
   }
-  
+
   /* ==================== TABLE WRAPPER ==================== */
   .print-table-wrapper {
     margin: 0 !important;
@@ -121,11 +122,21 @@
   }
 
   /* Hide outer borders for rounded corners */
-  .print-table tr:first-child th { border-top: none !important; }
-  .print-table tr:last-child td { border-bottom: none !important; }
-  .print-table th:first-child, .print-table td:first-child { border-left: none !important; }
-  .print-table th:last-child, .print-table td:last-child { border-right: none !important; }
-  
+  .print-table tr:first-child th {
+    border-top: none !important;
+  }
+  .print-table tr:last-child td {
+    border-bottom: none !important;
+  }
+  .print-table th:first-child,
+  .print-table td:first-child {
+    border-left: none !important;
+  }
+  .print-table th:last-child,
+  .print-table td:last-child {
+    border-right: none !important;
+  }
+
   /* ==================== TABLE ==================== */
   .print-table {
     width: 100% !important;
@@ -138,7 +149,7 @@
     border-radius: 0 !important;
     overflow: hidden !important;
   }
-  
+
   .print-table th {
     padding: 1.5mm !important;
     font-size: 11pt !important;
@@ -149,7 +160,7 @@
     text-align: center !important;
     white-space: nowrap !important;
   }
-  
+
   .print-table td {
     padding: 1mm !important;
     font-size: 9pt !important;
@@ -158,12 +169,12 @@
     vertical-align: top !important;
     line-height: 1.1 !important;
   }
-  
+
   /* ==================== TIME COLUMN ==================== */
   .print-table th.time-col {
     width: 14mm !important;
   }
-  
+
   .print-table td.time-col {
     font-weight: bold !important;
     background-color: #f0f0f0 !important;
@@ -172,7 +183,7 @@
     font-size: 12pt !important;
     border: 1px solid #000 !important;
   }
-  
+
   /* ==================== MEAL COLUMN ==================== */
   .print-table th.meal-col,
   .print-table td.meal-col {
@@ -182,19 +193,19 @@
     font-weight: bold !important;
     padding: 0 !important;
     vertical-align: middle !important;
-    font-family: 'Arial Unicode MS', 'Segoe UI Symbol', monospace !important;
+    font-family: "Arial Unicode MS", "Segoe UI Symbol", monospace !important;
     border: 1px solid #000 !important;
   }
-  
+
   .print-table th.meal-col {
     font-size: 14pt !important;
     line-height: 1.1 !important;
   }
-  
+
   .print-table td.meal-col {
     line-height: 1 !important;
   }
-  
+
   /* ==================== MEAL SYMBOLS ==================== */
   .meal-symbol {
     display: inline-flex !important;
@@ -208,38 +219,44 @@
     position: relative !important;
     font-size: 0 !important;
   }
-  
+
   .meal-symbol.before {
     background: white !important;
   }
-  
+
   .meal-symbol.with {
-    background: linear-gradient(90deg, #000 0%, #000 50%, white 50%, white 100%) !important;
+    background: linear-gradient(
+      90deg,
+      #000 0%,
+      #000 50%,
+      white 50%,
+      white 100%
+    ) !important;
   }
-  
+
   .meal-symbol.after {
     background: #000 !important;
   }
-  
+
   .meal-symbol.anytime {
     border-radius: 0 !important;
     background: #000 !important;
     height: 1.5px !important;
   }
-  
+
   /* ==================== MEDICATION ITEMS ==================== */
   .med-item {
     margin-bottom: 0.8mm !important;
     padding-bottom: 0.8mm !important;
     border-bottom: 1px dashed #000 !important;
   }
-  
+
   .med-item:last-child {
     margin-bottom: 0 !important;
     padding-bottom: 0 !important;
     border-bottom: none !important;
   }
-  
+
   .med-name {
     font-weight: 700 !important;
     font-size: 10pt !important;
@@ -252,7 +269,7 @@
     word-break: break-word !important;
     hyphens: auto !important;
   }
-  
+
   .med-details {
     font-size: 9pt !important;
     color: #333 !important;
@@ -260,7 +277,7 @@
     margin: 0.2mm 0 !important;
     line-height: 1.1 !important;
   }
-  
+
   .med-instruction {
     font-size: 10pt !important;
     font-weight: 700 !important;
@@ -271,7 +288,7 @@
     margin: 0.3mm 0 0 0 !important;
     line-height: 1.15 !important;
   }
-  
+
   /* ==================== CHECKBOXES ==================== */
   .med-checkbox-row {
     display: flex !important;
@@ -279,7 +296,7 @@
     gap: 1.5mm !important;
     margin-top: 1mm !important;
   }
-  
+
   input[type="checkbox"] {
     border: 1px solid #000 !important;
     width: 4.5mm !important;
@@ -292,17 +309,17 @@
     background: white !important;
     border-radius: 1px !important;
   }
-  
+
   input[type="checkbox"]:checked {
     background: #000 !important;
   }
-  
+
   .checkbox-label {
     font-size: 8pt !important;
     color: #000 !important;
     font-weight: 600 !important;
   }
-  
+
   /* ==================== FOOTER ==================== */
   .print-footer {
     margin-top: 1.5mm !important;
@@ -313,14 +330,14 @@
     color: #666 !important;
     flex-shrink: 0 !important;
   }
-  
+
   .print-doctor {
     display: inline !important;
     font-size: 8pt !important;
     color: #000 !important;
     margin-right: 5mm !important;
   }
-  
+
   /* ==================== LEGEND ==================== */
   .print-legend {
     margin-top: 2mm !important;
@@ -335,11 +352,11 @@
     flex-shrink: 0 !important;
     line-height: 1.4 !important;
   }
-  
+
   .print-legend strong {
     font-weight: bold !important;
   }
-  
+
   .legend-symbol {
     display: inline-flex !important;
     align-items: center !important;
@@ -354,26 +371,32 @@
     vertical-align: middle !important;
     margin: 0 1mm !important;
   }
-  
+
   .legend-symbol.before {
     background: white !important;
   }
-  
+
   .legend-symbol.with {
-    background: linear-gradient(90deg, #000 0%, #000 50%, white 50%, white 100%) !important;
+    background: linear-gradient(
+      90deg,
+      #000 0%,
+      #000 50%,
+      white 50%,
+      white 100%
+    ) !important;
   }
-  
+
   .legend-symbol.after {
     background: #000 !important;
   }
-  
+
   .legend-symbol.anytime {
     border-radius: 0 !important;
     background: #000 !important;
     height: 2px !important;
     width: 5mm !important;
   }
-  
+
   /* ==================== EMPTY CELLS ==================== */
   .empty-cell {
     background-color: #fafafa !important;
@@ -381,7 +404,7 @@
     text-align: center !important;
     font-size: 9pt !important;
   }
-  
+
   /* ==================== COLOR PRESERVATION ==================== */
   * {
     color-adjust: exact !important;
@@ -396,85 +419,85 @@
     size: A4 landscape;
     margin: 5mm 6mm 5mm 3mm;
   }
-  
+
   .print-header {
     margin-bottom: 2mm !important;
   }
-  
+
   .print-header-left h1 {
     font-size: 14pt !important;
   }
-  
+
   .print-header-left p {
     font-size: 7pt !important;
   }
-  
+
   .print-qr-wrapper {
     width: 18mm !important;
     height: 18mm !important;
   }
-  
+
   .print-qr-wrapper svg {
     width: 16mm !important;
     height: 16mm !important;
   }
-  
+
   .print-table {
     font-size: 10pt !important;
   }
-  
+
   .print-table th {
     font-size: 10pt !important;
     padding: 1mm !important;
   }
-  
+
   .print-table th.time-col {
     width: 10mm !important;
   }
-  
+
   .print-table td {
     font-size: 8pt !important;
     padding: 1mm !important;
   }
-  
+
   .print-table td.time-col {
     font-size: 9pt !important;
     padding: 1mm !important;
   }
-  
+
   .med-name {
     font-size: 10pt !important;
   }
-  
+
   .med-details {
     font-size: 9pt !important;
   }
-  
+
   .med-instruction {
     font-size: 10pt !important;
   }
-  
+
   input[type="checkbox"] {
     width: 4mm !important;
     height: 4mm !important;
     min-width: 4mm !important;
     min-height: 4mm !important;
   }
-  
+
   .checkbox-label {
     font-size: 7pt !important;
   }
-  
+
   .print-legend {
     font-size: 8pt !important;
     padding: 1mm 2mm !important;
   }
-  
+
   .print-footer {
     font-size: 7pt !important;
     padding: 1mm 0 !important;
   }
-  
+
   .print-doctor {
     font-size: 7pt !important;
   }
