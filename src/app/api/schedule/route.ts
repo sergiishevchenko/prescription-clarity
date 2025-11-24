@@ -72,7 +72,7 @@ export async function GET(request: NextRequest) {
           },
         },
       },
-      orderBy: { dateTime: "asc" },
+      orderBy: [{ dateTime: "asc" }, { id: "asc" }],
     });
 
     type EventWithRelations = Prisma.ScheduleEntryGetPayload<{
