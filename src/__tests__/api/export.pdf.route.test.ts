@@ -76,6 +76,7 @@ describe("POST /api/export/pdf", () => {
   });
 
   it("returns 404 when no schedule entries are found", async () => {
+    prismaMock.scheduleEntry.count.mockResolvedValueOnce(0);
     prismaMock.scheduleEntry.findMany.mockResolvedValueOnce([]);
 
     const res = await POST(
@@ -87,6 +88,7 @@ describe("POST /api/export/pdf", () => {
       }),
     );
 
+    expect(prismaMock.scheduleEntry.count).toHaveBeenCalled();
     expect(prismaMock.scheduleEntry.findMany).toHaveBeenCalled();
     expect(res.status).toBe(404);
     await expect(res.json()).resolves.toEqual(
@@ -97,6 +99,7 @@ describe("POST /api/export/pdf", () => {
   });
 
   it("returns PDF buffer when data exists", async () => {
+    prismaMock.scheduleEntry.count.mockResolvedValueOnce(1);
     prismaMock.scheduleEntry.findMany.mockResolvedValueOnce([
       {
         id: "entry-1",
@@ -111,6 +114,8 @@ describe("POST /api/export/pdf", () => {
           id: "med-1",
           name: "Ibuprofen",
           dose: 200,
+          form: "tablets",
+          deletedAt: null,
         },
         schedule: {
           quantity: 1,
@@ -156,6 +161,7 @@ describe("POST /api/export/pdf", () => {
   });
 
   it("returns 422 when PDF rendering times out", async () => {
+    prismaMock.scheduleEntry.count.mockResolvedValueOnce(1);
     prismaMock.scheduleEntry.findMany.mockResolvedValueOnce([
       {
         id: "entry-2",
@@ -170,6 +176,8 @@ describe("POST /api/export/pdf", () => {
           id: "med-1",
           name: "Ibuprofen",
           dose: 200,
+          form: "tablets",
+          deletedAt: null,
         },
         schedule: {
           quantity: 1,
