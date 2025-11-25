@@ -41,10 +41,7 @@ export async function POST(request: NextRequest) {
   }
 
   if (fromDate > toDate) {
-    return NextResponse.json(
-      { error: "Invalid date range" },
-      { status: 422 },
-    );
+    return NextResponse.json({ error: "Invalid date range" }, { status: 422 });
   }
 
   try {
@@ -69,7 +66,13 @@ export async function POST(request: NextRequest) {
       },
       include: {
         medication: {
-          select: { id: true, name: true, dose: true, form: true, deletedAt: true },
+          select: {
+            id: true,
+            name: true,
+            dose: true,
+            form: true,
+            deletedAt: true,
+          },
         },
         schedule: {
           select: {
@@ -91,7 +94,9 @@ export async function POST(request: NextRequest) {
 
     if (!validEntries.length) {
       const entriesWithoutMedicationId = totalCount - entries.length;
-      const entriesWithNullMedication = entries.filter((e) => e.medication === null).length;
+      const entriesWithNullMedication = entries.filter(
+        (e) => e.medication === null,
+      ).length;
       const entriesWithDeletedMedication = entries.filter(
         (e) => e.medication?.deletedAt !== null,
       ).length;
@@ -126,7 +131,9 @@ export async function POST(request: NextRequest) {
       generatedAt: new Date(),
     });
 
-    const pdfBuffer = await renderPdfBuffer(html, { timeoutMs: PDF_TIMEOUT_MS });
+    const pdfBuffer = await renderPdfBuffer(html, {
+      timeoutMs: PDF_TIMEOUT_MS,
+    });
     const headers = {
       "Content-Type": "application/pdf",
       "Content-Disposition": `attachment; filename="${buildFileName(fromDate, toDate)}"`,
@@ -134,7 +141,10 @@ export async function POST(request: NextRequest) {
       "Cache-Control": "no-store",
     };
 
-    return new NextResponse(new Uint8Array(pdfBuffer), { status: 200, headers });
+    return new NextResponse(new Uint8Array(pdfBuffer), {
+      status: 200,
+      headers,
+    });
   } catch (error) {
     if (error instanceof PdfTimeoutError) {
       return NextResponse.json(
@@ -157,10 +167,7 @@ async function parseRequest(request: NextRequest): Promise<ExportPdfInput> {
   return exportPdfSchema.parse(body);
 }
 
-function parseDateInput(
-  value: string,
-  options?: { endOfDay?: boolean },
-): Date {
+function parseDateInput(value: string, options?: { endOfDay?: boolean }): Date {
   const isDateOnly = /^\d{4}-\d{2}-\d{2}$/.test(value);
   const date = new Date(isDateOnly ? `${value}T00:00:00.000Z` : value);
   if (Number.isNaN(date.getTime())) {

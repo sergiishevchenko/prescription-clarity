@@ -233,4 +233,3 @@
     "performance": "PDF rendering uses Puppeteer and may take 5-20 seconds depending on data volume. Timeout is set to 20 seconds."
   }
 }
-

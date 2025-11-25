@@ -9,7 +9,13 @@ export type ScheduleEntryWithRelations = {
   status: "PLANNED" | "DONE";
   createdAt: Date;
   updatedAt: Date;
-  medication: { id: string; name: string; dose: number | null; form: string | null; deletedAt: Date | null } | null;
+  medication: {
+    id: string;
+    name: string;
+    dose: number | null;
+    form: string | null;
+    deletedAt: Date | null;
+  } | null;
   schedule: {
     quantity: number;
     units: string;
@@ -40,18 +46,19 @@ export function toPrintableEntries(
   });
 
   return uniqueEntries.map((entry) => {
-    const dose = entry.medication?.dose !== null && entry.medication?.dose !== undefined
-      ? `${entry.medication.dose}mg`
-      : "";
-    
+    const dose =
+      entry.medication?.dose !== null && entry.medication?.dose !== undefined
+        ? `${entry.medication.dose}mg`
+        : "";
+
     const form = entry.medication?.form || entry.schedule?.units || "";
-    
-    const medicationName = entry.medication?.name 
+
+    const medicationName = entry.medication?.name
       ? entry.medication.name
-      : entry.medicationId 
+      : entry.medicationId
         ? `Medication ${entry.medicationId}`
         : "Unknown Medication";
-    
+
     return {
       dateUtc: entry.dateTime,
       mealTiming: normalizeMealTiming(entry.schedule?.mealTiming),

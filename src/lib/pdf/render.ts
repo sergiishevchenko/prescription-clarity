@@ -33,10 +33,10 @@ export async function renderPdfBuffer(
 ): Promise<Buffer> {
   const timeoutMs = options?.timeoutMs ?? DEFAULT_TIMEOUT_MS;
   const launchArgs =
-    process.env.CHROMIUM_ARGS?.split(" ").filter(Boolean) ?? DEFAULT_LAUNCH_ARGS;
+    process.env.CHROMIUM_ARGS?.split(" ").filter(Boolean) ??
+    DEFAULT_LAUNCH_ARGS;
 
-  const executablePath =
-    process.env.PUPPETEER_EXECUTABLE_PATH || undefined;
+  const executablePath = process.env.PUPPETEER_EXECUTABLE_PATH || undefined;
 
   const browser = await puppeteer.launch({
     headless: true,
@@ -64,10 +64,7 @@ export async function renderPdfBuffer(
 async function withTimeout<T>(promise: Promise<T>, timeoutMs: number) {
   let timeoutHandle: NodeJS.Timeout;
   const timeoutPromise = new Promise<never>((_, reject) => {
-    timeoutHandle = setTimeout(
-      () => reject(new PdfTimeoutError()),
-      timeoutMs,
-    );
+    timeoutHandle = setTimeout(() => reject(new PdfTimeoutError()), timeoutMs);
   });
   try {
     return await Promise.race([promise, timeoutPromise]);

@@ -112,9 +112,9 @@ function buildRow(row: PrintableRow): string {
   const mealTimings = row.cells
     .map((cell) => cell.mealTiming)
     .filter((mt): mt is MealTiming => mt !== null);
-  
+
   const rowMealTiming = resolveMealTiming(mealTimings);
-  
+
   return `<tr>
     <td class="time-col">${escapeHtml(row.timeLabel)}</td>
     <td class="meal-col">
@@ -126,11 +126,11 @@ function buildRow(row: PrintableRow): string {
 
 function resolveMealTiming(timings: MealTiming[]): MealTiming {
   if (timings.length === 0) return "anytime";
-  
+
   if (timings.includes("before")) return "before";
   if (timings.includes("with")) return "with";
   if (timings.includes("after")) return "after";
-  
+
   return timings[0] ?? "anytime";
 }
 
@@ -141,18 +141,17 @@ function buildCell(cell: PrintableCell): string {
 
   return `<td>
     ${cell.entries
-      .map(
-        (entry) => {
-          const detailsParts: string[] = [];
-          if (entry.dose) {
-            detailsParts.push(entry.dose);
-          }
-          if (entry.form) {
-            detailsParts.push(entry.form);
-          }
-          const details = detailsParts.length > 0 ? detailsParts.join(" • ") : "";
-          
-          return `<div class="med-item">
+      .map((entry) => {
+        const detailsParts: string[] = [];
+        if (entry.dose) {
+          detailsParts.push(entry.dose);
+        }
+        if (entry.form) {
+          detailsParts.push(entry.form);
+        }
+        const details = detailsParts.length > 0 ? detailsParts.join(" • ") : "";
+
+        return `<div class="med-item">
             <span class="med-name">${escapeHtml(entry.medicationName)}</span>
             ${details ? `<span class="med-details">${escapeHtml(details)}</span>` : ""}
             <div class="med-checkbox-row">
@@ -160,8 +159,7 @@ function buildCell(cell: PrintableCell): string {
               <span class="checkbox-label">DONE</span>
             </div>
           </div>`;
-        },
-      )
+      })
       .join("")}
   </td>`;
 }
@@ -171,7 +169,8 @@ function buildLegend(): string {
     <strong>Meal Timing:</strong>
     ${(["before", "with", "after", "anytime"] as MealTiming[])
       .map(
-        (type) => `<span class="legend-symbol ${type}"></span> ${MEAL_LABELS[type]}`,
+        (type) =>
+          `<span class="legend-symbol ${type}"></span> ${MEAL_LABELS[type]}`,
       )
       .join(" ")}
   </div>`;
@@ -220,7 +219,7 @@ function buildWeeks(
   const oneDayMs = 24 * 60 * 60 * 1000;
   const allDays: PrintableDay[] = [];
   const seen = new Set<string>();
-  
+
   for (
     let cursor = from.getTime();
     cursor <= to.getTime();
@@ -270,7 +269,14 @@ function buildRowsForWeek(
   const daysByKey = new Map(days.map((day) => [day.key, day]));
   const grouped = new Map<
     string,
-    Map<string, Array<{ entry: ScheduleEntryPrintable; printable: PrintableCellEntry; mealTiming: MealTiming }>>
+    Map<
+      string,
+      Array<{
+        entry: ScheduleEntryPrintable;
+        printable: PrintableCellEntry;
+        mealTiming: MealTiming;
+      }>
+    >
   >();
 
   for (const entry of entries) {
@@ -289,10 +295,18 @@ function buildRowsForWeek(
       grouped.get(timeLabel) ??
       new Map<
         string,
-        Array<{ entry: ScheduleEntryPrintable; printable: PrintableCellEntry; mealTiming: MealTiming }>
+        Array<{
+          entry: ScheduleEntryPrintable;
+          printable: PrintableCellEntry;
+          mealTiming: MealTiming;
+        }>
       >();
     const cellEntries = timeGroup.get(dayKey) ?? [];
-    cellEntries.push({ entry, printable: cellEntry, mealTiming: entry.mealTiming });
+    cellEntries.push({
+      entry,
+      printable: cellEntry,
+      mealTiming: entry.mealTiming,
+    });
     timeGroup.set(dayKey, cellEntries);
     grouped.set(timeLabel, timeGroup);
   }
@@ -307,7 +321,7 @@ function buildRowsForWeek(
       timeLabel,
       cells: days.map((day) => {
         const dayEntries = timeGroup.get(day.key) ?? [];
-        
+
         const seenMedications = new Set<string>();
         const uniqueEntries = dayEntries.filter((item) => {
           const key = `${item.printable.medicationName}-${item.printable.dose}-${item.printable.form}`;
@@ -317,8 +331,9 @@ function buildRowsForWeek(
           seenMedications.add(key);
           return true;
         });
-        
-        const cellMealTiming = uniqueEntries.length > 0 ? uniqueEntries[0].mealTiming : null;
+
+        const cellMealTiming =
+          uniqueEntries.length > 0 ? uniqueEntries[0].mealTiming : null;
         return {
           entries: uniqueEntries.map((item) => item.printable),
           mealTiming: cellMealTiming,
