@@ -26,6 +26,8 @@ services:
     environment:
       DATABASE_URL: postgresql://postgres:postgres@db:5432/goit?schema=public
       NEXT_PUBLIC_APP_URL: http://localhost:3000
+      PUPPETEER_SKIP_CHROMIUM_DOWNLOAD: "true"
+      PUPPETEER_EXECUTABLE_PATH: "/usr/bin/chromium-browser"
     ports:
       - "3000:3000"
     volumes:
