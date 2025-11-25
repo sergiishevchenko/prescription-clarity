@@ -1,0 +1,235 @@
+{
+  "info": {
+    "name": "Export PDF API Test Data",
+    "description": "Test data for PDF export API endpoint"
+  },
+  "requests": [
+    {
+      "name": "1. POST /api/export/pdf - Export one week schedule (UTC)",
+      "method": "POST",
+      "url": "http://localhost:3000/api/export/pdf",
+      "headers": {
+        "Content-Type": "application/json",
+        "Cookie": "SESSION_ID=your_session_token_here"
+      },
+      "body": {
+        "userId": "your_user_id_here",
+        "from": "2025-01-01",
+        "to": "2025-01-07",
+        "tz": "UTC"
+      },
+      "note": "Exports schedule for one week. Response is PDF file. Save response as file to view."
+    },
+    {
+      "name": "2. POST /api/export/pdf - Export with custom timezone (Europe/Kyiv)",
+      "method": "POST",
+      "url": "http://localhost:3000/api/export/pdf",
+      "headers": {
+        "Content-Type": "application/json",
+        "Cookie": "SESSION_ID=your_session_token_here"
+      },
+      "body": {
+        "userId": "your_user_id_here",
+        "from": "2025-02-10",
+        "to": "2025-02-16",
+        "tz": "Europe/Kyiv"
+      },
+      "note": "Exports schedule with Kyiv timezone. Dates and times will be displayed in local time."
+    },
+    {
+      "name": "3. POST /api/export/pdf - Export with ISO timestamps",
+      "method": "POST",
+      "url": "http://localhost:3000/api/export/pdf",
+      "headers": {
+        "Content-Type": "application/json",
+        "Cookie": "SESSION_ID=your_session_token_here"
+      },
+      "body": {
+        "userId": "your_user_id_here",
+        "from": "2025-03-01T00:00:00.000Z",
+        "to": "2025-03-03T23:59:59.000Z",
+        "tz": "UTC"
+      },
+      "note": "Exports schedule using full ISO timestamp format. Useful for precise time ranges."
+    },
+    {
+      "name": "4. POST /api/export/pdf - Export two weeks schedule",
+      "method": "POST",
+      "url": "http://localhost:3000/api/export/pdf",
+      "headers": {
+        "Content-Type": "application/json",
+        "Cookie": "SESSION_ID=your_session_token_here"
+      },
+      "body": {
+        "userId": "your_user_id_here",
+        "from": "2025-01-01",
+        "to": "2025-01-14",
+        "tz": "UTC"
+      },
+      "note": "Exports schedule for two weeks. May generate multiple pages in PDF."
+    },
+    {
+      "name": "5. POST /api/export/pdf - Export single day",
+      "method": "POST",
+      "url": "http://localhost:3000/api/export/pdf",
+      "headers": {
+        "Content-Type": "application/json",
+        "Cookie": "SESSION_ID=your_session_token_here"
+      },
+      "body": {
+        "userId": "your_user_id_here",
+        "from": "2025-01-15",
+        "to": "2025-01-15",
+        "tz": "UTC"
+      },
+      "note": "Exports schedule for a single day. Useful for daily medication tracking."
+    },
+    {
+      "name": "6. POST /api/export/pdf - Export with America/New_York timezone",
+      "method": "POST",
+      "url": "http://localhost:3000/api/export/pdf",
+      "headers": {
+        "Content-Type": "application/json",
+        "Cookie": "SESSION_ID=your_session_token_here"
+      },
+      "body": {
+        "userId": "your_user_id_here",
+        "from": "2025-04-01",
+        "to": "2025-04-07",
+        "tz": "America/New_York"
+      },
+      "note": "Exports schedule with EST/EDT timezone. Demonstrates timezone conversion."
+    },
+    {
+      "name": "7. POST /api/export/pdf - Validation error: missing 'to' field",
+      "method": "POST",
+      "url": "http://localhost:3000/api/export/pdf",
+      "headers": {
+        "Content-Type": "application/json",
+        "Cookie": "SESSION_ID=your_session_token_here"
+      },
+      "body": {
+        "userId": "your_user_id_here",
+        "from": "2025-01-01",
+        "tz": "UTC"
+      },
+      "expectedStatus": 400,
+      "note": "Should return 400 Bad Request - missing required 'to' field"
+    },
+    {
+      "name": "8. POST /api/export/pdf - Validation error: missing 'from' field",
+      "method": "POST",
+      "url": "http://localhost:3000/api/export/pdf",
+      "headers": {
+        "Content-Type": "application/json",
+        "Cookie": "SESSION_ID=your_session_token_here"
+      },
+      "body": {
+        "userId": "your_user_id_here",
+        "to": "2025-01-07",
+        "tz": "UTC"
+      },
+      "expectedStatus": 400,
+      "note": "Should return 400 Bad Request - missing required 'from' field"
+    },
+    {
+      "name": "9. POST /api/export/pdf - Validation error: invalid date range",
+      "method": "POST",
+      "url": "http://localhost:3000/api/export/pdf",
+      "headers": {
+        "Content-Type": "application/json",
+        "Cookie": "SESSION_ID=your_session_token_here"
+      },
+      "body": {
+        "userId": "your_user_id_here",
+        "from": "2025-01-05",
+        "to": "2025-01-02",
+        "tz": "UTC"
+      },
+      "expectedStatus": 422,
+      "note": "Should return 422 Unprocessable Entity - 'from' date is after 'to' date"
+    },
+    {
+      "name": "10. POST /api/export/pdf - Forbidden: userId mismatch",
+      "method": "POST",
+      "url": "http://localhost:3000/api/export/pdf",
+      "headers": {
+        "Content-Type": "application/json",
+        "Cookie": "SESSION_ID=your_session_token_here"
+      },
+      "body": {
+        "userId": "different_user_id",
+        "from": "2025-01-01",
+        "to": "2025-01-07",
+        "tz": "UTC"
+      },
+      "expectedStatus": 403,
+      "note": "Should return 403 Forbidden - userId in request doesn't match authenticated user"
+    },
+    {
+      "name": "11. POST /api/export/pdf - Not found: no schedule entries",
+      "method": "POST",
+      "url": "http://localhost:3000/api/export/pdf",
+      "headers": {
+        "Content-Type": "application/json",
+        "Cookie": "SESSION_ID=your_session_token_here"
+      },
+      "body": {
+        "userId": "your_user_id_here",
+        "from": "2099-01-01",
+        "to": "2099-01-02",
+        "tz": "UTC"
+      },
+      "expectedStatus": 404,
+      "note": "Should return 404 Not Found - no schedule entries exist for the selected date range"
+    },
+    {
+      "name": "12. POST /api/export/pdf - Unauthorized: no session cookie",
+      "method": "POST",
+      "url": "http://localhost:3000/api/export/pdf",
+      "headers": {
+        "Content-Type": "application/json"
+      },
+      "body": {
+        "userId": "your_user_id_here",
+        "from": "2025-01-01",
+        "to": "2025-01-07",
+        "tz": "UTC"
+      },
+      "expectedStatus": 401,
+      "note": "Should return 401 Unauthorized - missing or invalid session cookie"
+    }
+  ],
+  "fieldReference": {
+    "userId": "String, required. User ID (must match authenticated user). Format: cuid (32 chars)",
+    "from": "String, required. Start date. Format: YYYY-MM-DD or ISO 8601 timestamp (e.g., '2025-01-01' or '2025-01-01T00:00:00.000Z')",
+    "to": "String, required. End date (inclusive). Format: YYYY-MM-DD or ISO 8601 timestamp (e.g., '2025-01-07' or '2025-01-07T23:59:59.000Z')",
+    "tz": "String, required. IANA timezone identifier (e.g., 'UTC', 'Europe/Kyiv', 'America/New_York'). Used for date/time display in PDF",
+    "authentication": "First login via POST /api/auth/login and use the SESSION_ID cookie value in Cookie header",
+    "response": "Success (200): application/pdf file. Error responses: JSON with 'error' field"
+  },
+  "exampleResponse": {
+    "success": {
+      "status": 200,
+      "headers": {
+        "Content-Type": "application/pdf",
+        "Content-Disposition": "attachment; filename=\"schedule-2025-01-01-2025-01-07.pdf\"",
+        "Content-Length": "123456"
+      },
+      "body": "Binary PDF file - save response as file to view"
+    },
+    "error": {
+      "status": 422,
+      "body": {
+        "error": "Invalid date range"
+      }
+    }
+  },
+  "testingNotes": {
+    "pdfViewing": "In Postman, click 'Save Response' button and save as .pdf file to view the generated schedule",
+    "timezoneTesting": "Test with different timezones to verify date/time conversion. Common timezones: UTC, Europe/Kyiv, America/New_York, Asia/Tokyo",
+    "dateRangeTesting": "Test various ranges: single day, one week, two weeks, one month. Large ranges may take longer to render.",
+    "errorHandling": "All error responses return JSON with 'error' field. Check status codes: 400 (validation), 401 (unauthorized), 403 (forbidden), 404 (no data), 422 (unprocessable), 500 (server error)",
+    "performance": "PDF rendering uses Puppeteer and may take 5-20 seconds depending on data volume. Timeout is set to 20 seconds."
+  }
+}
