@@ -12,7 +12,13 @@ const DEFAULT_PDF_OPTIONS = {
   },
 };
 
-const DEFAULT_LAUNCH_ARGS = ["--no-sandbox", "--disable-setuid-sandbox"];
+const DEFAULT_LAUNCH_ARGS = [
+  "--no-sandbox",
+  "--disable-setuid-sandbox",
+  "--disable-dev-shm-usage",
+  "--disable-accelerated-2d-canvas",
+  "--disable-gpu",
+];
 
 export class PdfTimeoutError extends Error {
   constructor(message = "PDF rendering timed out") {
@@ -29,8 +35,12 @@ export async function renderPdfBuffer(
   const launchArgs =
     process.env.CHROMIUM_ARGS?.split(" ").filter(Boolean) ?? DEFAULT_LAUNCH_ARGS;
 
+  const executablePath =
+    process.env.PUPPETEER_EXECUTABLE_PATH || undefined;
+
   const browser = await puppeteer.launch({
     headless: true,
+    executablePath,
     args: launchArgs,
   });
   const page = await browser.newPage();

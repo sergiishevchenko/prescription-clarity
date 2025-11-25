@@ -18,20 +18,23 @@ interface PrintableDay {
 
 interface PrintableCellEntry {
   medicationName: string;
-  medDetails: string;
-  quantityLabel: string;
-  mealLabel: string;
-  statusLabel: string;
+  dose: string;
+  form: string;
 }
 
 interface PrintableCell {
   entries: PrintableCellEntry[];
+  mealTiming: MealTiming | null;
 }
 
 interface PrintableRow {
   timeLabel: string;
-  mealTiming: MealTiming;
   cells: PrintableCell[];
+}
+
+interface PrintableWeek {
+  days: PrintableDay[];
+  rows: PrintableRow[];
 }
 
 const MEAL_LABELS: Record<MealTiming, string> = {
@@ -46,8 +49,7 @@ const DISPLAY_TITLE = "Weekly Medication Schedule";
 export function buildScheduleHtml(options: BuildScheduleHtmlOptions): string {
   const { entries, tz, from, to, userName, rangeLabel, generatedAt } = options;
 
-  const days = buildDays(from, to, tz);
-  const rows = buildRows(entries, days, tz);
+  const weeks = buildWeeks(from, to, tz, entries);
   const documentTitle = `${DISPLAY_TITLE} • ${rangeLabel}`;
   const generatedLabel = formatGeneratedAt(generatedAt, tz);
 
@@ -72,20 +74,7 @@ export function buildScheduleHtml(options: BuildScheduleHtmlOptions): string {
           ${buildQrPlaceholder()}
         </div>
       </div>
-      <div class="print-table-wrapper">
-        <table class="print-table">
-          <thead>
-            <tr>
-              <th class="time-col">Time</th>
-              <th class="meal-col">🍽️</th>
-              ${days.map((day) => `<th>${escapeHtml(day.label)}</th>`).join("")}
-            </tr>
-          </thead>
-          <tbody>
-            ${rows.map((row) => buildRow(row)).join("")}
-          </tbody>
-        </table>
-      </div>
+      ${weeks.map((week, weekIndex) => buildWeekTable(week, weekIndex === 0)).join("")}
       ${buildLegend()}
       <div class="print-footer">
         Generated ${escapeHtml(generatedLabel)} • Prescription Clarity
@@ -95,14 +84,54 @@ export function buildScheduleHtml(options: BuildScheduleHtmlOptions): string {
 </html>`;
 }
 
+function buildWeekTable(week: PrintableWeek, isFirst: boolean): string {
+  return `<div class="print-table-wrapper">
+    <table class="print-table">
+      <thead>
+        <tr>
+          <th class="time-col">Time</th>
+          <th class="meal-col">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" stroke-width="1.5">
+              <path d="M3 2v7c0 1.1.9 2 2 2h4a2 2 0 0 0 2-2V2H3z"/>
+              <path d="M7 2v20"/>
+              <path d="M21 15V2v0a5 5 0 0 0-5 5v6c0 1.1.9 2 2 2h3v0"/>
+              <path d="M21 15c0 2.5-2 4.5-4.5 4.5S12 17.5 12 15"/>
+            </svg>
+          </th>
+          ${week.days.map((day) => `<th>${escapeHtml(day.label)}</th>`).join("")}
+        </tr>
+      </thead>
+      <tbody>
+        ${week.rows.map((row) => buildRow(row)).join("")}
+      </tbody>
+    </table>
+  </div>`;
+}
+
 function buildRow(row: PrintableRow): string {
+  const mealTimings = row.cells
+    .map((cell) => cell.mealTiming)
+    .filter((mt): mt is MealTiming => mt !== null);
+  
+  const rowMealTiming = resolveMealTiming(mealTimings);
+  
   return `<tr>
     <td class="time-col">${escapeHtml(row.timeLabel)}</td>
     <td class="meal-col">
-      <span class="meal-symbol ${row.mealTiming}"></span>
+      <span class="meal-symbol ${rowMealTiming}"></span>
     </td>
     ${row.cells.map((cell) => buildCell(cell)).join("")}
   </tr>`;
+}
+
+function resolveMealTiming(timings: MealTiming[]): MealTiming {
+  if (timings.length === 0) return "anytime";
+  
+  if (timings.includes("before")) return "before";
+  if (timings.includes("with")) return "with";
+  if (timings.includes("after")) return "after";
+  
+  return timings[0] ?? "anytime";
 }
 
 function buildCell(cell: PrintableCell): string {
@@ -113,18 +142,25 @@ function buildCell(cell: PrintableCell): string {
   return `<td>
     ${cell.entries
       .map(
-        (entry) => `<div class="med-item">
-          <span class="med-name">${escapeHtml(entry.medicationName)}</span>
-          <span class="med-details">${escapeHtml(entry.medDetails)}</span>
-          <div class="med-instruction">
-            <span>${escapeHtml(entry.quantityLabel)}</span>
-            <span>${escapeHtml(entry.mealLabel)}</span>
-          </div>
-          <div class="med-checkbox-row">
-            <input type="checkbox" />
-            <span class="checkbox-label">${escapeHtml(entry.statusLabel)}</span>
-          </div>
-        </div>`,
+        (entry) => {
+          const detailsParts: string[] = [];
+          if (entry.dose) {
+            detailsParts.push(entry.dose);
+          }
+          if (entry.form) {
+            detailsParts.push(entry.form);
+          }
+          const details = detailsParts.length > 0 ? detailsParts.join(" • ") : "";
+          
+          return `<div class="med-item">
+            <span class="med-name">${escapeHtml(entry.medicationName)}</span>
+            ${details ? `<span class="med-details">${escapeHtml(details)}</span>` : ""}
+            <div class="med-checkbox-row">
+              <input type="checkbox" />
+              <span class="checkbox-label">DONE</span>
+            </div>
+          </div>`;
+        },
       )
       .join("")}
   </td>`;
@@ -132,14 +168,12 @@ function buildCell(cell: PrintableCell): string {
 
 function buildLegend(): string {
   return `<div class="print-legend">
+    <strong>Meal Timing:</strong>
     ${(["before", "with", "after", "anytime"] as MealTiming[])
       .map(
-        (type) => `<div class="legend-item">
-        <span class="meal-symbol legend-symbol ${type}"></span>
-        <span>${MEAL_LABELS[type]}</span>
-      </div>`,
+        (type) => `<span class="legend-symbol ${type}"></span> ${MEAL_LABELS[type]}`,
       )
-      .join("")}
+      .join(" ")}
   </div>`;
 }
 
@@ -164,7 +198,12 @@ function buildQrPlaceholder(): string {
   return `<svg width="64" height="64" viewBox="0 0 24 24">${cells.join("")}</svg>`;
 }
 
-function buildDays(from: Date, to: Date, tz: string): PrintableDay[] {
+function buildWeeks(
+  from: Date,
+  to: Date,
+  tz: string,
+  entries: ScheduleEntryPrintable[],
+): PrintableWeek[] {
   const dayFormatter = new Intl.DateTimeFormat("en-US", {
     timeZone: tz,
     weekday: "short",
@@ -179,26 +218,38 @@ function buildDays(from: Date, to: Date, tz: string): PrintableDay[] {
   });
 
   const oneDayMs = 24 * 60 * 60 * 1000;
-  const days: PrintableDay[] = [];
+  const allDays: PrintableDay[] = [];
   const seen = new Set<string>();
+  
   for (
     let cursor = from.getTime();
-    cursor <= to.getTime() + oneDayMs;
+    cursor <= to.getTime();
     cursor += oneDayMs
   ) {
     const date = new Date(cursor);
     const key = keyFormatter.format(date);
     if (seen.has(key)) continue;
     seen.add(key);
-    days.push({
+    allDays.push({
       key,
       label: dayFormatter.format(date),
     });
   }
-  return days;
+
+  const weeks: PrintableWeek[] = [];
+  for (let i = 0; i < allDays.length; i += 7) {
+    const weekDays = allDays.slice(i, i + 7);
+    const weekRows = buildRowsForWeek(entries, weekDays, tz);
+    weeks.push({
+      days: weekDays,
+      rows: weekRows,
+    });
+  }
+
+  return weeks;
 }
 
-function buildRows(
+function buildRowsForWeek(
   entries: ScheduleEntryPrintable[],
   days: PrintableDay[],
   tz: string,
@@ -210,7 +261,7 @@ function buildRows(
     day: "2-digit",
   });
   const timeFormatter = new Intl.DateTimeFormat("en-GB", {
-    timeZone: tz,
+    timeZone: "UTC",
     hour: "2-digit",
     minute: "2-digit",
     hour12: false,
@@ -219,7 +270,7 @@ function buildRows(
   const daysByKey = new Map(days.map((day) => [day.key, day]));
   const grouped = new Map<
     string,
-    Map<string, Array<{ entry: ScheduleEntryPrintable; printable: PrintableCellEntry }>>
+    Map<string, Array<{ entry: ScheduleEntryPrintable; printable: PrintableCellEntry; mealTiming: MealTiming }>>
   >();
 
   for (const entry of entries) {
@@ -230,20 +281,18 @@ function buildRows(
     const timeLabel = timeFormatter.format(entry.dateUtc);
     const cellEntry: PrintableCellEntry = {
       medicationName: entry.medicationName,
-      medDetails: entry.medDetails,
-      quantityLabel: entry.quantityLabel,
-      mealLabel: MEAL_LABELS[entry.mealTiming],
-      statusLabel: entry.statusLabel,
+      dose: entry.dose,
+      form: entry.form,
     };
 
     const timeGroup =
       grouped.get(timeLabel) ??
       new Map<
         string,
-        Array<{ entry: ScheduleEntryPrintable; printable: PrintableCellEntry }>
+        Array<{ entry: ScheduleEntryPrintable; printable: PrintableCellEntry; mealTiming: MealTiming }>
       >();
     const cellEntries = timeGroup.get(dayKey) ?? [];
-    cellEntries.push({ entry, printable: cellEntry });
+    cellEntries.push({ entry, printable: cellEntry, mealTiming: entry.mealTiming });
     timeGroup.set(dayKey, cellEntries);
     grouped.set(timeLabel, timeGroup);
   }
@@ -254,33 +303,29 @@ function buildRows(
 
   return sortedTimes.map((timeLabel) => {
     const timeGroup = grouped.get(timeLabel)!;
-    const flatEntries = Array.from(timeGroup.values()).flat();
-    const mealTiming = resolveRowMealTiming(flatEntries.map((item) => item.entry));
     return {
       timeLabel,
-      mealTiming,
-      cells: days.map((day) => ({
-        entries:
-          (timeGroup.get(day.key)?.map((item) => item.printable) as
-            | PrintableCellEntry[]
-            | undefined) ?? [],
-      })),
+      cells: days.map((day) => {
+        const dayEntries = timeGroup.get(day.key) ?? [];
+        
+        const seenMedications = new Set<string>();
+        const uniqueEntries = dayEntries.filter((item) => {
+          const key = `${item.printable.medicationName}-${item.printable.dose}-${item.printable.form}`;
+          if (seenMedications.has(key)) {
+            return false;
+          }
+          seenMedications.add(key);
+          return true;
+        });
+        
+        const cellMealTiming = uniqueEntries.length > 0 ? uniqueEntries[0].mealTiming : null;
+        return {
+          entries: uniqueEntries.map((item) => item.printable),
+          mealTiming: cellMealTiming,
+        };
+      }),
     };
   });
-}
-
-function resolveRowMealTiming(entries: ScheduleEntryPrintable[]): MealTiming {
-  const distinct = new Set(entries.map((entry) => entry.mealTiming));
-  if (distinct.size === 1) {
-    return entries[0]?.mealTiming ?? "anytime";
-  }
-  if (!entries.length) {
-    return "anytime";
-  }
-  if (distinct.has("before")) return "before";
-  if (distinct.has("with")) return "with";
-  if (distinct.has("after")) return "after";
-  return "anytime";
 }
 
 function formatGeneratedAt(date: Date, tz: string): string {

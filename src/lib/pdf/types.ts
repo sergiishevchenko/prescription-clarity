@@ -9,7 +9,7 @@ export type ScheduleEntryWithRelations = {
   status: "PLANNED" | "DONE";
   createdAt: Date;
   updatedAt: Date;
-  medication: { id: string; name: string; dose: number | null } | null;
+  medication: { id: string; name: string; dose: number | null; form: string | null; deletedAt: Date | null } | null;
   schedule: {
     quantity: number;
     units: string;
@@ -21,9 +21,8 @@ export interface ScheduleEntryPrintable {
   dateUtc: Date;
   mealTiming: MealTiming;
   medicationName: string;
-  medDetails: string;
-  quantityLabel: string;
-  statusLabel: string;
+  dose: string;
+  form: string;
 }
 
 const DEFAULT_UNITS = "unit";
@@ -31,20 +30,34 @@ const DEFAULT_UNITS = "unit";
 export function toPrintableEntries(
   entries: ScheduleEntryWithRelations[],
 ): ScheduleEntryPrintable[] {
-  return entries.map((entry) => {
-    const quantity = entry.schedule?.quantity ?? 1;
-    const units = entry.schedule?.units ?? DEFAULT_UNITS;
-    const dose =
-      entry.medication?.dose !== null && entry.medication?.dose !== undefined
-        ? `${entry.medication?.dose} mg`
-        : "No dose set";
+  const seen = new Set<string>();
+  const uniqueEntries = entries.filter((entry) => {
+    if (seen.has(entry.id)) {
+      return false;
+    }
+    seen.add(entry.id);
+    return true;
+  });
+
+  return uniqueEntries.map((entry) => {
+    const dose = entry.medication?.dose !== null && entry.medication?.dose !== undefined
+      ? `${entry.medication.dose}mg`
+      : "";
+    
+    const form = entry.medication?.form || entry.schedule?.units || "";
+    
+    const medicationName = entry.medication?.name 
+      ? entry.medication.name
+      : entry.medicationId 
+        ? `Medication ${entry.medicationId}`
+        : "Unknown Medication";
+    
     return {
       dateUtc: entry.dateTime,
       mealTiming: normalizeMealTiming(entry.schedule?.mealTiming),
-      medicationName: entry.medication?.name ?? "Medication",
-      medDetails: dose,
-      quantityLabel: `${quantity} ${units}`,
-      statusLabel: entry.status === "DONE" ? "Taken" : "Planned",
+      medicationName,
+      dose,
+      form,
     };
   });
 }

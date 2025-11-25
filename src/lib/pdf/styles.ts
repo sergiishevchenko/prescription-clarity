@@ -18,6 +18,12 @@ body {
   background-color: #f7f7f7;
 }
 
+/* Hide print button and no-print elements */
+.no-print {
+  display: none !important;
+  visibility: hidden !important;
+}
+
 .print-container {
   width: 100%;
   max-width: 210mm;
@@ -73,6 +79,11 @@ body {
   border: 1px solid #111;
   border-radius: 3mm;
   overflow: hidden;
+  margin-bottom: 8mm;
+}
+
+.print-table-wrapper:last-of-type {
+  margin-bottom: 0;
 }
 
 .print-table {
@@ -101,6 +112,7 @@ body {
   width: 16mm;
   font-weight: 700;
   text-align: center;
+  vertical-align: middle;
   background: #f7f7f7;
 }
 
@@ -108,17 +120,41 @@ body {
 .print-table td.meal-col {
   width: 10mm;
   text-align: center;
+  vertical-align: middle;
   background: #f7f7f7;
+  padding: 2.5mm;
+}
+
+.print-table th.meal-col {
+  line-height: 1.2;
+}
+
+.print-table th.meal-col svg {
+  display: inline-block;
+  vertical-align: middle;
+  width: 14px;
+  height: 14px;
+}
+
+.print-table td.meal-col {
+  line-height: 1;
+  position: relative;
+  height: auto;
 }
 
 .meal-symbol {
-  display: inline-flex;
+  display: block;
   width: 8mm;
   height: 8mm;
+  min-width: 8mm;
+  min-height: 8mm;
   border-radius: 50%;
   border: 2px solid #000;
-  justify-content: center;
-  align-items: center;
+  margin: 0 auto;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
 }
 
 .meal-symbol.before {
@@ -134,9 +170,8 @@ body {
 }
 
 .meal-symbol.anytime {
-  border-radius: 2px;
-  height: 2px;
-  background: #000;
+  background: #fff;
+  border: 2px solid #000;
 }
 
 .med-item {
@@ -203,10 +238,12 @@ body {
   padding: 3mm;
   background: #fafafa;
   font-size: 10pt;
-  display: flex;
-  gap: 4mm;
-  align-items: center;
-  flex-wrap: wrap;
+  text-align: center;
+  line-height: 1.6;
+}
+
+.print-legend strong {
+  font-weight: 700;
 }
 
 .print-footer {
@@ -217,15 +254,36 @@ body {
   color: #555;
 }
 
-.legend-item {
-  display: flex;
+.legend-symbol {
+  display: inline-flex;
   align-items: center;
-  gap: 2mm;
+  justify-content: center;
+  width: 5mm;
+  height: 5mm;
+  border-radius: 50%;
+  border: 2px solid #000;
+  background: white;
+  vertical-align: middle;
+  margin: 0 1mm;
 }
 
-.legend-symbol {
-  width: 6mm;
-  height: 6mm;
+.legend-symbol.before {
+  background: white;
+}
+
+.legend-symbol.with {
+  background: linear-gradient(90deg, #000 0%, #000 50%, white 50%, white 100%);
+}
+
+.legend-symbol.after {
+  background: #000;
+}
+
+.legend-symbol.anytime {
+  border-radius: 0;
+  background: #000;
+  height: 2px;
+  width: 5mm;
 }
 
 @media print {

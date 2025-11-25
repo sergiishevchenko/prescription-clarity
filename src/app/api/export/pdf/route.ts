@@ -48,7 +48,7 @@ export async function POST(request: NextRequest) {
   }
 
   try {
-    const entries = (await prisma.scheduleEntry.findMany({
+    const totalCount = await prisma.scheduleEntry.count({
       where: {
         userId: user.id,
         dateTime: {
@@ -56,8 +56,21 @@ export async function POST(request: NextRequest) {
           lte: toDate,
         },
       },
+    });
+
+    const entries = (await prisma.scheduleEntry.findMany({
+      where: {
+        userId: user.id,
+        dateTime: {
+          gte: fromDate,
+          lte: toDate,
+        },
+        medicationId: { not: null },
+      },
       include: {
-        medication: { select: { id: true, name: true, dose: true } },
+        medication: {
+          select: { id: true, name: true, dose: true, form: true, deletedAt: true },
+        },
         schedule: {
           select: {
             quantity: true,
@@ -69,14 +82,39 @@ export async function POST(request: NextRequest) {
       orderBy: [{ dateTime: "asc" }, { id: "asc" }],
     })) as ScheduleEntryWithRelations[];
 
-    if (!entries.length) {
+    const validEntries = entries.filter(
+      (entry) =>
+        entry.medication !== null &&
+        entry.medication !== undefined &&
+        entry.medication.deletedAt === null,
+    );
+
+    if (!validEntries.length) {
+      const entriesWithoutMedicationId = totalCount - entries.length;
+      const entriesWithNullMedication = entries.filter((e) => e.medication === null).length;
+      const entriesWithDeletedMedication = entries.filter(
+        (e) => e.medication?.deletedAt !== null,
+      ).length;
+
+      console.log("No valid entries found", {
+        userId: user.id,
+        fromDate: fromDate.toISOString(),
+        toDate: toDate.toISOString(),
+        totalEntriesInRange: totalCount,
+        entriesWithMedicationId: entries.length,
+        entriesWithoutMedicationId,
+        entriesWithNullMedication,
+        entriesWithDeletedMedication,
+        validEntries: validEntries.length,
+      });
+
       return NextResponse.json(
         { error: "No schedule entries for selected dates" },
         { status: 404 },
       );
     }
 
-    const printableEntries = toPrintableEntries(entries);
+    const printableEntries = toPrintableEntries(validEntries);
     const rangeLabel = formatRangeLabel(fromDate, toDate, payload.tz);
     const html = buildScheduleHtml({
       entries: printableEntries,
