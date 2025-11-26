@@ -298,7 +298,9 @@ export function SidebarNav({ user, onClose }: SidebarNavProps) {
                           className={clsx(
                             styles.navItem,
                             active && styles.navItemActive,
-                            active && item.id === "dependents" && styles.navItemActiveDependents,
+                            active &&
+                              item.id === "dependents" &&
+                              styles.navItemActiveDependents,
                           )}
                           onClick={onClose}
                         >

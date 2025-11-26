@@ -152,7 +152,7 @@ const MONTHS = [
 ];
 const YEARS = Array.from(
   { length: 100 },
-  (_, i) => new Date().getFullYear() - i
+  (_, i) => new Date().getFullYear() - i,
 );
 
 const GENDERS = ["Male", "Female", "Other", "Prefer not to say"];
@@ -465,4 +465,3 @@ export default function AddDependentPage() {
     </div>
   );
 }
-

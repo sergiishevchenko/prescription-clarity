@@ -148,13 +148,18 @@
 .dependentCard {
   background-color: #ffffff;
   border-radius: 20px;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1), 0 1px 2px -1px rgba(0, 0, 0, 0.1);
+  box-shadow:
+    0 1px 3px rgba(0, 0, 0, 0.1),
+    0 1px 2px -1px rgba(0, 0, 0, 0.1);
   overflow: hidden;
-  transition: box-shadow 0.2s ease, transform 0.2s ease;
+  transition:
+    box-shadow 0.2s ease,
+    transform 0.2s ease;
 }
 
 .dependentCard:hover {
-  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1),
+  box-shadow:
+    0 10px 15px -3px rgba(0, 0, 0, 0.1),
     0 4px 6px -4px rgba(0, 0, 0, 0.1);
   transform: translateY(-2px);
 }
@@ -416,7 +421,8 @@
   align-items: center;
   justify-content: center;
   cursor: pointer;
-  box-shadow: 0 10px 25px -5px rgba(59, 130, 246, 0.5),
+  box-shadow:
+    0 10px 25px -5px rgba(59, 130, 246, 0.5),
     0 8px 10px -6px rgba(59, 130, 246, 0.3);
   transition: all 0.2s ease;
   z-index: 50;
@@ -425,7 +431,8 @@
 .fab:hover {
   background-color: #2563eb;
   transform: translateY(-2px) scale(1.05);
-  box-shadow: 0 20px 35px -10px rgba(59, 130, 246, 0.6),
+  box-shadow:
+    0 20px 35px -10px rgba(59, 130, 246, 0.6),
     0 10px 15px -8px rgba(59, 130, 246, 0.4);
 }
 
@@ -511,4 +518,3 @@
     padding: 8px 16px 16px;
   }
 }
-

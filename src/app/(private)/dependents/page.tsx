@@ -367,7 +367,8 @@ function DependentCard({ dependent }: { dependent: Dependent }) {
             <div className={styles.medicationInfo}>
               <span className={styles.medicationName}>{med.name}</span>
               <span className={styles.medicationDetails}>
-                {med.dosage} • <span className={styles.medTime}>{med.time}</span>
+                {med.dosage} •{" "}
+                <span className={styles.medTime}>{med.time}</span>
               </span>
             </div>
             <div className={styles.medicationActions}>
@@ -396,11 +397,11 @@ function DependentCard({ dependent }: { dependent: Dependent }) {
 export default function DependentsPage() {
   const totalDependents = DEPENDENTS.length;
   const averageAdherence = Math.round(
-    DEPENDENTS.reduce((sum, d) => sum + d.adherence, 0) / totalDependents
+    DEPENDENTS.reduce((sum, d) => sum + d.adherence, 0) / totalDependents,
   );
   const totalMedications = DEPENDENTS.reduce(
     (sum, d) => sum + d.medicationCount,
-    0
+    0,
   );
 
   return (
@@ -463,4 +464,3 @@ export default function DependentsPage() {
     </div>
   );
 }
-
