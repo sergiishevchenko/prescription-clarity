@@ -81,6 +81,13 @@ const NAV_GROUPS: NavGroup[] = [
         icon: ClockIcon,
         match: "startsWith",
       },
+      {
+        id: "dependents",
+        label: "Dependents",
+        href: "/dependents",
+        icon: UsersIcon,
+        match: "startsWith",
+      },
     ],
   },
   {
@@ -291,6 +298,7 @@ export function SidebarNav({ user, onClose }: SidebarNavProps) {
                           className={clsx(
                             styles.navItem,
                             active && styles.navItemActive,
+                            active && item.id === "dependents" && styles.navItemActiveDependents,
                           )}
                           onClick={onClose}
                         >
@@ -598,6 +606,26 @@ function XIcon({ className }: IconProps) {
     >
       <path d="M18 6L6 18" />
       <path d="M6 6l12 12" />
+    </svg>
+  );
+}
+
+function UsersIcon({ className }: IconProps) {
+  return (
+    <svg
+      className={className}
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth={2.5}
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      aria-hidden="true"
+    >
+      <path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2" />
+      <circle cx="9" cy="7" r="4" />
+      <path d="M23 21v-2a4 4 0 00-3-3.87" />
+      <path d="M16 3.13a4 4 0 010 7.75" />
     </svg>
   );
 }

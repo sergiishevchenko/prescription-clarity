@@ -294,6 +294,16 @@
   transform: translateY(-1px);
 }
 
+/* Orange active state for Dependents */
+.navItemActiveDependents {
+  background-color: #fff7ed;
+  color: #f54a00;
+  border-left: 4px solid #f54a00;
+  box-shadow:
+    0 10px 15px -3px rgba(245, 74, 0, 0.22),
+    0 4px 6px -4px rgba(245, 74, 0, 0.3);
+}
+
 .navItemIcon {
   width: 24px;
   height: 24px;
