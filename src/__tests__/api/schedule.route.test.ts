@@ -357,12 +357,32 @@ describe("POST /api/schedule", () => {
     );
   });
 
-  it("returns 400 when dateStart is in the past", async () => {
+  it("allows dateStart in the past for historical records", async () => {
     jest.mocked(getSessionUserFromRequest).mockResolvedValueOnce(mockUser);
 
-    const yesterday = new Date();
-    yesterday.setDate(yesterday.getDate() - 1);
-    const dateStr = yesterday.toISOString().split("T")[0];
+    const lastWeek = new Date();
+    lastWeek.setDate(lastWeek.getDate() - 7);
+    const dateStr = lastWeek.toISOString().split("T")[0];
+
+    const mockSchedule = {
+      id: "s1",
+      medicationId: "m1",
+      userId: mockUser.id,
+      quantity: 1,
+      units: "pill",
+      frequencyDays: [1],
+      durationDays: 7,
+      dateStart: lastWeek,
+      dateEnd: new Date(),
+      timeOfDay: ["09:00"],
+      mealTiming: "anytime",
+      createdAt: new Date(),
+      updatedAt: new Date(),
+    };
+
+    prismaMock.schedule.create.mockResolvedValueOnce(mockSchedule);
+    prismaMock.schedule.findFirst.mockResolvedValueOnce(mockSchedule);
+    prismaMock.scheduleEntry.createMany.mockResolvedValueOnce({ count: 1 });
 
     const res = await ScheduleRoute.POST(
       makePostRequest({
@@ -373,12 +393,11 @@ describe("POST /api/schedule", () => {
         timeOfDay: ["09:00"],
       }),
     );
-    expect(res.status).toBe(400);
-    await expect(res.json()).resolves.toEqual(
-      expect.objectContaining({
-        error: "dateStart must be today or in the future",
-      }),
-    );
+
+    // Past dates are now allowed for recording historical medication intake
+    expect(res.status).toBe(201);
+    const data = await res.json();
+    expect(data.schedule.id).toBe("s1");
   });
 
   it("creates schedule and generates entries", async () => {

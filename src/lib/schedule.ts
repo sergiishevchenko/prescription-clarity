@@ -16,6 +16,9 @@ export type ScheduleEntryItem = {
     name: string;
     dose: number;
   } | null;
+  // Historical entry indicators (for deleted medications/schedules)
+  isFromDeletedMedication?: boolean;
+  isFromDeletedSchedule?: boolean;
 };
 
 export type ScheduleTemplateItem = {

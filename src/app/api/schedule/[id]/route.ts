@@ -61,3 +61,51 @@ export async function PATCH(
     );
   }
 }
+
+/**
+ * DELETE /api/schedule/[id]
+ * Delete a single schedule entry
+ */
+export async function DELETE(
+  request: NextRequest,
+  { params }: { params: Promise<{ id: string }> },
+) {
+  try {
+    const { id } = await params;
+    const sessionToken = await getSessionCookie();
+    if (!sessionToken) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+
+    const user = await verifySession(sessionToken);
+    if (!user) {
+      return NextResponse.json({ error: "Invalid session" }, { status: 401 });
+    }
+
+    const existing = await prisma.scheduleEntry.findFirst({
+      where: { id, userId: user.id },
+      select: { id: true, dateTime: true },
+    });
+
+    if (!existing) {
+      return NextResponse.json({ error: "Not found" }, { status: 404 });
+    }
+
+    await prisma.scheduleEntry.delete({
+      where: { id },
+    });
+
+    // Update day status cache for the entry's date
+    updateDayStatusForDate(user.id, existing.dateTime, "UTC").catch((error) => {
+      console.error("Failed to update day status cache:", error);
+    });
+
+    return NextResponse.json({ message: "Entry deleted successfully" });
+  } catch (error) {
+    console.error("Delete schedule entry error:", error);
+    return NextResponse.json(
+      { error: "Internal server error" },
+      { status: 500 },
+    );
+  }
+}

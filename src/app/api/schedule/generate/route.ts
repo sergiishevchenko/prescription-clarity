@@ -51,6 +51,8 @@ export async function generateScheduleEntries(
         const entryDateTime = new Date(current);
         entryDateTime.setHours(hours, minutes, 0, 0);
 
+        // For new schedules, generate all entries including past times today
+        // (User may want to mark earlier doses as taken)
         entries.push({
           scheduleId: schedule.id,
           medicationId: schedule.medicationId,

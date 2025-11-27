@@ -170,12 +170,14 @@ describe("PATCH /api/medications/[id]", () => {
     expect(data.error).toBe("Medication not found");
   });
 
-  it("should update medication successfully", async () => {
+  it("should update medication successfully (no active schedule)", async () => {
     jest
       .spyOn(SessionModule, "getSessionUserFromRequest")
       .mockResolvedValueOnce(mockUser);
 
     prismaMock.medication.findFirst.mockResolvedValueOnce(mockMedication);
+    // No active schedule - use simple update path
+    prismaMock.schedule.findFirst.mockResolvedValueOnce(null);
 
     const updatedMedication = { ...mockMedication, name: "Updated Aspirin" };
     prismaMock.medication.update.mockResolvedValueOnce(updatedMedication);
@@ -188,6 +190,7 @@ describe("PATCH /api/medications/[id]", () => {
 
     expect(res.status).toBe(200);
     expect(data.medication.name).toBe("Updated Aspirin");
+    expect(data.isNewVersion).toBe(false);
     expect(prismaMock.medication.update).toHaveBeenCalledWith(
       expect.objectContaining({
         where: { id: "med1" },
@@ -198,12 +201,14 @@ describe("PATCH /api/medications/[id]", () => {
     );
   });
 
-  it("should update multiple fields", async () => {
+  it("should update multiple fields (no active schedule)", async () => {
     jest
       .spyOn(SessionModule, "getSessionUserFromRequest")
       .mockResolvedValueOnce(mockUser);
 
     prismaMock.medication.findFirst.mockResolvedValueOnce(mockMedication);
+    // No active schedule - use simple update path
+    prismaMock.schedule.findFirst.mockResolvedValueOnce(null);
 
     const updatedMedication = {
       ...mockMedication,
@@ -254,6 +259,8 @@ describe("PATCH /api/medications/[id]", () => {
       .mockResolvedValueOnce(mockUser);
 
     prismaMock.medication.findFirst.mockResolvedValueOnce(mockMedication);
+    // No active schedule - use simple update path
+    prismaMock.schedule.findFirst.mockResolvedValueOnce(null);
     prismaMock.medication.update.mockRejectedValueOnce(
       new Error("Database error"),
     );
@@ -273,6 +280,98 @@ describe("PATCH /api/medications/[id]", () => {
     expect(consoleSpy).toHaveBeenCalled();
 
     consoleSpy.mockRestore();
+  });
+
+  it("should use versioning flow when medication has active schedule", async () => {
+    jest
+      .spyOn(SessionModule, "getSessionUserFromRequest")
+      .mockResolvedValueOnce(mockUser);
+
+    const medicationWithSchedules = {
+      ...mockMedication,
+      schedules: [
+        {
+          id: "sched1",
+          medicationId: "med1",
+          userId: "user123",
+          quantity: 1,
+          units: "pill",
+          frequencyDays: [1, 2, 3, 4, 5],
+          durationDays: 30,
+          dateStart: new Date(),
+          dateEnd: null,
+          timeOfDay: ["08:00", "20:00"],
+          mealTiming: "anytime",
+          deletedAt: null,
+          createdAt: new Date(),
+          updatedAt: new Date(),
+        },
+      ],
+    };
+
+    // First findFirst for checking medication exists
+    prismaMock.medication.findFirst
+      .mockResolvedValueOnce(mockMedication)
+      // Second findFirst includes schedules (in createMedicationVersion)
+      .mockResolvedValueOnce(medicationWithSchedules);
+
+    // Has active schedule - triggers versioning
+    prismaMock.schedule.findFirst.mockResolvedValueOnce({
+      id: "sched1",
+      deletedAt: null,
+    });
+
+    // Mock $transaction operations
+    prismaMock.scheduleEntry.findMany.mockResolvedValue([]);
+    prismaMock.scheduleEntry.deleteMany.mockResolvedValue({ count: 0 });
+    prismaMock.scheduleEntry.createMany.mockResolvedValue({ count: 5 });
+    prismaMock.schedule.updateMany.mockResolvedValue({ count: 1 });
+    prismaMock.medication.update.mockResolvedValue({
+      ...mockMedication,
+      deletedAt: new Date(),
+    });
+
+    const newMedication = {
+      id: "med2",
+      userId: "user123",
+      name: "Updated Aspirin",
+      dose: 100,
+      form: "tablets",
+      previousMedicationId: "med1",
+      deletedAt: null,
+      createdAt: new Date(),
+      updatedAt: new Date(),
+    };
+    prismaMock.medication.create.mockResolvedValue(newMedication);
+
+    const newSchedule = {
+      id: "sched2",
+      medicationId: "med2",
+      userId: "user123",
+      quantity: 1,
+      units: "pill",
+      frequencyDays: [1, 2, 3, 4, 5],
+      durationDays: 30,
+      dateStart: new Date(),
+      dateEnd: null,
+      timeOfDay: ["08:00", "20:00"],
+      mealTiming: "anytime",
+      deletedAt: null,
+      createdAt: new Date(),
+      updatedAt: new Date(),
+    };
+    prismaMock.schedule.create.mockResolvedValue(newSchedule);
+
+    const res = await MedicationIdRoute.PATCH(
+      makePatchReq({ name: "Updated Aspirin" }),
+      params,
+    );
+    const data = await res.json();
+
+    expect(res.status).toBe(200);
+    expect(data.isNewVersion).toBe(true);
+    expect(data.medication.name).toBe("Updated Aspirin");
+    expect(data.previousMedicationId).toBe("med1");
   });
 });
 
@@ -308,8 +407,14 @@ describe("DELETE /api/medications/[id]", () => {
       .spyOn(SessionModule, "getSessionUserFromRequest")
       .mockResolvedValueOnce(mockUser);
 
+    // Mock for verification that medication exists
     prismaMock.medication.findFirst.mockResolvedValueOnce(mockMedication);
-    prismaMock.medication.update.mockResolvedValueOnce({
+
+    // Mock for $transaction operations
+    prismaMock.scheduleEntry.findMany.mockResolvedValue([]);
+    prismaMock.scheduleEntry.deleteMany.mockResolvedValue({ count: 0 });
+    prismaMock.schedule.updateMany.mockResolvedValue({ count: 0 });
+    prismaMock.medication.update.mockResolvedValue({
       ...mockMedication,
       deletedAt: new Date(),
     });
@@ -319,10 +424,6 @@ describe("DELETE /api/medications/[id]", () => {
 
     expect(res.status).toBe(200);
     expect(data.message).toBe("Medication deleted successfully");
-    expect(prismaMock.medication.update).toHaveBeenCalledWith({
-      where: { id: "med1" },
-      data: { deletedAt: expect.any(Date) },
-    });
   });
 
   it("should return 500 on database error", async () => {
@@ -331,9 +432,9 @@ describe("DELETE /api/medications/[id]", () => {
       .mockResolvedValueOnce(mockUser);
 
     prismaMock.medication.findFirst.mockResolvedValueOnce(mockMedication);
-    prismaMock.medication.update.mockRejectedValueOnce(
-      new Error("Database error"),
-    );
+
+    // Mock $transaction to throw
+    prismaMock.$transaction.mockRejectedValueOnce(new Error("Database error"));
 
     const consoleSpy = jest
       .spyOn(console, "error")
