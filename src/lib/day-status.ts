@@ -307,3 +307,50 @@ export async function invalidateDayStatus(
     },
   });
 }
+
+/**
+ * Invalidate day status cache for multiple dates (batch operation)
+ * Useful after medication/schedule deletion or edit
+ */
+export async function invalidateDayStatusesForDates(
+  userId: string,
+  dates: Date[],
+  timezone: string = "UTC",
+): Promise<number> {
+  if (dates.length === 0) {
+    return 0;
+  }
+
+  const dateOnlyValues = dates.map((date) => getDateOnly(date, timezone));
+
+  const result = await prisma.dayStatus.deleteMany({
+    where: {
+      userId,
+      date: {
+        in: dateOnlyValues,
+      },
+    },
+  });
+
+  return result.count;
+}
+
+/**
+ * Invalidate and immediately recalculate day statuses for given dates
+ * This is useful when you want to ensure the cache is up-to-date immediately
+ */
+export async function refreshDayStatusesForDates(
+  userId: string,
+  dates: Date[],
+  timezone: string = "UTC",
+): Promise<void> {
+  if (dates.length === 0) {
+    return;
+  }
+
+  // First invalidate
+  await invalidateDayStatusesForDates(userId, dates, timezone);
+
+  // Then recalculate
+  await updateDayStatusesForDates(userId, dates, timezone);
+}

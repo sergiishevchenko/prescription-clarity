@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useTransition } from "react";
+import { useState, useTransition, useRef, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import clsx from "clsx";
 import styles from "./today.module.css";
@@ -79,6 +79,9 @@ export function ScheduleList({
   const router = useRouter();
   const [isPending, startTransition] = useTransition();
   const [updatingIds, setUpdatingIds] = useState<Set<string>>(new Set());
+  const [openMenuId, setOpenMenuId] = useState<string | null>(null);
+  const [deleteConfirmId, setDeleteConfirmId] = useState<string | null>(null);
+  const [deleting, setDeleting] = useState(false);
 
   // Transform API response to ScheduleItem format
   const transformEntry = (entry: ScheduleEntryItem): ScheduleItem => ({
@@ -161,6 +164,38 @@ export function ScheduleList({
     }
   };
 
+  const handleDeleteEntry = async (entryId: string) => {
+    setDeleting(true);
+    try {
+      const res = await fetch(`/api/schedule/${entryId}`, {
+        method: "DELETE",
+      });
+
+      if (!res.ok) {
+        throw new Error("Failed to delete entry");
+      }
+
+      startTransition(() => {
+        router.refresh();
+      });
+    } catch (error) {
+      console.error("Failed to delete schedule entry:", error);
+    } finally {
+      setDeleting(false);
+      setDeleteConfirmId(null);
+      setOpenMenuId(null);
+    }
+  };
+
+  const handleMenuToggle = (itemId: string) => {
+    setOpenMenuId((prev) => (prev === itemId ? null : itemId));
+  };
+
+  const handleDeleteClick = (itemId: string) => {
+    setOpenMenuId(null);
+    setDeleteConfirmId(itemId);
+  };
+
   const pendingCount = activeSchedule.length;
   const completedCount = completedSchedule.length;
 
@@ -194,6 +229,7 @@ export function ScheduleList({
       <ul className={styles.scheduleList}>
         {activeSchedule.map((item) => {
           const isUpdating = updatingIds.has(item.id);
+          const isMenuOpen = openMenuId === item.id;
           return (
             <li key={item.id} className={styles.listItem}>
               <button
@@ -226,13 +262,11 @@ export function ScheduleList({
                   </span>
                 </div>
               </div>
-              <button
-                type="button"
-                className={styles.moreButton}
-                aria-label="More actions"
-              >
-                <MoreIcon className={styles.moreIcon} />
-              </button>
+              <EntryMenu
+                isOpen={isMenuOpen}
+                onToggle={() => handleMenuToggle(item.id)}
+                onDelete={() => handleDeleteClick(item.id)}
+              />
             </li>
           );
         })}
@@ -246,6 +280,7 @@ export function ScheduleList({
       <ul className={clsx(styles.scheduleList, styles.completedList)}>
         {completedSchedule.map((item) => {
           const isUpdating = updatingIds.has(item.id);
+          const isMenuOpen = openMenuId === item.id;
           return (
             <li key={item.id} className={styles.listItem}>
               <button
@@ -281,17 +316,24 @@ export function ScheduleList({
                   </span>
                 </div>
               </div>
-              <button
-                type="button"
-                className={styles.moreButton}
-                aria-label="More actions"
-              >
-                <MoreIcon className={styles.moreIcon} />
-              </button>
+              <EntryMenu
+                isOpen={isMenuOpen}
+                onToggle={() => handleMenuToggle(item.id)}
+                onDelete={() => handleDeleteClick(item.id)}
+              />
             </li>
           );
         })}
       </ul>
+
+      {/* Delete Confirmation Dialog */}
+      {deleteConfirmId && (
+        <DeleteConfirmDialog
+          onConfirm={() => handleDeleteEntry(deleteConfirmId)}
+          onCancel={() => setDeleteConfirmId(null)}
+          deleting={deleting}
+        />
+      )}
     </section>
   );
 }
@@ -348,9 +390,163 @@ function MoreIcon({ className }: IconProps) {
       strokeLinejoin="round"
       aria-hidden="true"
     >
-      <path d="M12 7h.01" />
-      <path d="M12 12h.01" />
-      <path d="M12 17h.01" />
+      <circle cx="12" cy="5" r="1.5" fill="currentColor" stroke="none" />
+      <circle cx="12" cy="12" r="1.5" fill="currentColor" stroke="none" />
+      <circle cx="12" cy="19" r="1.5" fill="currentColor" stroke="none" />
     </svg>
+  );
+}
+
+function TrashIcon({ className }: IconProps) {
+  return (
+    <svg
+      className={className}
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth={2}
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      aria-hidden="true"
+    >
+      <path d="M3 6h18" />
+      <path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6" />
+      <path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2" />
+      <line x1="10" x2="10" y1="11" y2="17" />
+      <line x1="14" x2="14" y1="11" y2="17" />
+    </svg>
+  );
+}
+
+// Entry Menu Component
+type EntryMenuProps = {
+  isOpen: boolean;
+  onToggle: () => void;
+  onDelete: () => void;
+};
+
+function EntryMenu({ isOpen, onToggle, onDelete }: EntryMenuProps) {
+  const menuRef = useRef<HTMLDivElement>(null);
+
+  // Close menu when clicking outside
+  useEffect(() => {
+    if (!isOpen) return;
+
+    const handleClickOutside = (event: MouseEvent) => {
+      if (menuRef.current && !menuRef.current.contains(event.target as Node)) {
+        onToggle();
+      }
+    };
+
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, [isOpen, onToggle]);
+
+  return (
+    <div className={styles.menuWrapper} ref={menuRef}>
+      <button
+        type="button"
+        className={clsx(styles.moreButton, isOpen && styles.moreButtonActive)}
+        aria-label="More actions"
+        aria-expanded={isOpen}
+        aria-haspopup="menu"
+        onClick={onToggle}
+      >
+        <MoreIcon className={styles.moreIcon} />
+      </button>
+
+      {isOpen && (
+        <div className={styles.dropdownMenu} role="menu">
+          <button
+            type="button"
+            className={styles.menuItemDanger}
+            role="menuitem"
+            onClick={onDelete}
+          >
+            <TrashIcon className={styles.menuItemIcon} />
+            <span>Delete</span>
+          </button>
+        </div>
+      )}
+    </div>
+  );
+}
+
+// Delete Confirmation Dialog
+type DeleteConfirmDialogProps = {
+  onConfirm: () => void;
+  onCancel: () => void;
+  deleting: boolean;
+};
+
+function DeleteConfirmDialog({
+  onConfirm,
+  onCancel,
+  deleting,
+}: DeleteConfirmDialogProps) {
+  const dialogRef = useRef<HTMLDivElement>(null);
+
+  // Close on escape key
+  useEffect(() => {
+    const handleEscape = (event: KeyboardEvent) => {
+      if (event.key === "Escape" && !deleting) {
+        onCancel();
+      }
+    };
+
+    document.addEventListener("keydown", handleEscape);
+    return () => document.removeEventListener("keydown", handleEscape);
+  }, [onCancel, deleting]);
+
+  // Focus trap and initial focus
+  useEffect(() => {
+    dialogRef.current?.focus();
+  }, []);
+
+  return (
+    <div
+      className={styles.dialogOverlay}
+      onClick={deleting ? undefined : onCancel}
+    >
+      <div
+        className={styles.confirmDialog}
+        ref={dialogRef}
+        role="alertdialog"
+        aria-modal="true"
+        aria-labelledby="delete-dialog-title"
+        aria-describedby="delete-dialog-desc"
+        tabIndex={-1}
+        onClick={(e) => e.stopPropagation()}
+      >
+        <div className={styles.confirmDialogIcon}>
+          <TrashIcon className={styles.confirmDialogIconSvg} />
+        </div>
+        <h3 id="delete-dialog-title" className={styles.confirmDialogTitle}>
+          Delete entry?
+        </h3>
+        <p id="delete-dialog-desc" className={styles.confirmDialogDesc}>
+          This schedule entry will be permanently removed. This action cannot be
+          undone.
+        </p>
+        <div className={styles.confirmDialogActions}>
+          <button
+            type="button"
+            className={styles.confirmDialogCancel}
+            onClick={onCancel}
+            disabled={deleting}
+          >
+            Cancel
+          </button>
+          <button
+            type="button"
+            className={styles.confirmDialogDelete}
+            onClick={onConfirm}
+            disabled={deleting}
+          >
+            {deleting ? "Deleting..." : "Delete"}
+          </button>
+        </div>
+      </div>
+    </div>
   );
 }

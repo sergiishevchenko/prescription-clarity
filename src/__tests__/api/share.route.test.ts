@@ -27,6 +27,12 @@ const mockUser = {
 
 beforeEach(() => {
   jest.clearAllMocks();
+  // Set env var so route doesn't access request.nextUrl (which doesn't exist on standard Request)
+  process.env.NEXT_PUBLIC_APP_URL = "http://localhost:3000";
+});
+
+afterEach(() => {
+  delete process.env.NEXT_PUBLIC_APP_URL;
 });
 
 describe("POST /api/share", () => {

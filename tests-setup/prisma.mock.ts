@@ -20,6 +20,7 @@ const mockMedication = {
   findFirst: jest.fn() as AsyncMockFn<[unknown], unknown>,
   create: jest.fn() as AsyncMockFn<[unknown], unknown>,
   update: jest.fn() as AsyncMockFn<[unknown], unknown>,
+  updateMany: jest.fn() as AsyncMockFn<[unknown], unknown>,
   delete: jest.fn() as AsyncMockFn<[unknown], unknown>,
 };
 
@@ -28,6 +29,7 @@ const mockScheduleEntry = {
   findFirst: jest.fn() as AsyncMockFn<[unknown], unknown>,
   createMany: jest.fn() as AsyncMockFn<[unknown], unknown>,
   update: jest.fn() as AsyncMockFn<[unknown], unknown>,
+  delete: jest.fn() as AsyncMockFn<[unknown], unknown>,
   deleteMany: jest.fn() as AsyncMockFn<[unknown], unknown>,
   count: jest.fn() as AsyncMockFn<[unknown], unknown>,
 };
@@ -44,6 +46,7 @@ const mockSchedule = {
   findMany: jest.fn() as AsyncMockFn<[unknown], unknown>,
   create: jest.fn() as AsyncMockFn<[unknown], unknown>,
   update: jest.fn() as AsyncMockFn<[unknown], unknown>,
+  updateMany: jest.fn() as AsyncMockFn<[unknown], unknown>,
   delete: jest.fn() as AsyncMockFn<[unknown], unknown>,
 };
 
@@ -63,7 +66,24 @@ const mockCareAccess = {
   delete: jest.fn() as AsyncMockFn<[unknown], unknown>,
 };
 
-const mockTransaction = jest.fn() as AsyncMockFn<[unknown], unknown>;
+// Transaction mock - executes callback with the same mock client
+const mock$transaction = jest.fn(async (callback: (tx: unknown) => unknown) => {
+  // If callback is a function, call it with the mock prisma client
+  if (typeof callback === "function") {
+    return callback({
+      medication: mockMedication,
+      schedule: mockSchedule,
+      scheduleEntry: mockScheduleEntry,
+      dayStatus: mockDayStatus,
+      user: mockUser,
+      session: mockSession,
+      shareLink: mockShareLink,
+      careAccess: mockCareAccess,
+    });
+  }
+  // If it's an array of promises, resolve them
+  return Promise.all(callback as Promise<unknown>[]);
+}) as AsyncMockFn<[unknown], unknown>;
 
 jest.mock("@/lib/db", () => ({
   __esModule: true,
@@ -76,7 +96,7 @@ jest.mock("@/lib/db", () => ({
     dayStatus: mockDayStatus,
     shareLink: mockShareLink,
     careAccess: mockCareAccess,
-    $transaction: mockTransaction,
+    $transaction: mock$transaction,
   },
   default: {
     user: mockUser,
@@ -87,7 +107,7 @@ jest.mock("@/lib/db", () => ({
     dayStatus: mockDayStatus,
     shareLink: mockShareLink,
     careAccess: mockCareAccess,
-    $transaction: mockTransaction,
+    $transaction: mock$transaction,
   },
 }));
 
@@ -100,7 +120,7 @@ export const prismaMock = {
   dayStatus: mockDayStatus,
   shareLink: mockShareLink,
   careAccess: mockCareAccess,
-  $transaction: mockTransaction,
+  $transaction: mock$transaction,
 };
 
 beforeEach(() => jest.clearAllMocks());

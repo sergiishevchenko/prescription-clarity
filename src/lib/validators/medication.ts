@@ -57,6 +57,9 @@ export const updateMedicationSchema = z.object({
       message: `Form must be one of: ${validForms.join(", ")}`,
     })
     .optional(),
+  // If true, creates a new medication version instead of updating in place
+  // This will soft delete the old version and create a new one with link
+  createVersion: z.boolean().optional(),
 });
 
 export const searchMedicationSchema = z.object({

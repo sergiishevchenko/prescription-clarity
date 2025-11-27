@@ -20,7 +20,8 @@ export default function DeleteMedicationButton({
   async function onDelete() {
     const ok = await confirm({
       title: "Delete medication",
-      description: "This action will mark the medication as deleted.",
+      description:
+        "This will delete the medication and remove all future scheduled doses. Past completed entries will be preserved for your history.",
       confirmText: "Delete",
       cancelText: "Cancel",
     });
@@ -34,7 +35,7 @@ export default function DeleteMedicationButton({
       }
       if (!res.ok) throw new Error("Delete failed");
       onDeleted?.();
-      toast("Medication deleted", { variant: "success" });
+      toast("Medication and future schedules deleted", { variant: "success" });
       router.refresh();
     } finally {
       setLoading(false);

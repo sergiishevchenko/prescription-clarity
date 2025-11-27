@@ -37,6 +37,7 @@ const NAV_GROUPS: NavGroup[] = [
   {
     id: "overview",
     label: "Overview",
+    defaultOpen: true,
     items: [
       {
         id: "dashboard",
@@ -147,6 +148,9 @@ export function SidebarNav({ user, onClose }: SidebarNavProps) {
   const activeGroupOnLoad = findActiveGroup(pathname);
   const [openGroups, setOpenGroups] = useState<Set<string>>(() => {
     const initial = new Set<string>();
+    // Always add groups with defaultOpen: true
+    NAV_GROUPS.filter((g) => g.defaultOpen).forEach((g) => initial.add(g.id));
+    // Also add the active group
     if (activeGroupOnLoad) {
       initial.add(activeGroupOnLoad.id);
     }
@@ -158,6 +162,9 @@ export function SidebarNav({ user, onClose }: SidebarNavProps) {
     const activeGroup = findActiveGroup(pathname);
     setOpenGroups(() => {
       const next = new Set<string>();
+      // Always keep groups with defaultOpen: true open
+      NAV_GROUPS.filter((g) => g.defaultOpen).forEach((g) => next.add(g.id));
+      // Also add the active group
       if (activeGroup) {
         next.add(activeGroup.id);
       }
