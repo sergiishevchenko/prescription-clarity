@@ -22,11 +22,15 @@ model User {
   createdAt    DateTime @default(now())
   updatedAt    DateTime @updatedAt
 
-  sessions        Session[]
-  medications     Medication[]
-  scheduleEntries ScheduleEntry[]
-  schedules       Schedule[]
-  dayStatuses     DayStatus[]
+  sessions           Session[]
+  medications        Medication[]
+  scheduleEntries    ScheduleEntry[]
+  schedules          Schedule[]
+  dayStatuses        DayStatus[]
+  ownedShareLinks    ShareLink[]   @relation("ShareLinkOwner")
+  viewerShareLinks   ShareLink[]   @relation("ShareLinkViewer")
+  careAccessesOwner  CareAccess[]  @relation("CareAccessOwner")
+  careAccessesViewer CareAccess[]  @relation("CareAccessViewer")
 }
 
 model Session {
@@ -133,4 +137,43 @@ model DayStatus {
   @@unique([userId, date])
   @@index([userId, date])
   @@index([userId, status])
+}
+
+enum ShareLinkStatus {
+  active
+  revoked
+  expired
+}
+
+model ShareLink {
+  id        String          @id @default(cuid()) @db.VarChar(32)
+  token     String          @unique @db.VarChar(64)
+  ownerId   String          @db.VarChar(32)
+  viewerId  String?         @db.VarChar(32)
+  expiresAt DateTime
+  status    ShareLinkStatus @default(active)
+  createdAt DateTime        @default(now())
+  updatedAt DateTime        @updatedAt
+
+  owner  User  @relation("ShareLinkOwner", fields: [ownerId], references: [id], onDelete: Cascade)
+  viewer User? @relation("ShareLinkViewer", fields: [viewerId], references: [id], onDelete: SetNull)
+
+  @@index([token])
+  @@index([ownerId])
+  @@index([status, expiresAt])
+}
+
+model CareAccess {
+  id        String   @id @default(cuid()) @db.VarChar(32)
+  ownerId   String   @db.VarChar(32)
+  viewerId  String   @db.VarChar(32)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  owner  User @relation("CareAccessOwner", fields: [ownerId], references: [id], onDelete: Cascade)
+  viewer User @relation("CareAccessViewer", fields: [viewerId], references: [id], onDelete: Cascade)
+
+  @@unique([ownerId, viewerId])
+  @@index([ownerId])
+  @@index([viewerId])
 }

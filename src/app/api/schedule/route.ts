@@ -1,7 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
-import { getSessionCookie } from "@/lib/auth/cookies";
-import { verifySession } from "@/lib/auth/session";
 import { getSessionUserFromRequest } from "@/lib/auth/session";
 import {
   scheduleQuerySchema,
@@ -10,6 +8,7 @@ import {
 } from "@/lib/validators/schedule";
 import { generateScheduleEntries } from "@/app/api/schedule/generate/route";
 import type { Prisma } from "@prisma/client";
+import { checkApiAccess } from "@/lib/middleware/apiHelpers";
 
 export const runtime = "nodejs";
 
@@ -31,20 +30,35 @@ function toLocalString(dateUtc: Date, timeZone: string): string {
 
 export async function GET(request: NextRequest) {
   try {
-    const sessionToken = await getSessionCookie();
-    if (!sessionToken) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-    }
-
-    const user = await verifySession(sessionToken);
-    if (!user) {
-      return NextResponse.json({ error: "Invalid session" }, { status: 401 });
-    }
-
     const { searchParams } = new URL(request.url);
     const from = searchParams.get("from");
     const to = searchParams.get("to");
     const tz = searchParams.get("tz") || "UTC";
+    const targetUserId = searchParams.get("userId"); // For shared access
+
+    // Authenticate user
+    const user = await getSessionUserFromRequest(request);
+    if (!user) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+
+    // Determine whose schedule to fetch
+    let scheduleOwnerId = user.id; // Default to own schedule
+
+    // If accessing another user's schedule, verify permissions
+    if (targetUserId && targetUserId !== user.id) {
+      const { authorized, response } = await checkApiAccess(
+        request,
+        targetUserId,
+        "viewer",
+      );
+
+      if (!authorized) {
+        return response!;
+      }
+
+      scheduleOwnerId = targetUserId;
+    }
 
     const validated = scheduleQuerySchema.parse({ from, to, tz });
 
@@ -53,7 +67,7 @@ export async function GET(request: NextRequest) {
 
     const events = await prisma.scheduleEntry.findMany({
       where: {
-        userId: user.id,
+        userId: scheduleOwnerId,
         dateTime: {
           gte: fromDate,
           lte: toDate,

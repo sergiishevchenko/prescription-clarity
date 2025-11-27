@@ -1,13 +1,22 @@
 import * as ScheduleRoute from "@/app/api/schedule/route";
-import { getSessionCookie } from "@/lib/auth/cookies";
-import { verifySession, getSessionUserFromRequest } from "@/lib/auth/session";
+import { NextResponse } from "next/server";
+import { getSessionUserFromRequest } from "@/lib/auth/session";
 import { prismaMock } from "../../../tests-setup/prisma.mock";
 import * as GenerateRoute from "@/app/api/schedule/generate/route";
+import * as ApiHelpers from "@/lib/middleware/apiHelpers";
 
 // Mock the generateScheduleEntries function
 jest.mock("@/app/api/schedule/generate/route", () => ({
   generateScheduleEntries: jest.fn().mockResolvedValue(5),
 }));
+
+// Mock the apiHelpers module
+jest.mock("@/lib/middleware/apiHelpers");
+
+// Clean up mock after all tests to prevent pollution
+afterAll(() => {
+  jest.unmock("@/lib/middleware/apiHelpers");
+});
 
 type GetHandler = typeof ScheduleRoute.GET;
 type GetRequest = Parameters<GetHandler>[0];
@@ -16,13 +25,16 @@ const defaultFrom = "2025-02-01T00:00:00.000Z";
 const defaultTo = "2025-02-02T00:00:00.000Z";
 
 const makeGetRequest = (
-  params?: Partial<{ from: string; to: string; tz: string }>,
+  params?: Partial<{ from: string; to: string; tz: string; userId: string }>,
 ): GetRequest => {
   const url = new URL("http://localhost/api/schedule");
   url.searchParams.set("from", params?.from ?? defaultFrom);
   url.searchParams.set("to", params?.to ?? defaultTo);
   if (params?.tz) {
     url.searchParams.set("tz", params.tz);
+  }
+  if (params?.userId) {
+    url.searchParams.set("userId", params.userId);
   }
   return new Request(url.toString()) as unknown as GetRequest;
 };
@@ -34,8 +46,8 @@ describe("GET /api/schedule", () => {
     jest.clearAllMocks();
   });
 
-  it("returns 401 when no session cookie", async () => {
-    jest.mocked(getSessionCookie).mockResolvedValueOnce(null);
+  it("returns 401 when no session user", async () => {
+    jest.mocked(getSessionUserFromRequest).mockResolvedValueOnce(null);
 
     const res = await ScheduleRoute.GET(makeGetRequest());
     expect(res.status).toBe(401);
@@ -45,19 +57,17 @@ describe("GET /api/schedule", () => {
   });
 
   it("returns 401 when session is invalid", async () => {
-    jest.mocked(getSessionCookie).mockResolvedValueOnce("invalid");
-    jest.mocked(verifySession).mockResolvedValueOnce(null);
+    jest.mocked(getSessionUserFromRequest).mockResolvedValueOnce(null);
 
     const res = await ScheduleRoute.GET(makeGetRequest());
     expect(res.status).toBe(401);
     await expect(res.json()).resolves.toEqual(
-      expect.objectContaining({ error: "Invalid session" }),
+      expect.objectContaining({ error: "Unauthorized" }),
     );
   });
 
   it("returns 400 when query params are invalid", async () => {
-    jest.mocked(getSessionCookie).mockResolvedValueOnce("token");
-    jest.mocked(verifySession).mockResolvedValueOnce(mockUser);
+    jest.mocked(getSessionUserFromRequest).mockResolvedValueOnce(mockUser);
 
     const req = new Request(
       `http://localhost/api/schedule?to=${defaultTo}`,
@@ -72,8 +82,7 @@ describe("GET /api/schedule", () => {
   });
 
   it("returns schedule items when request is valid", async () => {
-    jest.mocked(getSessionCookie).mockResolvedValueOnce("token");
-    jest.mocked(verifySession).mockResolvedValueOnce(mockUser);
+    jest.mocked(getSessionUserFromRequest).mockResolvedValueOnce(mockUser);
 
     const scheduleEntries = [
       {
@@ -127,9 +136,174 @@ describe("GET /api/schedule", () => {
     );
   });
 
+  it("returns another user's schedule when userId param is provided and user has access", async () => {
+    const targetUserId = "u2";
+
+    jest.mocked(getSessionUserFromRequest).mockResolvedValueOnce(mockUser);
+
+    // Mock checkApiAccess to grant viewer access
+    jest.mocked(ApiHelpers.checkApiAccess).mockResolvedValueOnce({
+      authorized: true,
+      context: {
+        userId: mockUser.id,
+        ownerId: targetUserId,
+        role: "viewer",
+      },
+    });
+
+    const scheduleEntries = [
+      {
+        id: "se2",
+        medicationId: "med2",
+        userId: targetUserId,
+        dateTime: new Date("2025-02-01T10:00:00.000Z"),
+        status: "PLANNED",
+        medication: { id: "med2", name: "Aspirin", dose: 100 },
+        schedule: {
+          medicationId: "med2",
+          quantity: 2,
+          units: "tablet",
+          mealTiming: "after",
+        },
+      },
+    ];
+
+    prismaMock.scheduleEntry.findMany.mockResolvedValueOnce(scheduleEntries);
+
+    const res = await ScheduleRoute.GET(
+      makeGetRequest({ userId: targetUserId }),
+    );
+
+    expect(res.status).toBe(200);
+    const json = await res.json();
+    expect(json.items).toHaveLength(1);
+    expect(json.items[0]).toEqual(
+      expect.objectContaining({
+        id: "se2",
+        userId: targetUserId,
+        medicationId: "med2",
+      }),
+    );
+
+    // Verify checkApiAccess was called with correct params
+    expect(ApiHelpers.checkApiAccess).toHaveBeenCalledWith(
+      expect.anything(),
+      targetUserId,
+      "viewer",
+    );
+
+    // Verify we fetched the target user's schedule, not our own
+    expect(prismaMock.scheduleEntry.findMany).toHaveBeenCalledWith(
+      expect.objectContaining({
+        where: expect.objectContaining({
+          userId: targetUserId,
+        }),
+      }),
+    );
+  });
+
+  it("returns 403 when trying to access another user's schedule without permission", async () => {
+    const targetUserId = "u3";
+
+    jest.mocked(getSessionUserFromRequest).mockResolvedValueOnce(mockUser);
+
+    // Mock checkApiAccess to deny access
+    jest.mocked(ApiHelpers.checkApiAccess).mockResolvedValueOnce({
+      authorized: false,
+      response: new Response(
+        JSON.stringify({
+          error: "Forbidden: You do not have access to this resource",
+          required: "viewer",
+          actual: "anonymous",
+        }),
+        { status: 403, headers: { "Content-Type": "application/json" } },
+      ) as unknown as NextResponse,
+    });
+
+    const res = await ScheduleRoute.GET(
+      makeGetRequest({ userId: targetUserId }),
+    );
+
+    expect(res.status).toBe(403);
+    const data = await res.json();
+    expect(data.error).toContain("Forbidden");
+
+    // Verify checkApiAccess was called
+    expect(ApiHelpers.checkApiAccess).toHaveBeenCalledWith(
+      expect.anything(),
+      targetUserId,
+      "viewer",
+    );
+
+    // Verify we did not query the database
+    expect(prismaMock.scheduleEntry.findMany).not.toHaveBeenCalled();
+  });
+
+  it("does not call checkApiAccess when userId param equals current user", async () => {
+    jest.mocked(getSessionUserFromRequest).mockResolvedValueOnce(mockUser);
+
+    const scheduleEntries = [
+      {
+        id: "se1",
+        medicationId: "med1",
+        userId: mockUser.id,
+        dateTime: new Date("2025-02-01T03:00:00.000Z"),
+        status: "PLANNED",
+        medication: { id: "med1", name: "Ibuprofen", dose: 200 },
+        schedule: {
+          medicationId: "med1",
+          quantity: 1,
+          units: "pill",
+          mealTiming: "before",
+        },
+      },
+    ];
+
+    prismaMock.scheduleEntry.findMany.mockResolvedValueOnce(scheduleEntries);
+
+    const res = await ScheduleRoute.GET(
+      makeGetRequest({ userId: mockUser.id }), // Same as current user
+    );
+
+    expect(res.status).toBe(200);
+
+    // checkApiAccess should NOT be called when userId equals current user
+    expect(ApiHelpers.checkApiAccess).not.toHaveBeenCalled();
+
+    // Should fetch user's own schedule
+    expect(prismaMock.scheduleEntry.findMany).toHaveBeenCalledWith(
+      expect.objectContaining({
+        where: expect.objectContaining({
+          userId: mockUser.id,
+        }),
+      }),
+    );
+  });
+
+  it("does not call checkApiAccess when no userId param is provided", async () => {
+    jest.mocked(getSessionUserFromRequest).mockResolvedValueOnce(mockUser);
+
+    prismaMock.scheduleEntry.findMany.mockResolvedValueOnce([]);
+
+    const res = await ScheduleRoute.GET(makeGetRequest()); // No userId param
+
+    expect(res.status).toBe(200);
+
+    // checkApiAccess should NOT be called
+    expect(ApiHelpers.checkApiAccess).not.toHaveBeenCalled();
+
+    // Should fetch user's own schedule
+    expect(prismaMock.scheduleEntry.findMany).toHaveBeenCalledWith(
+      expect.objectContaining({
+        where: expect.objectContaining({
+          userId: mockUser.id,
+        }),
+      }),
+    );
+  });
+
   it("returns 500 when database query fails", async () => {
-    jest.mocked(getSessionCookie).mockResolvedValueOnce("token");
-    jest.mocked(verifySession).mockResolvedValueOnce(mockUser);
+    jest.mocked(getSessionUserFromRequest).mockResolvedValueOnce(mockUser);
     prismaMock.scheduleEntry.findMany.mockRejectedValueOnce(new Error("fail"));
 
     const res = await ScheduleRoute.GET(makeGetRequest());

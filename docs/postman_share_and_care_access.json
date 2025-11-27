@@ -1,0 +1,458 @@
+{
+  "info": {
+    "name": "Share Profile & Care Access API",
+    "description": "API endpoints for sharing profiles and managing care access relationships",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "_exporter_id": "share-care-access-v1"
+  },
+  "auth": {
+    "type": "bearer",
+    "bearer": [
+      {
+        "key": "token",
+        "value": "{{sessionToken}}",
+        "type": "string"
+      }
+    ]
+  },
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:3000",
+      "type": "string"
+    },
+    {
+      "key": "sessionToken",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "shareToken",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "accessId",
+      "value": "",
+      "type": "string"
+    }
+  ],
+  "item": [
+    {
+      "name": "Share Links",
+      "item": [
+        {
+          "name": "Create Share Link",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "if (pm.response.code === 201) {",
+                  "    const response = pm.response.json();",
+                  "    pm.collectionVariables.set('shareToken', response.shareLink.token);",
+                  "    console.log('Share token saved:', response.shareLink.token);",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"expiresAt\": \"2025-12-31T23:59:59.000Z\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/share",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "share"]
+            },
+            "description": "Create a new share link for the authenticated user.\n\n**Request Body (optional):**\n- `expiresAt` (ISO 8601 date, optional): Custom expiration date. Defaults to 48 hours from now.\n\n**Response (201):**\n```json\n{\n  \"shareLink\": {\n    \"id\": \"share123\",\n    \"shareUrl\": \"http://localhost:3000/share/accept?token=abc123\",\n    \"token\": \"abc123\",\n    \"expiresAt\": \"2025-11-28T12:00:00Z\",\n    \"status\": \"active\",\n    \"createdAt\": \"2025-11-26T12:00:00Z\"\n  }\n}\n```\n\n**Errors:**\n- 401: Unauthorized\n- 400: Invalid input data\n- 500: Internal server error"
+          },
+          "response": []
+        },
+        {
+          "name": "Get Share Links Status",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/share/status?status=active",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "share", "status"],
+              "query": [
+                {
+                  "key": "status",
+                  "value": "active",
+                  "description": "Filter by status: active, revoked, expired, or all"
+                }
+              ]
+            },
+            "description": "Get all share links for the authenticated user.\n\n**Query Parameters:**\n- `status` (optional): Filter by status. Values: `active`, `revoked`, `expired`, `all`. Default: `active`\n\n**Response (200):**\n```json\n{\n  \"shareLinks\": [\n    {\n      \"id\": \"share123\",\n      \"token\": \"abc123\",\n      \"viewerId\": \"viewer456\",\n      \"viewer\": {\n        \"id\": \"viewer456\",\n        \"email\": \"viewer@example.com\",\n        \"name\": \"Viewer Name\"\n      },\n      \"expiresAt\": \"2025-11-28T12:00:00Z\",\n      \"status\": \"active\",\n      \"createdAt\": \"2025-11-26T12:00:00Z\",\n      \"updatedAt\": \"2025-11-26T12:00:00Z\"\n    }\n  ]\n}\n```\n\n**Errors:**\n- 401: Unauthorized\n- 400: Invalid query parameters\n- 500: Internal server error"
+          },
+          "response": []
+        },
+        {
+          "name": "Validate Share Token",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/share/validate?token={{shareToken}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "share", "validate"],
+              "query": [
+                {
+                  "key": "token",
+                  "value": "{{shareToken}}",
+                  "description": "Share token to validate"
+                }
+              ]
+            },
+            "description": "Validate a share token (public endpoint, no auth required).\n\n**Query Parameters:**\n- `token` (required): The share token to validate\n\n**Response (200) - Valid:**\n```json\n{\n  \"valid\": true,\n  \"shareLink\": {\n    \"id\": \"share123\",\n    \"ownerId\": \"owner123\",\n    \"viewerId\": null,\n    \"expiresAt\": \"2025-11-28T12:00:00Z\",\n    \"status\": \"active\",\n    \"owner\": {\n      \"id\": \"owner123\",\n      \"name\": \"Owner Name\",\n      \"email\": \"owner@example.com\"\n    }\n  }\n}\n```\n\n**Response (200) - Invalid:**\n```json\n{\n  \"valid\": false,\n  \"error\": \"Token has expired\",\n  \"status\": \"expired\",\n  \"expiresAt\": \"2025-11-20T12:00:00Z\"\n}\n```\n\n**Errors:**\n- 404: Token not found\n- 400: Invalid token parameter\n- 500: Internal server error"
+          },
+          "response": []
+        },
+        {
+          "name": "Accept Share Link",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "if (pm.response.code === 201) {",
+                  "    const response = pm.response.json();",
+                  "    pm.collectionVariables.set('accessId', response.careAccess.id);",
+                  "    console.log('Care access ID saved:', response.careAccess.id);",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"token\": \"{{shareToken}}\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/share/accept",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "share", "accept"]
+            },
+            "description": "Accept a share link and create permanent care access.\n\n**Request Body:**\n- `token` (required): The share token to accept\n\n**Response (201) - New Access:**\n```json\n{\n  \"success\": true,\n  \"message\": \"Share link accepted successfully\",\n  \"careAccess\": {\n    \"id\": \"care123\",\n    \"ownerId\": \"owner123\",\n    \"viewerId\": \"viewer456\",\n    \"createdAt\": \"2025-11-26T12:00:00Z\",\n    \"owner\": {\n      \"id\": \"owner123\",\n      \"name\": \"Owner Name\",\n      \"email\": \"owner@example.com\"\n    }\n  },\n  \"shareLink\": {\n    \"id\": \"share123\",\n    \"token\": \"abc123\"\n  }\n}\n```\n\n**Response (200) - Already Exists:**\n```json\n{\n  \"success\": true,\n  \"message\": \"Access already granted\",\n  \"careAccess\": { ... },\n  \"alreadyExists\": true\n}\n```\n\n**Errors:**\n- 401: Unauthorized\n- 404: Share link not found\n- 403: Token revoked or expired\n- 400: Cannot accept own link or invalid input\n- 500: Internal server error"
+          },
+          "response": []
+        },
+        {
+          "name": "Revoke Share Link (by token)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"token\": \"{{shareToken}}\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/share/revoke",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "share", "revoke"]
+            },
+            "description": "Revoke a share link by token (only owner can revoke).\n\n**Request Body (one required):**\n- `token` (string): The share token to revoke\n- `shareId` (string): The share link ID to revoke\n\n**Response (200):**\n```json\n{\n  \"success\": true,\n  \"shareLink\": {\n    \"id\": \"share123\",\n    \"token\": \"abc123\",\n    \"status\": \"revoked\",\n    \"revokedAt\": \"2025-11-26T14:00:00Z\"\n  }\n}\n```\n\n**Errors:**\n- 401: Unauthorized\n- 404: Share link not found\n- 403: Forbidden (not the owner)\n- 400: Invalid input data\n- 500: Internal server error"
+          },
+          "response": []
+        },
+        {
+          "name": "Revoke Share Link (by ID)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"shareId\": \"share123\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/share/revoke",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "share", "revoke"]
+            },
+            "description": "Revoke a share link by ID (only owner can revoke)."
+          },
+          "response": []
+        }
+      ],
+      "description": "Endpoints for creating and managing share links"
+    },
+    {
+      "name": "Care Access",
+      "item": [
+        {
+          "name": "Get Care Access Relationships",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/care-access",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "care-access"]
+            },
+            "description": "Get care access relationships for the authenticated user.\n\n**Response (200):**\n```json\n{\n  \"viewers\": [\n    {\n      \"accessId\": \"care123\",\n      \"userId\": \"viewer456\",\n      \"user\": {\n        \"id\": \"viewer456\",\n        \"email\": \"viewer@example.com\",\n        \"name\": \"Viewer Name\"\n      },\n      \"grantedAt\": \"2025-11-20T10:00:00Z\",\n      \"updatedAt\": \"2025-11-20T10:00:00Z\"\n    }\n  ],\n  \"caringFor\": [\n    {\n      \"accessId\": \"care456\",\n      \"userId\": \"patient789\",\n      \"user\": {\n        \"id\": \"patient789\",\n        \"email\": \"patient@example.com\",\n        \"name\": \"Patient Name\"\n      },\n      \"grantedAt\": \"2025-11-22T10:00:00Z\",\n      \"updatedAt\": \"2025-11-22T10:00:00Z\"\n    }\n  ]\n}\n```\n\n**Response Fields:**\n- `viewers`: People who can view YOUR data (you are the owner)\n- `caringFor`: People whose data YOU can view (you are the viewer)\n\n**Errors:**\n- 401: Unauthorized\n- 500: Internal server error"
+          },
+          "response": []
+        },
+        {
+          "name": "Revoke Care Access",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/care-access?accessId={{accessId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "care-access"],
+              "query": [
+                {
+                  "key": "accessId",
+                  "value": "{{accessId}}",
+                  "description": "Care access ID to revoke"
+                }
+              ]
+            },
+            "description": "Revoke care access (only owner can revoke).\n\n**Query Parameters:**\n- `accessId` (required): The care access ID to revoke\n\n**Response (200):**\n```json\n{\n  \"success\": true,\n  \"message\": \"Care access revoked successfully\"\n}\n```\n\n**Authorization:**\n- Only the OWNER can revoke access\n- The viewer cannot revoke their own access\n\n**Errors:**\n- 401: Unauthorized\n- 400: Missing accessId parameter\n- 404: Care access not found\n- 403: Forbidden (only owner can revoke)\n- 500: Internal server error"
+          },
+          "response": []
+        }
+      ],
+      "description": "Endpoints for managing care access relationships"
+    },
+    {
+      "name": "Example Workflows",
+      "item": [
+        {
+          "name": "1. Login (Get Session Token)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "if (pm.response.code === 200) {",
+                  "    const cookies = pm.cookies.all();",
+                  "    const sessionCookie = cookies.find(c => c.name === 'SESSION_ID');",
+                  "    if (sessionCookie) {",
+                  "        pm.collectionVariables.set('sessionToken', sessionCookie.value);",
+                  "        console.log('Session token saved from cookie');",
+                  "    }",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"user@example.com\",\n  \"password\": \"password123\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/auth/login",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "auth", "login"]
+            },
+            "description": "Login to get session token for authenticated requests.\n\nThe session token will be automatically saved to the collection variable `sessionToken`."
+          },
+          "response": []
+        },
+        {
+          "name": "2. Owner: Create Share Link",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "if (pm.response.code === 201) {",
+                  "    const response = pm.response.json();",
+                  "    pm.collectionVariables.set('shareToken', response.shareLink.token);",
+                  "    console.log('Share URL:', response.shareLink.shareUrl);",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/share",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "share"]
+            },
+            "description": "Owner creates a share link to share with caregivers."
+          },
+          "response": []
+        },
+        {
+          "name": "3. Viewer: Validate Token",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/share/validate?token={{shareToken}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "share", "validate"],
+              "query": [
+                {
+                  "key": "token",
+                  "value": "{{shareToken}}"
+                }
+              ]
+            },
+            "description": "Viewer validates the share token before accepting (no auth required)."
+          },
+          "response": []
+        },
+        {
+          "name": "4. Viewer: Accept Share Link",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "if (pm.response.code === 201) {",
+                  "    const response = pm.response.json();",
+                  "    pm.collectionVariables.set('accessId', response.careAccess.id);",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"token\": \"{{shareToken}}\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/share/accept",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "share", "accept"]
+            },
+            "description": "Viewer accepts the share link (must be logged in).\n\nCreates permanent CareAccess relationship."
+          },
+          "response": []
+        },
+        {
+          "name": "5. Both: View Care Relationships",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/care-access",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "care-access"]
+            },
+            "description": "Both owner and viewer can view their care relationships.\n\n- Owner sees viewers list\n- Viewer sees caringFor list"
+          },
+          "response": []
+        },
+        {
+          "name": "6. Viewer: Access Shared Schedule",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/schedule?userId=owner123&from=2025-11-01T00:00:00.000Z&to=2025-11-30T23:59:59.999Z",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "schedule"],
+              "query": [
+                {
+                  "key": "userId",
+                  "value": "owner123",
+                  "description": "Owner's user ID (viewer has access)"
+                },
+                {
+                  "key": "from",
+                  "value": "2025-11-01T00:00:00.000Z"
+                },
+                {
+                  "key": "to",
+                  "value": "2025-11-30T23:59:59.999Z"
+                }
+              ]
+            },
+            "description": "Viewer accesses the owner's schedule data.\n\nRequires viewer to have CareAccess permission."
+          },
+          "response": []
+        },
+        {
+          "name": "7. Owner: Revoke Access",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/care-access?accessId={{accessId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "care-access"],
+              "query": [
+                {
+                  "key": "accessId",
+                  "value": "{{accessId}}"
+                }
+              ]
+            },
+            "description": "Owner revokes viewer's access to their data."
+          },
+          "response": []
+        }
+      ],
+      "description": "Complete workflow examples from creating share links to revoking access"
+    }
+  ]
+}
