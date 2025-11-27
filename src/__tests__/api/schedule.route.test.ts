@@ -3,7 +3,7 @@ import { NextResponse } from "next/server";
 import { getSessionUserFromRequest } from "@/lib/auth/session";
 import { prismaMock } from "../../../tests-setup/prisma.mock";
 import * as GenerateRoute from "@/app/api/schedule/generate/route";
-import { checkApiAccess } from "@/lib/middleware/apiHelpers";
+import * as ApiHelpers from "@/lib/middleware/apiHelpers";
 
 // Mock the generateScheduleEntries function
 jest.mock("@/app/api/schedule/generate/route", () => ({
@@ -11,11 +11,7 @@ jest.mock("@/app/api/schedule/generate/route", () => ({
 }));
 
 // Mock the apiHelpers module
-jest.mock("@/lib/middleware/apiHelpers", () => ({
-  checkApiAccess: jest.fn(),
-  extractTargetUserId: jest.fn(),
-  checkApiAccessAuto: jest.fn(),
-}));
+jest.mock("@/lib/middleware/apiHelpers");
 
 type GetHandler = typeof ScheduleRoute.GET;
 type GetRequest = Parameters<GetHandler>[0];
@@ -141,7 +137,7 @@ describe("GET /api/schedule", () => {
     jest.mocked(getSessionUserFromRequest).mockResolvedValueOnce(mockUser);
 
     // Mock checkApiAccess to grant viewer access
-    jest.mocked(checkApiAccess).mockResolvedValueOnce({
+    jest.mocked(ApiHelpers.checkApiAccess).mockResolvedValueOnce({
       authorized: true,
       context: {
         userId: mockUser.id,
@@ -185,7 +181,7 @@ describe("GET /api/schedule", () => {
     );
 
     // Verify checkApiAccess was called with correct params
-    expect(checkApiAccess).toHaveBeenCalledWith(
+    expect(ApiHelpers.checkApiAccess).toHaveBeenCalledWith(
       expect.anything(),
       targetUserId,
       "viewer",
@@ -207,7 +203,7 @@ describe("GET /api/schedule", () => {
     jest.mocked(getSessionUserFromRequest).mockResolvedValueOnce(mockUser);
 
     // Mock checkApiAccess to deny access
-    jest.mocked(checkApiAccess).mockResolvedValueOnce({
+    jest.mocked(ApiHelpers.checkApiAccess).mockResolvedValueOnce({
       authorized: false,
       response: new Response(
         JSON.stringify({
@@ -228,7 +224,7 @@ describe("GET /api/schedule", () => {
     expect(data.error).toContain("Forbidden");
 
     // Verify checkApiAccess was called
-    expect(checkApiAccess).toHaveBeenCalledWith(
+    expect(ApiHelpers.checkApiAccess).toHaveBeenCalledWith(
       expect.anything(),
       targetUserId,
       "viewer",
@@ -267,7 +263,7 @@ describe("GET /api/schedule", () => {
     expect(res.status).toBe(200);
 
     // checkApiAccess should NOT be called when userId equals current user
-    expect(checkApiAccess).not.toHaveBeenCalled();
+    expect(ApiHelpers.checkApiAccess).not.toHaveBeenCalled();
 
     // Should fetch user's own schedule
     expect(prismaMock.scheduleEntry.findMany).toHaveBeenCalledWith(
@@ -289,7 +285,7 @@ describe("GET /api/schedule", () => {
     expect(res.status).toBe(200);
 
     // checkApiAccess should NOT be called
-    expect(checkApiAccess).not.toHaveBeenCalled();
+    expect(ApiHelpers.checkApiAccess).not.toHaveBeenCalled();
 
     // Should fetch user's own schedule
     expect(prismaMock.scheduleEntry.findMany).toHaveBeenCalledWith(
