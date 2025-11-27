@@ -29,6 +29,7 @@ const mockScheduleEntry = {
   findFirst: jest.fn() as AsyncMockFn<[unknown], unknown>,
   createMany: jest.fn() as AsyncMockFn<[unknown], unknown>,
   update: jest.fn() as AsyncMockFn<[unknown], unknown>,
+  delete: jest.fn() as AsyncMockFn<[unknown], unknown>,
   deleteMany: jest.fn() as AsyncMockFn<[unknown], unknown>,
   count: jest.fn() as AsyncMockFn<[unknown], unknown>,
 };
