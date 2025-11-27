@@ -242,7 +242,9 @@ export function ScheduleList({
               <div className={styles.itemContent}>
                 <div className={styles.itemTitleRow}>
                   <h3 className={styles.itemTitle}>{item.name}</h3>
-                  <span className={styles.dosage}>{item.dosage}</span>
+                  {item.dosage && (
+                    <span className={styles.dosage}>{item.dosage}</span>
+                  )}
                 </div>
                 <div className={styles.itemMeta}>
                   <span className={styles.dose}>{item.dose}</span>
@@ -298,7 +300,9 @@ export function ScheduleList({
               <div className={styles.itemContent}>
                 <div className={styles.itemTitleRow}>
                   <h3 className={styles.itemTitle}>{item.name}</h3>
-                  <span className={styles.dosage}>{item.dosage}</span>
+                  {item.dosage && (
+                    <span className={styles.dosage}>{item.dosage}</span>
+                  )}
                 </div>
                 <div className={styles.itemMeta}>
                   <span className={styles.timeChip}>
