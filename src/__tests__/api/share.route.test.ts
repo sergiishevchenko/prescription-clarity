@@ -79,7 +79,7 @@ describe("POST /api/share", () => {
       status: "active",
     });
     expect(data.shareLink.shareUrl).toContain(`token=${mockToken}`);
-    expect(data.shareLink.shareUrl).toContain("/share/accept");
+    expect(data.shareLink.shareUrl).toContain("/api/share/accept");
 
     expect(prismaMock.shareLink.create).toHaveBeenCalledWith({
       data: {

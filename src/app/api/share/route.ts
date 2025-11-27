@@ -54,7 +54,7 @@ export async function POST(request: NextRequest) {
     const baseUrl =
       process.env.NEXT_PUBLIC_APP_URL ||
       `${request.nextUrl.protocol}//${request.nextUrl.host}`;
-    const shareUrl = `${baseUrl}/share/accept?token=${token}`;
+    const shareUrl = `${baseUrl}/api/share/accept?token=${token}`;
 
     return NextResponse.json(
       {
