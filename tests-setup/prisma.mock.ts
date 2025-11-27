@@ -47,6 +47,24 @@ const mockSchedule = {
   delete: jest.fn() as AsyncMockFn<[unknown], unknown>,
 };
 
+const mockShareLink = {
+  create: jest.fn() as AsyncMockFn<[unknown], unknown>,
+  findUnique: jest.fn() as AsyncMockFn<[unknown], unknown>,
+  findFirst: jest.fn() as AsyncMockFn<[unknown], unknown>,
+  findMany: jest.fn() as AsyncMockFn<[unknown], unknown>,
+  update: jest.fn() as AsyncMockFn<[unknown], unknown>,
+  delete: jest.fn() as AsyncMockFn<[unknown], unknown>,
+};
+
+const mockCareAccess = {
+  create: jest.fn() as AsyncMockFn<[unknown], unknown>,
+  findUnique: jest.fn() as AsyncMockFn<[unknown], unknown>,
+  findMany: jest.fn() as AsyncMockFn<[unknown], unknown>,
+  delete: jest.fn() as AsyncMockFn<[unknown], unknown>,
+};
+
+const mockTransaction = jest.fn() as AsyncMockFn<[unknown], unknown>;
+
 jest.mock("@/lib/db", () => ({
   __esModule: true,
   prisma: {
@@ -56,6 +74,9 @@ jest.mock("@/lib/db", () => ({
     scheduleEntry: mockScheduleEntry,
     schedule: mockSchedule,
     dayStatus: mockDayStatus,
+    shareLink: mockShareLink,
+    careAccess: mockCareAccess,
+    $transaction: mockTransaction,
   },
   default: {
     user: mockUser,
@@ -64,6 +85,9 @@ jest.mock("@/lib/db", () => ({
     scheduleEntry: mockScheduleEntry,
     schedule: mockSchedule,
     dayStatus: mockDayStatus,
+    shareLink: mockShareLink,
+    careAccess: mockCareAccess,
+    $transaction: mockTransaction,
   },
 }));
 
@@ -74,6 +98,9 @@ export const prismaMock = {
   scheduleEntry: mockScheduleEntry,
   schedule: mockSchedule,
   dayStatus: mockDayStatus,
+  shareLink: mockShareLink,
+  careAccess: mockCareAccess,
+  $transaction: mockTransaction,
 };
 
 beforeEach(() => jest.clearAllMocks());

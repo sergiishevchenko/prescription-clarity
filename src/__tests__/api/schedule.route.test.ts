@@ -1,6 +1,5 @@
 import * as ScheduleRoute from "@/app/api/schedule/route";
-import { getSessionCookie } from "@/lib/auth/cookies";
-import { verifySession, getSessionUserFromRequest } from "@/lib/auth/session";
+import { getSessionUserFromRequest } from "@/lib/auth/session";
 import { prismaMock } from "../../../tests-setup/prisma.mock";
 import * as GenerateRoute from "@/app/api/schedule/generate/route";
 
@@ -34,8 +33,8 @@ describe("GET /api/schedule", () => {
     jest.clearAllMocks();
   });
 
-  it("returns 401 when no session cookie", async () => {
-    jest.mocked(getSessionCookie).mockResolvedValueOnce(null);
+  it("returns 401 when no session user", async () => {
+    jest.mocked(getSessionUserFromRequest).mockResolvedValueOnce(null);
 
     const res = await ScheduleRoute.GET(makeGetRequest());
     expect(res.status).toBe(401);
@@ -45,19 +44,17 @@ describe("GET /api/schedule", () => {
   });
 
   it("returns 401 when session is invalid", async () => {
-    jest.mocked(getSessionCookie).mockResolvedValueOnce("invalid");
-    jest.mocked(verifySession).mockResolvedValueOnce(null);
+    jest.mocked(getSessionUserFromRequest).mockResolvedValueOnce(null);
 
     const res = await ScheduleRoute.GET(makeGetRequest());
     expect(res.status).toBe(401);
     await expect(res.json()).resolves.toEqual(
-      expect.objectContaining({ error: "Invalid session" }),
+      expect.objectContaining({ error: "Unauthorized" }),
     );
   });
 
   it("returns 400 when query params are invalid", async () => {
-    jest.mocked(getSessionCookie).mockResolvedValueOnce("token");
-    jest.mocked(verifySession).mockResolvedValueOnce(mockUser);
+    jest.mocked(getSessionUserFromRequest).mockResolvedValueOnce(mockUser);
 
     const req = new Request(
       `http://localhost/api/schedule?to=${defaultTo}`,
@@ -72,8 +69,7 @@ describe("GET /api/schedule", () => {
   });
 
   it("returns schedule items when request is valid", async () => {
-    jest.mocked(getSessionCookie).mockResolvedValueOnce("token");
-    jest.mocked(verifySession).mockResolvedValueOnce(mockUser);
+    jest.mocked(getSessionUserFromRequest).mockResolvedValueOnce(mockUser);
 
     const scheduleEntries = [
       {
@@ -128,8 +124,7 @@ describe("GET /api/schedule", () => {
   });
 
   it("returns 500 when database query fails", async () => {
-    jest.mocked(getSessionCookie).mockResolvedValueOnce("token");
-    jest.mocked(verifySession).mockResolvedValueOnce(mockUser);
+    jest.mocked(getSessionUserFromRequest).mockResolvedValueOnce(mockUser);
     prismaMock.scheduleEntry.findMany.mockRejectedValueOnce(new Error("fail"));
 
     const res = await ScheduleRoute.GET(makeGetRequest());
