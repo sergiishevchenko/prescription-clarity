@@ -58,10 +58,15 @@ export async function GET(request: NextRequest) {
           gte: fromDate,
           lte: toDate,
         },
+        // NOTE: We do NOT filter by schedule.deletedAt or medication.deletedAt here
+        // because we want to preserve historical entries for deleted medications.
+        // Future PLANNED entries are already deleted during the medication delete flow,
+        // so remaining entries are either past/completed entries (history) or entries
+        // that were marked DONE before deletion.
       },
       include: {
         medication: {
-          select: { id: true, name: true, dose: true },
+          select: { id: true, name: true, dose: true, deletedAt: true },
         },
         schedule: {
           select: {
@@ -69,6 +74,7 @@ export async function GET(request: NextRequest) {
             quantity: true,
             units: true,
             mealTiming: true,
+            deletedAt: true,
           },
         },
       },
@@ -77,13 +83,16 @@ export async function GET(request: NextRequest) {
 
     type EventWithRelations = Prisma.ScheduleEntryGetPayload<{
       include: {
-        medication: { select: { id: true; name: true; dose: true } };
+        medication: {
+          select: { id: true; name: true; dose: true; deletedAt: true };
+        };
         schedule: {
           select: {
             medicationId: true;
             quantity: true;
             units: true;
             mealTiming: true;
+            deletedAt: true;
           };
         };
       };
@@ -99,7 +108,16 @@ export async function GET(request: NextRequest) {
       quantity: e.schedule?.quantity ?? null,
       units: e.schedule?.units ?? null,
       mealTiming: e.schedule?.mealTiming ?? null,
-      medication: e.medication ?? null,
+      medication: e.medication
+        ? {
+            id: e.medication.id,
+            name: e.medication.name,
+            dose: e.medication.dose,
+          }
+        : null,
+      // Indicate if this is a historical entry from a deleted medication/schedule
+      isFromDeletedMedication: e.medication?.deletedAt != null,
+      isFromDeletedSchedule: e.schedule?.deletedAt != null,
     }));
 
     return NextResponse.json({ items: result });
@@ -136,14 +154,8 @@ export async function POST(request: NextRequest) {
       dateEnd.setDate(dateEnd.getDate() + validatedData.durationDays);
     }
 
-    const today = new Date();
-    today.setHours(0, 0, 0, 0);
-    if (dateStart < today) {
-      return NextResponse.json(
-        { error: "dateStart must be today or in the future" },
-        { status: 400 },
-      );
-    }
+    // NOTE: Past start dates are allowed to enable users to record historical medication intake
+    // The schedule generation will create all entries from the start date
 
     const schedule = await prisma.schedule.create({
       data: {

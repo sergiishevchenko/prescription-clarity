@@ -18,7 +18,13 @@ export async function GET() {
     }
 
     const templates = await prisma.schedule.findMany({
-      where: { userId: user.id },
+      where: {
+        userId: user.id,
+        deletedAt: null, // Only return non-deleted schedules
+        medication: {
+          deletedAt: null, // Only for non-deleted medications
+        },
+      },
       include: {
         medication: {
           select: {

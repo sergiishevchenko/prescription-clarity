@@ -20,6 +20,7 @@ const mockMedication = {
   findFirst: jest.fn() as AsyncMockFn<[unknown], unknown>,
   create: jest.fn() as AsyncMockFn<[unknown], unknown>,
   update: jest.fn() as AsyncMockFn<[unknown], unknown>,
+  updateMany: jest.fn() as AsyncMockFn<[unknown], unknown>,
   delete: jest.fn() as AsyncMockFn<[unknown], unknown>,
 };
 
@@ -44,8 +45,26 @@ const mockSchedule = {
   findMany: jest.fn() as AsyncMockFn<[unknown], unknown>,
   create: jest.fn() as AsyncMockFn<[unknown], unknown>,
   update: jest.fn() as AsyncMockFn<[unknown], unknown>,
+  updateMany: jest.fn() as AsyncMockFn<[unknown], unknown>,
   delete: jest.fn() as AsyncMockFn<[unknown], unknown>,
 };
+
+// Transaction mock - executes callback with the same mock client
+const mock$transaction = jest.fn(async (callback: (tx: unknown) => unknown) => {
+  // If callback is a function, call it with the mock prisma client
+  if (typeof callback === "function") {
+    return callback({
+      medication: mockMedication,
+      schedule: mockSchedule,
+      scheduleEntry: mockScheduleEntry,
+      dayStatus: mockDayStatus,
+      user: mockUser,
+      session: mockSession,
+    });
+  }
+  // If it's an array of promises, resolve them
+  return Promise.all(callback as Promise<unknown>[]);
+}) as AsyncMockFn<[unknown], unknown>;
 
 jest.mock("@/lib/db", () => ({
   __esModule: true,
@@ -56,6 +75,7 @@ jest.mock("@/lib/db", () => ({
     scheduleEntry: mockScheduleEntry,
     schedule: mockSchedule,
     dayStatus: mockDayStatus,
+    $transaction: mock$transaction,
   },
   default: {
     user: mockUser,
@@ -64,6 +84,7 @@ jest.mock("@/lib/db", () => ({
     scheduleEntry: mockScheduleEntry,
     schedule: mockSchedule,
     dayStatus: mockDayStatus,
+    $transaction: mock$transaction,
   },
 }));
 
@@ -74,6 +95,7 @@ export const prismaMock = {
   scheduleEntry: mockScheduleEntry,
   schedule: mockSchedule,
   dayStatus: mockDayStatus,
+  $transaction: mock$transaction,
 };
 
 beforeEach(() => jest.clearAllMocks());

@@ -239,6 +239,11 @@ export function ScheduleManager({
             );
             setEditingSchedule(null);
           }}
+          onDelete={(deletedId) => {
+            setSchedules((prev) =>
+              prev.filter((item) => item.id !== deletedId),
+            );
+          }}
         />
       ) : null}
     </section>
@@ -249,12 +254,14 @@ type ScheduleEditDialogProps = {
   schedule: ScheduleCardData;
   onClose: () => void;
   onSave: (schedule: ScheduleCardData) => void;
+  onDelete?: (scheduleId: string) => void;
 };
 
 function ScheduleEditDialog({
   schedule,
   onClose,
   onSave,
+  onDelete,
 }: ScheduleEditDialogProps) {
   const router = useRouter();
   const [quantity, setQuantity] = useState(String(schedule.quantity));
@@ -273,6 +280,8 @@ function ScheduleEditDialog({
   const [regenerateEntries, setRegenerateEntries] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState(false);
+  const [deleting, setDeleting] = useState(false);
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const [isPending, startTransition] = useTransition();
 
   const toggleDay = (value: number) => {
@@ -358,6 +367,34 @@ function ScheduleEditDialog({
       }
     } finally {
       setSubmitting(false);
+    }
+  };
+
+  const handleDelete = async () => {
+    setError(null);
+    setDeleting(true);
+    try {
+      const res = await fetch(`/api/schedule/templates/${schedule.id}`, {
+        method: "DELETE",
+      });
+
+      if (!res.ok) {
+        const body = await res.json().catch(() => ({}));
+        throw new Error(body?.error || "Failed to delete schedule");
+      }
+
+      onDelete?.(schedule.id);
+      onClose();
+      startTransition(() => router.refresh());
+    } catch (err) {
+      if (err instanceof Error) {
+        setError(err.message);
+      } else {
+        setError("Failed to delete schedule. Please try again.");
+      }
+      setShowDeleteConfirm(false);
+    } finally {
+      setDeleting(false);
     }
   };
 
@@ -535,20 +572,60 @@ function ScheduleEditDialog({
           <div className={styles.dialogFooter}>
             <button
               type="button"
-              onClick={onClose}
-              className={styles.dialogCancelButton}
+              onClick={() => setShowDeleteConfirm(true)}
+              disabled={submitting || deleting || isPending}
+              className={styles.dialogDeleteButton}
             >
-              Cancel
+              Delete
             </button>
-            <button
-              type="submit"
-              disabled={submitting || isPending}
-              className={styles.dialogSaveButton}
-            >
-              {submitting || isPending ? "Saving..." : "Save changes"}
-            </button>
+            <div className={styles.dialogFooterRight}>
+              <button
+                type="button"
+                onClick={onClose}
+                className={styles.dialogCancelButton}
+              >
+                Cancel
+              </button>
+              <button
+                type="submit"
+                disabled={submitting || deleting || isPending}
+                className={styles.dialogSaveButton}
+              >
+                {submitting || isPending ? "Saving..." : "Save changes"}
+              </button>
+            </div>
           </div>
         </form>
+
+        {showDeleteConfirm && (
+          <div className={styles.confirmOverlay}>
+            <div className={styles.confirmPanel}>
+              <h4 className={styles.confirmTitle}>Delete Schedule?</h4>
+              <p className={styles.confirmText}>
+                This will delete the schedule and remove all future doses. Past
+                entries will be preserved for your history.
+              </p>
+              <div className={styles.confirmActions}>
+                <button
+                  type="button"
+                  onClick={() => setShowDeleteConfirm(false)}
+                  className={styles.dialogCancelButton}
+                  disabled={deleting}
+                >
+                  Cancel
+                </button>
+                <button
+                  type="button"
+                  onClick={handleDelete}
+                  disabled={deleting}
+                  className={styles.confirmDeleteButton}
+                >
+                  {deleting ? "Deleting..." : "Delete Schedule"}
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );

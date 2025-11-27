@@ -4,6 +4,7 @@ import { getSessionCookie } from "@/lib/auth/cookies";
 import { verifySession } from "@/lib/auth/session";
 import { updateScheduleSchema } from "@/lib/validators/schedule";
 import { generateScheduleEntries } from "@/app/api/schedule/generate/route";
+import { updateDayStatusesForDates } from "@/lib/day-status";
 
 export const runtime = "nodejs";
 
@@ -24,7 +25,14 @@ export async function PATCH(
     }
 
     const existing = await prisma.schedule.findFirst({
-      where: { id, userId: user.id },
+      where: {
+        id,
+        userId: user.id,
+        deletedAt: null, // Only allow editing non-deleted schedules
+        medication: {
+          deletedAt: null, // Only for non-deleted medications
+        },
+      },
       include: {
         medication: {
           select: {
@@ -137,6 +145,115 @@ export async function PATCH(
       );
     }
     console.error("Update schedule template error:", error);
+    return NextResponse.json(
+      { error: "Internal server error" },
+      { status: 500 },
+    );
+  }
+}
+
+/**
+ * DELETE /api/schedule/templates/[id]
+ * Soft delete a schedule and remove future PLANNED entries
+ * Past entries are preserved for history
+ */
+export async function DELETE(
+  request: NextRequest,
+  { params }: { params: Promise<{ id: string }> },
+) {
+  try {
+    const { id } = await params;
+    const sessionToken = await getSessionCookie();
+    if (!sessionToken) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+
+    const user = await verifySession(sessionToken);
+    if (!user) {
+      return NextResponse.json({ error: "Invalid session" }, { status: 401 });
+    }
+
+    // Get timezone from query params (optional, defaults to UTC)
+    const { searchParams } = new URL(request.url);
+    const timezone = searchParams.get("tz") || "UTC";
+
+    // Check if schedule exists and belongs to user
+    const existing = await prisma.schedule.findFirst({
+      where: {
+        id,
+        userId: user.id,
+        deletedAt: null,
+      },
+    });
+
+    if (!existing) {
+      return NextResponse.json({ error: "Not found" }, { status: 404 });
+    }
+
+    const now = new Date();
+
+    // Get future PLANNED entries for day status cache update
+    const entriesToDelete = await prisma.scheduleEntry.findMany({
+      where: {
+        scheduleId: id,
+        userId: user.id,
+        dateTime: {
+          gte: now,
+        },
+        status: "PLANNED",
+      },
+      select: {
+        dateTime: true,
+      },
+    });
+
+    // Extract unique dates for cache invalidation
+    const affectedDates = Array.from(
+      new Set(
+        entriesToDelete.map((e) => {
+          const d = new Date(e.dateTime);
+          d.setHours(0, 0, 0, 0);
+          return d.toISOString();
+        }),
+      ),
+    ).map((iso) => new Date(iso));
+
+    // Delete future PLANNED entries
+    const deleteResult = await prisma.scheduleEntry.deleteMany({
+      where: {
+        scheduleId: id,
+        userId: user.id,
+        dateTime: {
+          gte: now,
+        },
+        status: "PLANNED",
+      },
+    });
+
+    // Soft delete the schedule
+    await prisma.schedule.update({
+      where: { id },
+      data: { deletedAt: now },
+    });
+
+    // Update day status cache for affected dates
+    if (affectedDates.length > 0) {
+      updateDayStatusesForDates(user.id, affectedDates, timezone).catch(
+        (error) => {
+          console.error(
+            "Failed to update day status cache after schedule deletion:",
+            error,
+          );
+        },
+      );
+    }
+
+    return NextResponse.json({
+      message: "Schedule deleted successfully",
+      deletedEntries: deleteResult.count,
+    });
+  } catch (error) {
+    console.error("Delete schedule template error:", error);
     return NextResponse.json(
       { error: "Internal server error" },
       { status: 500 },
