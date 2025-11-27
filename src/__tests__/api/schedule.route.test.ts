@@ -1,4 +1,5 @@
 import * as ScheduleRoute from "@/app/api/schedule/route";
+import { NextResponse } from "next/server";
 import { getSessionUserFromRequest } from "@/lib/auth/session";
 import { prismaMock } from "../../../tests-setup/prisma.mock";
 import * as GenerateRoute from "@/app/api/schedule/generate/route";
@@ -136,7 +137,6 @@ describe("GET /api/schedule", () => {
 
   it("returns another user's schedule when userId param is provided and user has access", async () => {
     const targetUserId = "u2";
-    const targetUser = { id: targetUserId, email: "target@example.com", name: "Target" };
 
     jest.mocked(getSessionUserFromRequest).mockResolvedValueOnce(mockUser);
 
@@ -169,7 +169,9 @@ describe("GET /api/schedule", () => {
 
     prismaMock.scheduleEntry.findMany.mockResolvedValueOnce(scheduleEntries);
 
-    const res = await ScheduleRoute.GET(makeGetRequest({ userId: targetUserId }));
+    const res = await ScheduleRoute.GET(
+      makeGetRequest({ userId: targetUserId }),
+    );
 
     expect(res.status).toBe(200);
     const json = await res.json();
@@ -214,10 +216,12 @@ describe("GET /api/schedule", () => {
           actual: "anonymous",
         }),
         { status: 403, headers: { "Content-Type": "application/json" } },
-      ) as any,
+      ) as unknown as NextResponse,
     });
 
-    const res = await ScheduleRoute.GET(makeGetRequest({ userId: targetUserId }));
+    const res = await ScheduleRoute.GET(
+      makeGetRequest({ userId: targetUserId }),
+    );
 
     expect(res.status).toBe(403);
     const data = await res.json();
