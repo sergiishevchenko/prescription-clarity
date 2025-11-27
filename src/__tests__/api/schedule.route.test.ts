@@ -13,6 +13,11 @@ jest.mock("@/app/api/schedule/generate/route", () => ({
 // Mock the apiHelpers module
 jest.mock("@/lib/middleware/apiHelpers");
 
+// Clean up mock after all tests to prevent pollution
+afterAll(() => {
+  jest.unmock("@/lib/middleware/apiHelpers");
+});
+
 type GetHandler = typeof ScheduleRoute.GET;
 type GetRequest = Parameters<GetHandler>[0];
 
