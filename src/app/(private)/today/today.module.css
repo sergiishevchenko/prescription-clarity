@@ -871,19 +871,23 @@
 
 @media (max-width: 768px) {
   .headerInner {
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 0.75rem;
+    gap: 0.5rem;
+  }
+
+  .profileBlock {
+    gap: 0.1rem;
   }
 
   .headerButtons {
-    align-self: stretch;
-    justify-content: flex-start;
+    gap: 0.5rem;
   }
 
   .sectionHeader {
-    flex-direction: column;
-    align-items: flex-start;
+    gap: 0.5rem;
+  }
+
+  .sectionHeading {
+    gap: 0;
   }
 
   .markAllButton span {
@@ -891,16 +895,17 @@
   }
 
   .listItem {
-    flex-direction: column;
-    align-items: stretch;
+    flex-direction: row;
+    align-items: center;
+    gap: 0.75rem;
   }
 
   .statusButton {
-    align-self: flex-start;
+    flex-shrink: 0;
   }
 
   .moreButton {
-    align-self: flex-end;
+    flex-shrink: 0;
   }
 
   .dayControls {
@@ -910,19 +915,230 @@
   .calendarSection {
     padding: 1.25rem;
   }
+
+  /* Additional tablet optimizations */
+  .iconButton {
+    width: 48px;
+    height: 48px;
+  }
+
+  .sectionTitle {
+    font-size: 1.3rem;
+  }
+
+  .statusButton {
+    width: 52px;
+    height: 52px;
+  }
+
+  .itemTitle {
+    font-size: 1.4rem;
+  }
+
+  .navArrow {
+    width: 44px;
+    height: 44px;
+  }
+
+  .calendarDay {
+    height: 44px;
+  }
 }
 
 @media (max-width: 520px) {
   .content {
-    padding-inline: 0.75rem;
+    padding: 0.75rem 0.6rem;
+  }
+
+  .stickyHeader {
+    padding: 0.5rem 0.75rem;
+  }
+
+  .profileBlock {
+    gap: 0;
+  }
+
+  .profileName {
+    font-size: 0.95rem;
+  }
+
+  .profileDate {
+    font-size: 0.8rem;
+  }
+
+  .headerButtons {
+    gap: 0.35rem;
+  }
+
+  .iconButton {
+    width: 36px;
+    height: 36px;
+  }
+
+  .iconButtonIcon {
+    width: 1rem;
+    height: 1rem;
+  }
+
+  .sectionHeader {
+    gap: 0.4rem;
+    margin-bottom: 0.6rem;
+  }
+
+  .sectionHeading {
+    flex: 1;
+    min-width: 0;
+  }
+
+  .sectionTitle {
+    font-size: 1.1rem;
+  }
+
+  .sectionSubtitle {
+    margin-top: 0;
+    font-size: 0.75rem;
+  }
+
+  .markAllButton {
+    padding: 0.4rem 0.55rem;
+    border-radius: 0.55rem;
+    flex-shrink: 0;
+  }
+
+  .markAllIcon {
+    width: 0.95rem;
+    height: 0.95rem;
+  }
+
+  .scheduleList {
+    gap: 0.5rem;
+  }
+
+  .listItem {
+    padding: 0.65rem 0.75rem;
+    border-radius: 0.85rem;
+    gap: 0.6rem;
+  }
+
+  .statusButton {
+    width: 38px;
+    height: 38px;
+    border-width: 2px;
+  }
+
+  .statusIcon {
+    width: 0.9rem;
+    height: 0.9rem;
+  }
+
+  .itemContent {
+    gap: 0.15rem;
+  }
+
+  .itemTitleRow {
+    gap: 0.4rem;
+  }
+
+  .itemTitle {
+    font-size: 1rem;
+  }
+
+  .dosage {
+    font-size: 0.8rem;
+  }
+
+  .itemMeta {
+    font-size: 0.7rem;
+    gap: 0.3rem;
+  }
+
+  .metaIcon {
+    width: 0.85rem;
+    height: 0.85rem;
+  }
+
+  .contextTag {
+    font-size: 0.65rem;
+  }
+
+  .moreButton {
+    width: 32px;
+    height: 32px;
+  }
+
+  .moreIcon {
+    width: 1rem;
+    height: 1rem;
+  }
+
+  .sectionDivider {
+    margin: 1.25rem 0 0.6rem;
+    font-size: 0.7rem;
+  }
+
+  .dayControls {
+    margin-top: 1.5rem;
+    gap: 0.5rem;
+  }
+
+  .navArrow {
+    width: 42px;
+    height: 42px;
+  }
+
+  .dateButton {
+    flex: 1;
+    padding: 0.6rem 1rem;
+    min-height: 3.25rem;
+  }
+
+  .datePrimary {
+    font-size: 0.9rem;
+  }
+
+  .dateSecondary {
+    font-size: 0.7rem;
+  }
+
+  .calendarSection {
+    margin-top: 1.5rem;
+    padding: 1rem;
+    border-radius: 1.15rem;
+    gap: 0.9rem;
+  }
+
+  .calendarTitle {
+    font-size: 0.95rem;
+  }
+
+  .calendarNav {
+    width: 34px;
+    height: 34px;
   }
 
   .calendarGrid,
   .weekdays {
-    gap: 0.35rem;
+    gap: 0.3rem;
+  }
+
+  .weekdays {
+    font-size: 0.7rem;
   }
 
   .calendarDay {
-    height: 42px;
+    height: 38px;
+    font-size: 0.8rem;
+    border-radius: 0.7rem;
+  }
+
+  .calendarLegend {
+    gap: 0.6rem;
+    font-size: 0.75rem;
+    justify-content: center;
+  }
+
+  .legendSwatch {
+    width: 10px;
+    height: 10px;
   }
 }

@@ -28,7 +28,10 @@ export function formatDose(
   return `${effectiveQuantity} ${effectiveUnits}`;
 }
 
-export function formatDosage(dose: number): string {
+export function formatDosage(dose: number | null | undefined): string {
+  if (dose == null) {
+    return "";
+  }
   return `${dose} mg`;
 }
 
