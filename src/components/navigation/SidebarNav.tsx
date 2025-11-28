@@ -227,15 +227,15 @@ export function SidebarNav({ user, onClose }: SidebarNavProps) {
           <div className={styles.logoMark}>
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img
-              src="/logo.png"
+              src="/logo.svg"
               alt="Prescription Clarity Logo"
               className={styles.logoImage}
             />
           </div>
-          <div className={styles.logoTitle}>
+          <Link href="/dashboard" className={styles.logoTitle}>
             <h1>Prescription</h1>
             <p>Clarity</p>
-          </div>
+          </Link>
           {onClose && (
             <button
               type="button"

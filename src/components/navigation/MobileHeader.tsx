@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import styles from "./MobileHeader.module.css";
 
 type MobileHeaderProps = {
@@ -15,15 +16,15 @@ export function MobileHeader({ onMenuToggle, isMenuOpen }: MobileHeaderProps) {
           <div className={styles.logoMark}>
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img
-              src="/logo.png"
+              src="/logo.svg"
               alt="Prescription Clarity Logo"
               className={styles.logoImage}
             />
           </div>
-          <div className={styles.logoTitle}>
+          <Link href="/dashboard" className={styles.logoTitle}>
             <h1>Prescription</h1>
             <p>Clarity</p>
-          </div>
+          </Link>
         </div>
         <button
           type="button"
