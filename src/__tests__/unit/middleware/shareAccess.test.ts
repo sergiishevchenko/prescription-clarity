@@ -221,7 +221,9 @@ describe("ShareAccess Middleware", () => {
     });
 
     it("should return viewer when valid share token provided", async () => {
-      const futureDate = new Date("2025-11-28T12:00:00Z");
+      // Use a date far in the future to ensure it's not expired
+      const futureDate = new Date();
+      futureDate.setFullYear(futureDate.getFullYear() + 1);
 
       prismaMock.shareLink.findUnique.mockResolvedValueOnce({
         id: "share1",
