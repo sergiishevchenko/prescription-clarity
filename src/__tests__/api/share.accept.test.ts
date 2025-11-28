@@ -64,11 +64,15 @@ describe("POST /api/share/accept", () => {
       .spyOn(SessionModule, "getSessionUserFromRequest")
       .mockResolvedValueOnce(mockViewer);
 
+    // Use a date far in the future (expiration doesn't matter for revoked status, but for consistency)
+    const futureDate = new Date();
+    futureDate.setFullYear(futureDate.getFullYear() + 1);
+
     const mockShareLink = {
       id: "share1",
       ownerId: mockOwner.id,
       viewerId: null,
-      expiresAt: new Date("2025-11-28T12:00:00Z"),
+      expiresAt: futureDate,
       status: "revoked" as const,
     };
 
@@ -112,11 +116,15 @@ describe("POST /api/share/accept", () => {
       .spyOn(SessionModule, "getSessionUserFromRequest")
       .mockResolvedValueOnce(mockOwner);
 
+    // Use a date far in the future to ensure it's not expired
+    const futureDate = new Date();
+    futureDate.setFullYear(futureDate.getFullYear() + 1);
+
     const mockShareLink = {
       id: "share3",
       ownerId: mockOwner.id,
       viewerId: null,
-      expiresAt: new Date("2025-11-28T12:00:00Z"),
+      expiresAt: futureDate,
       status: "active" as const,
     };
 
@@ -136,11 +144,15 @@ describe("POST /api/share/accept", () => {
       .spyOn(SessionModule, "getSessionUserFromRequest")
       .mockResolvedValueOnce(mockViewer);
 
+    // Use a date far in the future to ensure it's not expired
+    const futureDate = new Date();
+    futureDate.setFullYear(futureDate.getFullYear() + 1);
+
     const mockShareLink = {
       id: "share4",
       ownerId: mockOwner.id,
       viewerId: null,
-      expiresAt: new Date("2025-11-28T12:00:00Z"),
+      expiresAt: futureDate,
       status: "active" as const,
     };
 
@@ -198,11 +210,15 @@ describe("POST /api/share/accept", () => {
       .spyOn(SessionModule, "getSessionUserFromRequest")
       .mockResolvedValueOnce(mockViewer);
 
+    // Use a date far in the future to ensure it's not expired
+    const futureDate = new Date();
+    futureDate.setFullYear(futureDate.getFullYear() + 1);
+
     const mockShareLink = {
       id: "share5",
       ownerId: mockOwner.id,
       viewerId: mockViewer.id,
-      expiresAt: new Date("2025-11-28T12:00:00Z"),
+      expiresAt: futureDate,
       status: "active" as const,
     };
 
@@ -238,11 +254,15 @@ describe("POST /api/share/accept", () => {
       .spyOn(SessionModule, "getSessionUserFromRequest")
       .mockResolvedValueOnce(mockViewer);
 
+    // Use a date far in the future to ensure it's not expired
+    const futureDate = new Date();
+    futureDate.setFullYear(futureDate.getFullYear() + 1);
+
     const mockShareLink = {
       id: "share6",
       ownerId: mockOwner.id,
       viewerId: null,
-      expiresAt: new Date("2025-11-28T12:00:00Z"),
+      expiresAt: futureDate,
       status: "active" as const,
     };
 
@@ -288,12 +308,16 @@ describe("POST /api/share/accept", () => {
       .spyOn(SessionModule, "getSessionUserFromRequest")
       .mockResolvedValueOnce(mockViewer);
 
+    // Use a date far in the future to ensure it's not expired
+    const futureDate = new Date();
+    futureDate.setFullYear(futureDate.getFullYear() + 1);
+
     const existingViewerId = "existing-viewer";
     const mockShareLink = {
       id: "share7",
       ownerId: mockOwner.id,
       viewerId: existingViewerId,
-      expiresAt: new Date("2025-11-28T12:00:00Z"),
+      expiresAt: futureDate,
       status: "active" as const,
     };
 

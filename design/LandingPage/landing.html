@@ -1,805 +1,1696 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Prescription Clarity - Medication Management Made Simple</title>
-  <meta name="description" content="Complete medication management platform for patients, caregivers, and healthcare professionals. 95% adherence rate. GDPR & HIPAA compliant.">
-  
-  <script src="https://cdn.tailwindcss.com"></script>
-  <script src="https://unpkg.com/lucide@latest"></script>
-  
-  <style>
-    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap');
-    
-    * { font-family: 'Inter', sans-serif; }
-    
-    @keyframes fadeInUp {
-      from { opacity: 0; transform: translateY(30px); }
-      to { opacity: 1; transform: translateY(0); }
-    }
-    
-    @keyframes float {
-      0%, 100% { transform: scale(1) rotate(0deg); }
-      50% { transform: scale(1.2) rotate(90deg); }
-    }
-    
-    .hero-section { opacity: 0; animation: fadeInUp 0.7s ease-out 0.1s forwards; }
-    .stat-card { opacity: 0; }
-    .stat-card:nth-child(1) { animation: fadeInUp 0.6s ease-out 0.6s forwards; }
-    .stat-card:nth-child(2) { animation: fadeInUp 0.6s ease-out 0.7s forwards; }
-    .stat-card:nth-child(3) { animation: fadeInUp 0.6s ease-out 0.8s forwards; }
-    .stat-card:nth-child(4) { animation: fadeInUp 0.6s ease-out 0.9s forwards; }
-    
-    .testimonial-slide { display: none; opacity: 0; transition: opacity 0.5s ease-in-out; }
-    .testimonial-slide.active { display: block; opacity: 1; }
-    
-    .faq-content { max-height: 0; overflow: hidden; transition: max-height 0.3s ease-out; }
-    .faq-content.active { max-height: 500px; }
-    
-    .chevron { transition: transform 0.3s ease; }
-    .chevron.active { transform: rotate(180deg); }
-  </style>
-</head>
-<body class="bg-white">
-  
-  <header class="border-b border-slate-200 bg-white/95 backdrop-blur-md sticky top-0 z-50 shadow-sm">
-    <div class="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8">
-      <div class="flex items-center justify-between py-3 sm:py-4 lg:py-5">
-        <div class="flex items-center gap-2 sm:gap-3 lg:gap-4 flex-shrink-0 min-w-0">
-          <img src="logo.svg" alt="Prescription Clarity Logo" class="flex-shrink-0 w-10 h-10 sm:w-12 sm:h-12 lg:w-16 lg:h-16" style="object-fit: contain;">
-          <div class="flex-shrink-0 min-w-0">
-            <h1 class="text-base sm:text-lg lg:text-xl font-bold tracking-tight truncate text-slate-900">Prescription Clarity</h1>
-            <p class="text-xs sm:text-sm text-slate-500 hidden md:block mt-0.5">Medication Management Made Simple</p>
-          </div>
-        </div>
-        <div class="flex items-center gap-2 sm:gap-3 lg:gap-4 flex-shrink-0">
-          <button onclick="alert('Sign In functionality')" class="h-12 sm:h-14 lg:h-16 min-w-[80px] sm:min-w-[100px] lg:min-w-[120px] border-2 border-slate-300 text-sm sm:text-base lg:text-lg px-3 sm:px-4 lg:px-6 rounded-lg hover:bg-slate-50 transition-colors">Sign In</button>
-          <button onclick="alert('Get Started functionality')" class="h-12 sm:h-14 lg:h-16 min-w-[80px] sm:min-w-[100px] lg:min-w-[120px] bg-blue-600 hover:bg-blue-700 shadow-lg text-sm sm:text-base lg:text-lg px-3 sm:px-4 lg:px-6 rounded-lg text-white transition-colors">
-            <span class="hidden sm:inline">Get Started</span>
-            <span class="sm:hidden">Start</span>
-          </button>
-        </div>
-      </div>
-    </div>
-  </header>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Prescription Clarity - Medication Management Made Simple</title>
+    <meta
+      name="description"
+      content="Complete medication management platform for patients, caregivers, and healthcare professionals. 95% adherence rate. GDPR & HIPAA compliant."
+    />
 
-  <section class="relative overflow-hidden py-16 sm:py-20 lg:py-28 xl:py-32 bg-gradient-to-br from-blue-50 via-white to-purple-50">
-    <div class="absolute inset-0 overflow-hidden">
-      <div class="absolute top-1/4 left-1/4 w-96 h-96 rounded-full bg-blue-500/10 blur-3xl" style="animation: float 20s ease-in-out infinite;"></div>
-      <div class="absolute bottom-1/4 right-1/4 w-96 h-96 rounded-full bg-purple-500/10 blur-3xl" style="animation: float 20s ease-in-out infinite; animation-delay: -10s;"></div>
-    </div>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
 
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
-      <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-16 items-center">
-        <div class="text-center lg:text-left hero-section">
-          <div class="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-blue-100 border border-blue-200 mb-6">
-            <i data-lucide="sparkles" class="w-5 h-5 text-blue-600"></i>
-            <span class="text-sm lg:text-base font-medium text-blue-900">Trusted by 10,000+ users worldwide</span>
-          </div>
-          
-          <h1 class="text-3xl sm:text-4xl lg:text-5xl xl:text-6xl font-bold mb-6 leading-tight text-slate-900">
-            Stay on Track<br>
-            <span class="text-blue-600">With Your Medications</span>
-          </h1>
-          
-          <p class="text-lg sm:text-xl lg:text-2xl mb-6 leading-relaxed text-slate-600">The complete medication management platform trusted by patients, caregivers, and healthcare professionals.</p>
-          
-          <div class="flex flex-wrap gap-3 justify-center lg:justify-start mb-8">
-            <div class="flex items-center gap-2 px-4 py-2 rounded-lg bg-green-50 border border-green-200">
-              <i data-lucide="check-circle-2" class="w-5 h-5 text-green-600"></i>
-              <span class="text-sm lg:text-base text-green-700">95% Adherence Rate</span>
-            </div>
-            <div class="flex items-center gap-2 px-4 py-2 rounded-lg bg-green-50 border border-green-200">
-              <i data-lucide="check-circle-2" class="w-5 h-5 text-green-600"></i>
-              <span class="text-sm lg:text-base text-green-700">GDPR & HIPAA Compliant</span>
-            </div>
-            <div class="flex items-center gap-2 px-4 py-2 rounded-lg bg-green-50 border border-green-200">
-              <i data-lucide="check-circle-2" class="w-5 h-5 text-green-600"></i>
-              <span class="text-sm lg:text-base text-green-700">Free 30-Day Trial</span>
-            </div>
-          </div>
-          
-          <div class="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start">
-            <button onclick="alert('Start Free Trial')" class="h-14 lg:h-16 px-8 lg:px-12 text-lg lg:text-xl bg-blue-600 hover:bg-blue-700 shadow-xl hover:shadow-2xl transition-all rounded-lg text-white flex items-center justify-center gap-2 group">
-              Start Free Trial
-              <i data-lucide="arrow-right" class="w-6 h-6 group-hover:translate-x-1 transition-transform"></i>
-            </button>
-            <button onclick="alert('Try Demo')" class="h-14 lg:h-16 px-8 lg:px-12 text-lg lg:text-xl border-2 border-slate-300 rounded-lg hover:bg-slate-50 transition-colors flex items-center justify-center gap-2">
-              <i data-lucide="pill" class="w-6 h-6"></i>
-              Try Demo
-            </button>
-          </div>
-        </div>
+    <style>
+      @import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap");
 
-        <div class="relative hidden lg:block">
-          <div class="relative rounded-3xl overflow-hidden shadow-2xl">
-            <img src="https://images.unsplash.com/photo-1576091160550-2173dba999ef?w=800" alt="Medication management dashboard" class="w-full h-auto object-cover">
-            <div class="absolute inset-0 bg-gradient-to-t from-blue-900/30 to-transparent"></div>
-          </div>
-          
-          <div class="absolute -bottom-6 left-8 right-8 p-6 rounded-2xl backdrop-blur-xl bg-white/90 border border-slate-200 shadow-2xl">
-            <div class="grid grid-cols-2 gap-6">
-              <div class="flex items-center gap-3">
-                <div class="w-12 h-12 rounded-xl bg-green-100 flex items-center justify-center">
-                  <i data-lucide="trending-up" class="w-6 h-6 text-green-600"></i>
-                </div>
-                <div>
-                  <p class="text-2xl font-bold text-slate-900">95%</p>
-                  <p class="text-sm text-slate-600">Adherence</p>
-                </div>
-              </div>
-              <div class="flex items-center gap-3">
-                <div class="w-12 h-12 rounded-xl bg-blue-100 flex items-center justify-center">
-                  <i data-lucide="users" class="w-6 h-6 text-blue-600"></i>
-                </div>
-                <div>
-                  <p class="text-2xl font-bold text-slate-900">10K+</p>
-                  <p class="text-sm text-slate-600">Users</p>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <div class="mt-16 sm:mt-20 lg:mt-32">
-        <p class="text-center text-sm sm:text-base lg:text-lg mb-6 sm:mb-8 px-4 text-slate-600">Trusted by healthcare providers and patients worldwide</p>
-        <div class="grid grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 max-w-5xl mx-auto">
-          <div class="stat-card p-4 sm:p-6 rounded-2xl bg-white border border-slate-200 shadow-lg hover:shadow-xl transition-all">
-            <div class="flex flex-col items-center text-center">
-              <div class="w-12 h-12 sm:w-14 sm:h-14 rounded-xl bg-blue-100 flex items-center justify-center mb-3 sm:mb-4">
-                <i data-lucide="users" class="w-6 h-6 sm:w-7 sm:h-7 text-blue-600"></i>
-              </div>
-              <p class="text-2xl sm:text-3xl lg:text-4xl font-bold mb-1 sm:mb-2 text-slate-900">10,000+</p>
-              <p class="text-sm sm:text-base text-slate-600">Active Users</p>
-            </div>
-          </div>
-          <div class="stat-card p-4 sm:p-6 rounded-2xl bg-white border border-slate-200 shadow-lg hover:shadow-xl transition-all">
-            <div class="flex flex-col items-center text-center">
-              <div class="w-12 h-12 sm:w-14 sm:h-14 rounded-xl bg-blue-100 flex items-center justify-center mb-3 sm:mb-4">
-                <i data-lucide="check-circle-2" class="w-6 h-6 sm:w-7 sm:h-7 text-blue-600"></i>
-              </div>
-              <p class="text-2xl sm:text-3xl lg:text-4xl font-bold mb-1 sm:mb-2 text-slate-900">95%</p>
-              <p class="text-sm sm:text-base text-slate-600">Adherence Rate</p>
-            </div>
-          </div>
-          <div class="stat-card p-4 sm:p-6 rounded-2xl bg-white border border-slate-200 shadow-lg hover:shadow-xl transition-all">
-            <div class="flex flex-col items-center text-center">
-              <div class="w-12 h-12 sm:w-14 sm:h-14 rounded-xl bg-blue-100 flex items-center justify-center mb-3 sm:mb-4">
-                <i data-lucide="star" class="w-6 h-6 sm:w-7 sm:h-7 text-blue-600"></i>
-              </div>
-              <p class="text-2xl sm:text-3xl lg:text-4xl font-bold mb-1 sm:mb-2 text-slate-900">4.9/5</p>
-              <p class="text-sm sm:text-base text-slate-600">User Rating</p>
-            </div>
-          </div>
-          <div class="stat-card p-4 sm:p-6 rounded-2xl bg-white border border-slate-200 shadow-lg hover:shadow-xl transition-all">
-            <div class="flex flex-col items-center text-center">
-              <div class="w-12 h-12 sm:w-14 sm:h-14 rounded-xl bg-blue-100 flex items-center justify-center mb-3 sm:mb-4">
-                <i data-lucide="shield" class="w-6 h-6 sm:w-7 sm:h-7 text-blue-600"></i>
-              </div>
-              <p class="text-2xl sm:text-3xl lg:text-4xl font-bold mb-1 sm:mb-2 text-slate-900">50+</p>
-              <p class="text-sm sm:text-base text-slate-600">Countries</p>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <section class="bg-white py-16 lg:py-24">
-    <div class="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8">
-      <div class="text-center mb-16">
-        <h2 class="text-3xl lg:text-5xl font-bold mb-4 text-slate-900">Everything You Need to Stay on Track</h2>
-        <p class="text-lg lg:text-xl max-w-3xl mx-auto text-slate-600">Powerful features designed for patients, caregivers, and healthcare professionals</p>
-      </div>
-
-      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        <div class="p-8 rounded-2xl border shadow-lg hover:shadow-xl transition-all bg-slate-50 border-slate-200 hover:border-slate-300">
-          <div class="w-14 h-14 rounded-xl flex items-center justify-center mb-5 bg-blue-50 text-blue-600 border border-blue-200">
-            <i data-lucide="calendar" class="w-7 h-7"></i>
-          </div>
-          <h3 class="text-xl font-bold mb-3 text-slate-900">Smart Scheduling</h3>
-          <p class="text-base leading-relaxed mb-4 text-slate-600">Stay on track with intelligent time-based reminders. Coordinate with meals and track adherence automatically.</p>
-          <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full text-sm bg-green-100 text-green-700">
-            <i data-lucide="zap" class="w-4 h-4"></i>
-            95% adherence rate
-          </div>
-        </div>
-
-        <div class="p-8 rounded-2xl border shadow-lg hover:shadow-xl transition-all bg-slate-50 border-slate-200 hover:border-slate-300">
-          <div class="w-14 h-14 rounded-xl flex items-center justify-center mb-5 bg-orange-50 text-orange-600 border border-orange-200">
-            <i data-lucide="users" class="w-7 h-7"></i>
-          </div>
-          <h3 class="text-xl font-bold mb-3 text-slate-900">Family Care</h3>
-          <p class="text-base leading-relaxed mb-4 text-slate-600">Manage medications for your entire family from one dashboard. Perfect for caregivers managing elderly parents.</p>
-          <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full text-sm bg-green-100 text-green-700">
-            <i data-lucide="zap" class="w-4 h-4"></i>
-            Manage unlimited family members
-          </div>
-        </div>
-
-        <div class="p-8 rounded-2xl border shadow-lg hover:shadow-xl transition-all bg-slate-50 border-slate-200 hover:border-slate-300">
-          <div class="w-14 h-14 rounded-xl flex items-center justify-center mb-5 bg-purple-50 text-purple-600 border border-purple-200">
-            <i data-lucide="stethoscope" class="w-7 h-7"></i>
-          </div>
-          <h3 class="text-xl font-bold mb-3 text-slate-900">Healthcare Integration</h3>
-          <p class="text-base leading-relaxed mb-4 text-slate-600">Doctors can monitor patient adherence in real-time and adjust prescriptions directly through the platform.</p>
-          <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full text-sm bg-green-100 text-green-700">
-            <i data-lucide="zap" class="w-4 h-4"></i>
-            Real-time provider collaboration
-          </div>
-        </div>
-
-        <div class="p-8 rounded-2xl border shadow-lg hover:shadow-xl transition-all bg-slate-50 border-slate-200 hover:border-slate-300">
-          <div class="w-14 h-14 rounded-xl flex items-center justify-center mb-5 bg-green-50 text-green-600 border border-green-200">
-            <i data-lucide="bar-chart-3" class="w-7 h-7"></i>
-          </div>
-          <h3 class="text-xl font-bold mb-3 text-slate-900">Analytics & Insights</h3>
-          <p class="text-base leading-relaxed mb-4 text-slate-600">Visual reports, trend analysis, and streak counters help identify patterns and celebrate consistency.</p>
-          <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full text-sm bg-green-100 text-green-700">
-            <i data-lucide="zap" class="w-4 h-4"></i>
-            Data-driven health decisions
-          </div>
-        </div>
-
-        <div class="p-8 rounded-2xl border shadow-lg hover:shadow-xl transition-all bg-slate-50 border-slate-200 hover:border-slate-300">
-          <div class="w-14 h-14 rounded-xl flex items-center justify-center mb-5 bg-amber-50 text-amber-600 border border-amber-200">
-            <i data-lucide="bell" class="w-7 h-7"></i>
-          </div>
-          <h3 class="text-xl font-bold mb-3 text-slate-900">Smart Notifications</h3>
-          <p class="text-base leading-relaxed mb-4 text-slate-600">Customizable push notifications with sound alerts ensure medications are taken at the right time.</p>
-          <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full text-sm bg-green-100 text-green-700">
-            <i data-lucide="zap" class="w-4 h-4"></i>
-            99.9% notification reliability
-          </div>
-        </div>
-
-        <div class="p-8 rounded-2xl border shadow-lg hover:shadow-xl transition-all bg-slate-50 border-slate-200 hover:border-slate-300">
-          <div class="w-14 h-14 rounded-xl flex items-center justify-center mb-5 bg-slate-50 text-slate-600 border border-slate-200">
-            <i data-lucide="shield" class="w-7 h-7"></i>
-          </div>
-          <h3 class="text-xl font-bold mb-3 text-slate-900">Secure & Private</h3>
-          <p class="text-base leading-relaxed mb-4 text-slate-600">End-to-end encryption with full GDPR and HIPAA compliance. Your health data is always protected.</p>
-          <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full text-sm bg-green-100 text-green-700">
-            <i data-lucide="zap" class="w-4 h-4"></i>
-            Bank-level security
-          </div>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <section class="py-16 lg:py-24 bg-gradient-to-b from-slate-50 to-white">
-    <div class="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8">
-      <div class="text-center mb-16">
-        <h2 class="text-3xl lg:text-5xl font-bold mb-4 text-slate-900">Loved by Users Worldwide</h2>
-        <p class="text-lg lg:text-xl text-slate-600">See what our community has to say</p>
-      </div>
-
-      <div class="max-w-4xl mx-auto">
-        <div class="p-10 lg:p-12 rounded-3xl border shadow-2xl bg-white border-slate-200">
-          <div class="testimonial-slide active">
-            <div class="flex gap-2 mb-6">
-              <i data-lucide="star" class="w-8 h-8 text-amber-400 fill-current"></i>
-              <i data-lucide="star" class="w-8 h-8 text-amber-400 fill-current"></i>
-              <i data-lucide="star" class="w-8 h-8 text-amber-400 fill-current"></i>
-              <i data-lucide="star" class="w-8 h-8 text-amber-400 fill-current"></i>
-              <i data-lucide="star" class="w-8 h-8 text-amber-400 fill-current"></i>
-            </div>
-            <blockquote>
-              <p class="text-2xl lg:text-3xl mb-8 leading-relaxed text-slate-700">"Prescription Clarity has transformed how I manage my medications. The reminders are perfectly timed, and I haven't missed a dose in months."</p>
-              <footer class="flex items-center gap-5">
-                <img src="https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=200" alt="Margaret Williams" class="w-20 h-20 rounded-full border-2 border-blue-600 object-cover">
-                <div>
-                  <p class="text-2xl font-bold mb-1 text-slate-900">Margaret Williams</p>
-                  <p class="text-lg text-slate-600">Patient • 3 months using the platform</p>
-                </div>
-              </footer>
-            </blockquote>
-          </div>
-
-          <div class="testimonial-slide">
-            <div class="flex gap-2 mb-6">
-              <i data-lucide="star" class="w-8 h-8 text-amber-400 fill-current"></i>
-              <i data-lucide="star" class="w-8 h-8 text-amber-400 fill-current"></i>
-              <i data-lucide="star" class="w-8 h-8 text-amber-400 fill-current"></i>
-              <i data-lucide="star" class="w-8 h-8 text-amber-400 fill-current"></i>
-              <i data-lucide="star" class="w-8 h-8 text-amber-400 fill-current"></i>
-            </div>
-            <blockquote>
-              <p class="text-2xl lg:text-3xl mb-8 leading-relaxed text-slate-700">"As a caregiver for my elderly parents, this app is a lifesaver. I can manage both their medications from anywhere and get notified if they miss a dose."</p>
-              <footer class="flex items-center gap-5">
-                <img src="https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=200" alt="Michael O'Brien" class="w-20 h-20 rounded-full border-2 border-blue-600 object-cover">
-                <div>
-                  <p class="text-2xl font-bold mb-1 text-slate-900">Michael O'Brien</p>
-                  <p class="text-lg text-slate-600">Caregiver • Managing 2 family members</p>
-                </div>
-              </footer>
-            </blockquote>
-          </div>
-
-          <div class="testimonial-slide">
-            <div class="flex gap-2 mb-6">
-              <i data-lucide="star" class="w-8 h-8 text-amber-400 fill-current"></i>
-              <i data-lucide="star" class="w-8 h-8 text-amber-400 fill-current"></i>
-              <i data-lucide="star" class="w-8 h-8 text-amber-400 fill-current"></i>
-              <i data-lucide="star" class="w-8 h-8 text-amber-400 fill-current"></i>
-              <i data-lucide="star" class="w-8 h-8 text-amber-400 fill-current"></i>
-            </div>
-            <blockquote>
-              <p class="text-2xl lg:text-3xl mb-8 leading-relaxed text-slate-700">"The analytics dashboard helps me monitor patient adherence patterns. I can intervene early when I see someone struggling with their medication schedule."</p>
-              <footer class="flex items-center gap-5">
-                <img src="https://images.unsplash.com/photo-1559839734-2b71ea197ec2?w=200" alt="Dr. Sarah Mitchell" class="w-20 h-20 rounded-full border-2 border-blue-600 object-cover">
-                <div>
-                  <p class="text-2xl font-bold mb-1 text-slate-900">Dr. Sarah Mitchell</p>
-                  <p class="text-lg text-slate-600">Family Physician • 12 patients on platform</p>
-                </div>
-              </footer>
-            </blockquote>
-          </div>
-        </div>
-        
-        <div class="flex justify-center gap-2 mt-6">
-          <button onclick="showTestimonial(0)" class="testimonial-indicator h-2 rounded-full transition-all duration-300 w-8 bg-blue-600"></button>
-          <button onclick="showTestimonial(1)" class="testimonial-indicator h-2 rounded-full transition-all duration-300 w-2 bg-slate-300"></button>
-          <button onclick="showTestimonial(2)" class="testimonial-indicator h-2 rounded-full transition-all duration-300 w-2 bg-slate-300"></button>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <section id="pricing" class="py-12 sm:py-16 lg:py-24 bg-white">
-    <div class="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8">
-      <div class="text-center mb-8 sm:mb-12">
-        <h2 class="text-2xl sm:text-3xl lg:text-5xl font-bold mb-3 sm:mb-4 text-slate-900">Choose Your Plan</h2>
-        <p class="text-base sm:text-lg lg:text-xl mb-6 sm:mb-8 text-slate-600">Start free, upgrade when you need more</p>
-
-        <div class="inline-flex items-center gap-1 sm:gap-3 p-1 rounded-full bg-slate-100 border border-slate-200">
-          <button onclick="toggleBilling('monthly')" id="monthly-btn" class="px-4 sm:px-6 py-2 sm:py-3 text-sm sm:text-base rounded-full transition-all bg-blue-600 text-white shadow-lg">Monthly</button>
-          <button onclick="toggleBilling('yearly')" id="yearly-btn" class="px-4 sm:px-6 py-2 sm:py-3 text-sm sm:text-base rounded-full transition-all relative text-slate-600">
-            Yearly
-            <span class="absolute -top-2 -right-1 sm:-right-2 bg-green-500 text-white text-xs px-1.5 sm:px-2 py-0.5 rounded-full">Save 17%</span>
-          </button>
-        </div>
-      </div>
-
-      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
-        <div class="relative p-6 sm:p-8 rounded-2xl border-2 shadow-xl transition-all border-slate-200 bg-white hover:border-slate-300">
-          <div class="text-center mb-5 sm:mb-6">
-            <h3 class="text-xl sm:text-2xl font-bold mb-2 text-slate-900">Free</h3>
-            <p class="text-xs sm:text-sm mb-3 sm:mb-4 text-slate-600">Perfect for individuals managing their own medications</p>
-            <div class="mb-2">
-              <span class="text-3xl sm:text-4xl lg:text-5xl font-bold text-slate-900">€0.00</span>
-              <span class="text-base sm:text-lg text-slate-600">/month</span>
-            </div>
-          </div>
-
-          <button onclick="alert('Get Started')" class="w-full h-12 sm:h-14 text-sm sm:text-base mb-5 sm:mb-6 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors">Get Started Free</button>
-
-          <div class="space-y-2 sm:space-y-3">
-            <div class="flex items-start gap-2 sm:gap-3">
-              <i data-lucide="check" class="w-4 h-4 sm:w-5 sm:h-5 text-green-600 flex-shrink-0 mt-0.5"></i>
-              <span class="text-sm sm:text-base text-slate-700">Up to 5 medications</span>
-            </div>
-            <div class="flex items-start gap-2 sm:gap-3">
-              <i data-lucide="check" class="w-4 h-4 sm:w-5 sm:h-5 text-green-600 flex-shrink-0 mt-0.5"></i>
-              <span class="text-sm sm:text-base text-slate-700">Basic reminders</span>
-            </div>
-            <div class="flex items-start gap-2 sm:gap-3">
-              <i data-lucide="check" class="w-4 h-4 sm:w-5 sm:h-5 text-green-600 flex-shrink-0 mt-0.5"></i>
-              <span class="text-sm sm:text-base text-slate-700">Daily schedule view</span>
-            </div>
-            <div class="flex items-start gap-2 sm:gap-3">
-              <i data-lucide="check" class="w-4 h-4 sm:w-5 sm:h-5 text-green-600 flex-shrink-0 mt-0.5"></i>
-              <span class="text-sm sm:text-base text-slate-700">Adherence tracking</span>
-            </div>
-            <div class="flex items-start gap-2 sm:gap-3">
-              <i data-lucide="check" class="w-4 h-4 sm:w-5 sm:h-5 text-green-600 flex-shrink-0 mt-0.5"></i>
-              <span class="text-sm sm:text-base text-slate-700">Mobile & web access</span>
-            </div>
-          </div>
-        </div>
-
-        <div class="relative p-6 sm:p-8 rounded-2xl border-2 shadow-xl transition-all border-slate-200 bg-white hover:border-slate-300">
-          <div class="text-center mb-5 sm:mb-6">
-            <h3 class="text-xl sm:text-2xl font-bold mb-2 text-slate-900">Personal</h3>
-            <p class="text-xs sm:text-sm mb-3 sm:mb-4 text-slate-600">For patients who need advanced medication management</p>
-            <div class="mb-2">
-              <span class="price-monthly text-3xl sm:text-4xl lg:text-5xl font-bold text-slate-900">€8.99</span>
-              <span class="price-yearly text-3xl sm:text-4xl lg:text-5xl font-bold text-slate-900 hidden">€7.42</span>
-              <span class="text-base sm:text-lg text-slate-600">/month</span>
-            </div>
-            <p class="price-yearly-note text-xs sm:text-sm text-slate-500 hidden">€89/year billed annually</p>
-          </div>
-
-          <button onclick="alert('Start Free Trial')" class="w-full h-12 sm:h-14 text-sm sm:text-base mb-5 sm:mb-6 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors">Start Free Trial</button>
-
-          <div class="space-y-2 sm:space-y-3">
-            <div class="flex items-start gap-2 sm:gap-3">
-              <i data-lucide="check" class="w-4 h-4 sm:w-5 sm:h-5 text-green-600 flex-shrink-0 mt-0.5"></i>
-              <span class="text-sm sm:text-base text-slate-700">Unlimited medications</span>
-            </div>
-            <div class="flex items-start gap-2 sm:gap-3">
-              <i data-lucide="check" class="w-4 h-4 sm:w-5 sm:h-5 text-green-600 flex-shrink-0 mt-0.5"></i>
-              <span class="text-sm sm:text-base text-slate-700">Smart notifications</span>
-            </div>
-            <div class="flex items-start gap-2 sm:gap-3">
-              <i data-lucide="check" class="w-4 h-4 sm:w-5 sm:h-5 text-green-600 flex-shrink-0 mt-0.5"></i>
-              <span class="text-sm sm:text-base text-slate-700">Weekly analytics</span>
-            </div>
-            <div class="flex items-start gap-2 sm:gap-3">
-              <i data-lucide="check" class="w-4 h-4 sm:w-5 sm:h-5 text-green-600 flex-shrink-0 mt-0.5"></i>
-              <span class="text-sm sm:text-base text-slate-700">Medication database</span>
-            </div>
-            <div class="flex items-start gap-2 sm:gap-3">
-              <i data-lucide="check" class="w-4 h-4 sm:w-5 sm:h-5 text-green-600 flex-shrink-0 mt-0.5"></i>
-              <span class="text-sm sm:text-base text-slate-700">Print schedules</span>
-            </div>
-            <div class="flex items-start gap-2 sm:gap-3">
-              <i data-lucide="check" class="w-4 h-4 sm:w-5 sm:h-5 text-green-600 flex-shrink-0 mt-0.5"></i>
-              <span class="text-sm sm:text-base text-slate-700">Photo uploads</span>
-            </div>
-            <div class="flex items-start gap-2 sm:gap-3">
-              <i data-lucide="check" class="w-4 h-4 sm:w-5 sm:h-5 text-green-600 flex-shrink-0 mt-0.5"></i>
-              <span class="text-sm sm:text-base text-slate-700">Achievement system</span>
-            </div>
-            <div class="flex items-start gap-2 sm:gap-3">
-              <i data-lucide="check" class="w-4 h-4 sm:w-5 sm:h-5 text-green-600 flex-shrink-0 mt-0.5"></i>
-              <span class="text-sm sm:text-base text-slate-700">Priority support</span>
-            </div>
-          </div>
-        </div>
-
-        <div class="relative p-6 sm:p-8 rounded-2xl border-2 shadow-xl transition-all border-orange-500 bg-orange-50/20">
-          <div class="absolute -top-3 sm:-top-4 left-1/2 -translate-x-1/2 bg-gradient-to-r from-orange-500 to-orange-600 text-white px-3 sm:px-4 py-1 rounded-full text-xs sm:text-sm font-bold shadow-lg">Most Popular</div>
-
-          <div class="text-center mb-5 sm:mb-6">
-            <h3 class="text-xl sm:text-2xl font-bold mb-2 text-slate-900">Family</h3>
-            <p class="text-xs sm:text-sm mb-3 sm:mb-4 text-slate-600">Best for caregivers managing multiple family members</p>
-            <div class="mb-2">
-              <span class="price-monthly text-3xl sm:text-4xl lg:text-5xl font-bold text-slate-900">€17.99</span>
-              <span class="price-yearly text-3xl sm:text-4xl lg:text-5xl font-bold text-slate-900 hidden">€14.92</span>
-              <span class="text-base sm:text-lg text-slate-600">/month</span>
-            </div>
-            <p class="price-yearly-note text-xs sm:text-sm text-slate-500 hidden">€179/year billed annually</p>
-          </div>
-
-          <button onclick="alert('Start Free Trial')" class="w-full h-12 sm:h-14 text-sm sm:text-base mb-5 sm:mb-6 bg-orange-600 hover:bg-orange-700 text-white rounded-lg transition-colors">Start Free Trial</button>
-
-          <div class="space-y-2 sm:space-y-3">
-            <div class="flex items-start gap-2 sm:gap-3">
-              <i data-lucide="check" class="w-4 h-4 sm:w-5 sm:h-5 text-green-600 flex-shrink-0 mt-0.5"></i>
-              <span class="text-sm sm:text-base text-slate-700">Everything in Personal</span>
-            </div>
-            <div class="flex items-start gap-2 sm:gap-3">
-              <i data-lucide="check" class="w-4 h-4 sm:w-5 sm:h-5 text-green-600 flex-shrink-0 mt-0.5"></i>
-              <span class="text-sm sm:text-base text-slate-700">Manage up to 5 family members</span>
-            </div>
-            <div class="flex items-start gap-2 sm:gap-3">
-              <i data-lucide="check" class="w-4 h-4 sm:w-5 sm:h-5 text-green-600 flex-shrink-0 mt-0.5"></i>
-              <span class="text-sm sm:text-base text-slate-700">Caregiver dashboard</span>
-            </div>
-            <div class="flex items-start gap-2 sm:gap-3">
-              <i data-lucide="check" class="w-4 h-4 sm:w-5 sm:h-5 text-green-600 flex-shrink-0 mt-0.5"></i>
-              <span class="text-sm sm:text-base text-slate-700">Cross-user analytics</span>
-            </div>
-            <div class="flex items-start gap-2 sm:gap-3">
-              <i data-lucide="check" class="w-4 h-4 sm:w-5 sm:h-5 text-green-600 flex-shrink-0 mt-0.5"></i>
-              <span class="text-sm sm:text-base text-slate-700">Shared medication history</span>
-            </div>
-            <div class="flex items-start gap-2 sm:gap-3">
-              <i data-lucide="check" class="w-4 h-4 sm:w-5 sm:h-5 text-green-600 flex-shrink-0 mt-0.5"></i>
-              <span class="text-sm sm:text-base text-slate-700">Email notifications</span>
-            </div>
-            <div class="flex items-start gap-2 sm:gap-3">
-              <i data-lucide="check" class="w-4 h-4 sm:w-5 sm:h-5 text-green-600 flex-shrink-0 mt-0.5"></i>
-              <span class="text-sm sm:text-base text-slate-700">Multi-device sync</span>
-            </div>
-            <div class="flex items-start gap-2 sm:gap-3">
-              <i data-lucide="check" class="w-4 h-4 sm:w-5 sm:h-5 text-green-600 flex-shrink-0 mt-0.5"></i>
-              <span class="text-sm sm:text-base text-slate-700">Family insights</span>
-            </div>
-          </div>
-        </div>
-
-        <div class="relative p-6 sm:p-8 rounded-2xl border-2 shadow-xl transition-all border-slate-200 bg-white hover:border-slate-300">
-          <div class="text-center mb-5 sm:mb-6">
-            <h3 class="text-xl sm:text-2xl font-bold mb-2 text-slate-900">Professional</h3>
-            <p class="text-xs sm:text-sm mb-3 sm:mb-4 text-slate-600">For healthcare providers managing patient cohorts</p>
-            <div class="mb-2">
-              <span class="price-monthly text-3xl sm:text-4xl lg:text-5xl font-bold text-slate-900">€44.99</span>
-              <span class="price-yearly text-3xl sm:text-4xl lg:text-5xl font-bold text-slate-900 hidden">€37.42</span>
-              <span class="text-base sm:text-lg text-slate-600">/month</span>
-            </div>
-            <p class="price-yearly-note text-xs sm:text-sm text-slate-500 hidden">€449/year billed annually</p>
-          </div>
-
-          <button onclick="alert('Start Free Trial')" class="w-full h-12 sm:h-14 text-sm sm:text-base mb-5 sm:mb-6 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors">Start Free Trial</button>
-
-          <div class="space-y-2 sm:space-y-3">
-            <div class="flex items-start gap-2 sm:gap-3">
-              <i data-lucide="check" class="w-4 h-4 sm:w-5 sm:h-5 text-green-600 flex-shrink-0 mt-0.5"></i>
-              <span class="text-sm sm:text-base text-slate-700">Everything in Family</span>
-            </div>
-            <div class="flex items-start gap-2 sm:gap-3">
-              <i data-lucide="check" class="w-4 h-4 sm:w-5 sm:h-5 text-green-600 flex-shrink-0 mt-0.5"></i>
-              <span class="text-sm sm:text-base text-slate-700">Manage unlimited patients</span>
-            </div>
-            <div class="flex items-start gap-2 sm:gap-3">
-              <i data-lucide="check" class="w-4 h-4 sm:w-5 sm:h-5 text-green-600 flex-shrink-0 mt-0.5"></i>
-              <span class="text-sm sm:text-base text-slate-700">Doctor dashboard</span>
-            </div>
-            <div class="flex items-start gap-2 sm:gap-3">
-              <i data-lucide="check" class="w-4 h-4 sm:w-5 sm:h-5 text-green-600 flex-shrink-0 mt-0.5"></i>
-              <span class="text-sm sm:text-base text-slate-700">Cohort analytics</span>
-            </div>
-            <div class="flex items-start gap-2 sm:gap-3">
-              <i data-lucide="check" class="w-4 h-4 sm:w-5 sm:h-5 text-green-600 flex-shrink-0 mt-0.5"></i>
-              <span class="text-sm sm:text-base text-slate-700">At-risk patient alerts</span>
-            </div>
-            <div class="flex items-start gap-2 sm:gap-3">
-              <i data-lucide="check" class="w-4 h-4 sm:w-5 sm:h-5 text-green-600 flex-shrink-0 mt-0.5"></i>
-              <span class="text-sm sm:text-base text-slate-700">Prescribing tools</span>
-            </div>
-            <div class="flex items-start gap-2 sm:gap-3">
-              <i data-lucide="check" class="w-4 h-4 sm:w-5 sm:h-5 text-green-600 flex-shrink-0 mt-0.5"></i>
-              <span class="text-sm sm:text-base text-slate-700">Medication interaction checker</span>
-            </div>
-            <div class="flex items-start gap-2 sm:gap-3">
-              <i data-lucide="check" class="w-4 h-4 sm:w-5 sm:h-5 text-green-600 flex-shrink-0 mt-0.5"></i>
-              <span class="text-sm sm:text-base text-slate-700">HIPAA compliance tools</span>
-            </div>
-            <div class="flex items-start gap-2 sm:gap-3">
-              <i data-lucide="check" class="w-4 h-4 sm:w-5 sm:h-5 text-green-600 flex-shrink-0 mt-0.5"></i>
-              <span class="text-sm sm:text-base text-slate-700">Priority support</span>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <p class="text-center text-base mt-8 text-slate-600">All plans include a 30-day free trial. No credit card required.</p>
-    </div>
-  </section>
-
-  <section id="faq" class="py-16 lg:py-24 bg-gradient-to-b from-slate-50 to-white">
-    <div class="max-w-4xl mx-auto px-3 sm:px-6 lg:px-8">
-      <div class="text-center mb-16">
-        <h2 class="text-3xl lg:text-5xl font-bold mb-4 text-slate-900">Frequently Asked Questions</h2>
-        <p class="text-lg lg:text-xl text-slate-600">Everything you need to know about Prescription Clarity</p>
-      </div>
-
-      <div class="space-y-4">
-        <div class="rounded-2xl border overflow-hidden bg-white border-slate-200">
-          <button onclick="toggleFAQ(0)" class="faq-button w-full p-6 flex items-center justify-between text-left hover:bg-slate-50 transition-colors">
-            <span class="text-lg font-bold pr-8 text-slate-900">How does the free trial work?</span>
-            <i data-lucide="chevron-down" class="chevron w-6 h-6 flex-shrink-0 text-slate-600"></i>
-          </button>
-          <div class="faq-content">
-            <div class="px-6 pb-6 text-base leading-relaxed text-slate-600">All paid plans include a 30-day free trial with full access to features. No credit card required to start. Cancel anytime during the trial without being charged.</div>
-          </div>
-        </div>
-
-        <div class="rounded-2xl border overflow-hidden bg-white border-slate-200">
-          <button onclick="toggleFAQ(1)" class="faq-button w-full p-6 flex items-center justify-between text-left hover:bg-slate-50 transition-colors">
-            <span class="text-lg font-bold pr-8 text-slate-900">Is my health data secure?</span>
-            <i data-lucide="chevron-down" class="chevron w-6 h-6 flex-shrink-0 text-slate-600"></i>
-          </button>
-          <div class="faq-content">
-            <div class="px-6 pb-6 text-base leading-relaxed text-slate-600">Yes! We use bank-level 256-bit encryption for all data. We're fully GDPR and HIPAA compliant. Your data is never shared with third parties without your explicit consent.</div>
-          </div>
-        </div>
-
-        <div class="rounded-2xl border overflow-hidden bg-white border-slate-200">
-          <button onclick="toggleFAQ(2)" class="faq-button w-full p-6 flex items-center justify-between text-left hover:bg-slate-50 transition-colors">
-            <span class="text-lg font-bold pr-8 text-slate-900">Can I switch plans later?</span>
-            <i data-lucide="chevron-down" class="chevron w-6 h-6 flex-shrink-0 text-slate-600"></i>
-          </button>
-          <div class="faq-content">
-            <div class="px-6 pb-6 text-base leading-relaxed text-slate-600">Absolutely! You can upgrade or downgrade your plan at any time. If you upgrade, you'll get immediate access to new features. If you downgrade, changes take effect at the end of your billing cycle.</div>
-          </div>
-        </div>
-
-        <div class="rounded-2xl border overflow-hidden bg-white border-slate-200">
-          <button onclick="toggleFAQ(3)" class="faq-button w-full p-6 flex items-center justify-between text-left hover:bg-slate-50 transition-colors">
-            <span class="text-lg font-bold pr-8 text-slate-900">Do you offer refunds?</span>
-            <i data-lucide="chevron-down" class="chevron w-6 h-6 flex-shrink-0 text-slate-600"></i>
-          </button>
-          <div class="faq-content">
-            <div class="px-6 pb-6 text-base leading-relaxed text-slate-600">Yes, we offer a 30-day money-back guarantee on all paid plans. If you're not satisfied for any reason, contact us within 30 days for a full refund.</div>
-          </div>
-        </div>
-
-        <div class="rounded-2xl border overflow-hidden bg-white border-slate-200">
-          <button onclick="toggleFAQ(4)" class="faq-button w-full p-6 flex items-center justify-between text-left hover:bg-slate-50 transition-colors">
-            <span class="text-lg font-bold pr-8 text-slate-900">How do notifications work?</span>
-            <i data-lucide="chevron-down" class="chevron w-6 h-6 flex-shrink-0 text-slate-600"></i>
-          </button>
-          <div class="faq-content">
-            <div class="px-6 pb-6 text-base leading-relaxed text-slate-600">You can receive notifications via push (mobile), email, and SMS. Set custom reminder times before each dose. Notifications are smart - they adapt to your adherence patterns over time.</div>
-          </div>
-        </div>
-
-        <div class="rounded-2xl border overflow-hidden bg-white border-slate-200">
-          <button onclick="toggleFAQ(5)" class="faq-button w-full p-6 flex items-center justify-between text-left hover:bg-slate-50 transition-colors">
-            <span class="text-lg font-bold pr-8 text-slate-900">Can family members share a subscription?</span>
-            <i data-lucide="chevron-down" class="chevron w-6 h-6 flex-shrink-0 text-slate-600"></i>
-          </button>
-          <div class="faq-content">
-            <div class="px-6 pb-6 text-base leading-relaxed text-slate-600">Yes! The Family plan allows up to 5 family members under one subscription. Each member gets their own secure account with privacy controls.</div>
-          </div>
-        </div>
-
-        <div class="rounded-2xl border overflow-hidden bg-white border-slate-200">
-          <button onclick="toggleFAQ(6)" class="faq-button w-full p-6 flex items-center justify-between text-left hover:bg-slate-50 transition-colors">
-            <span class="text-lg font-bold pr-8 text-slate-900">Is there a mobile app?</span>
-            <i data-lucide="chevron-down" class="chevron w-6 h-6 flex-shrink-0 text-slate-600"></i>
-          </button>
-          <div class="faq-content">
-            <div class="px-6 pb-6 text-base leading-relaxed text-slate-600">Yes! Our web app works seamlessly on all devices and is optimized for mobile. We also have native iOS and Android apps (coming soon) with offline support.</div>
-          </div>
-        </div>
-
-        <div class="rounded-2xl border overflow-hidden bg-white border-slate-200">
-          <button onclick="toggleFAQ(7)" class="faq-button w-full p-6 flex items-center justify-between text-left hover:bg-slate-50 transition-colors">
-            <span class="text-lg font-bold pr-8 text-slate-900">What if I need help?</span>
-            <i data-lucide="chevron-down" class="chevron w-6 h-6 flex-shrink-0 text-slate-600"></i>
-          </button>
-          <div class="faq-content">
-            <div class="px-6 pb-6 text-base leading-relaxed text-slate-600">We offer comprehensive support via email, live chat, and our help center. Personal and higher plans get priority support with faster response times.</div>
-          </div>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <section class="bg-gradient-to-br from-blue-600 via-blue-700 to-blue-800 py-16 sm:py-20 lg:py-32 relative overflow-hidden">
-    <div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 text-center relative z-10">
-      <h2 class="text-2xl sm:text-3xl md:text-4xl lg:text-5xl xl:text-6xl font-bold text-white mb-6 sm:mb-8 leading-tight px-4">Ready to Transform Your Medication Management?</h2>
-      <p class="text-base sm:text-lg md:text-xl lg:text-2xl text-blue-100 mb-8 sm:mb-10 lg:mb-12 leading-relaxed max-w-3xl mx-auto px-4">Join thousands of users managing their medications with confidence. Start your free 30-day trial today.</p>
-      <div class="flex flex-col sm:flex-row gap-3 sm:gap-4 justify-center items-center px-4">
-        <button onclick="alert('Start Free Trial')" class="w-full sm:w-auto h-14 sm:h-16 px-8 sm:px-10 lg:px-12 text-base sm:text-lg lg:text-xl bg-white text-blue-600 hover:bg-blue-50 shadow-2xl rounded-lg transition-all flex items-center justify-center gap-2 group">
-          Start Your Free Trial
-          <i data-lucide="arrow-right" class="w-5 h-5 sm:w-6 sm:h-6 lg:w-7 lg:h-7 group-hover:translate-x-1 transition-transform"></i>
-        </button>
-        <button onclick="alert('Try Demo')" class="w-full sm:w-auto h-14 sm:h-16 px-8 sm:px-10 lg:px-12 text-base sm:text-lg lg:text-xl border-2 border-white text-white hover:bg-white/20 bg-white/10 rounded-lg transition-colors">Try Demo</button>
-      </div>
-      
-      <div class="grid grid-cols-1 sm:grid-cols-3 gap-6 sm:gap-8 mt-12 sm:mt-14 lg:mt-16 pt-10 sm:pt-12 border-t border-blue-500/30">
-        <div class="flex flex-col items-center gap-2 sm:gap-3">
-          <i data-lucide="shield" class="w-10 h-10 sm:w-12 sm:h-12 text-blue-200"></i>
-          <p class="text-sm sm:text-base lg:text-lg text-blue-100">GDPR & HIPAA Compliant</p>
-        </div>
-        <div class="flex flex-col items-center gap-2 sm:gap-3">
-          <i data-lucide="check-circle-2" class="w-10 h-10 sm:w-12 sm:h-12 text-blue-200"></i>
-          <p class="text-sm sm:text-base lg:text-lg text-blue-100">No Credit Card Required</p>
-        </div>
-        <div class="flex flex-col items-center gap-2 sm:gap-3">
-          <i data-lucide="clock" class="w-10 h-10 sm:w-12 sm:h-12 text-blue-200"></i>
-          <p class="text-sm sm:text-base lg:text-lg text-blue-100">Free 30-Day Trial</p>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <footer class="border-t py-12 sm:py-16 bg-white border-slate-200">
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-      <div class="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-4 gap-8 sm:gap-10 lg:gap-12 mb-10 sm:mb-12">
-        <div>
-          <h3 class="text-lg sm:text-xl font-bold mb-4 sm:mb-6 text-slate-900">Product</h3>
-          <ul class="space-y-3 sm:space-y-4">
-            <li><a href="#" class="text-base sm:text-lg hover:text-blue-600 transition-colors text-slate-600">Features</a></li>
-            <li><a href="#pricing" class="text-base sm:text-lg hover:text-blue-600 transition-colors text-slate-600">Pricing</a></li>
-            <li><a href="#" class="text-base sm:text-lg hover:text-blue-600 transition-colors text-slate-600">Security</a></li>
-          </ul>
-        </div>
-        <div>
-          <h3 class="text-lg sm:text-xl font-bold mb-4 sm:mb-6 text-slate-900">Company</h3>
-          <ul class="space-y-3 sm:space-y-4">
-            <li><a href="#" class="text-base sm:text-lg hover:text-blue-600 transition-colors text-slate-600">About</a></li>
-            <li><a href="#" class="text-base sm:text-lg hover:text-blue-600 transition-colors text-slate-600">Blog</a></li>
-            <li><a href="#" class="text-base sm:text-lg hover:text-blue-600 transition-colors text-slate-600">Careers</a></li>
-          </ul>
-        </div>
-        <div>
-          <h3 class="text-lg sm:text-xl font-bold mb-4 sm:mb-6 text-slate-900">Resources</h3>
-          <ul class="space-y-3 sm:space-y-4">
-            <li><a href="#" class="text-base sm:text-lg hover:text-blue-600 transition-colors text-slate-600">Help Center</a></li>
-            <li><a href="#" class="text-base sm:text-lg hover:text-blue-600 transition-colors text-slate-600">Community</a></li>
-            <li><a href="#" class="text-base sm:text-lg hover:text-blue-600 transition-colors text-slate-600">Contact</a></li>
-          </ul>
-        </div>
-        <div>
-          <h3 class="text-lg sm:text-xl font-bold mb-4 sm:mb-6 text-slate-900">Legal</h3>
-          <ul class="space-y-3 sm:space-y-4">
-            <li><a href="#" class="text-base sm:text-lg hover:text-blue-600 transition-colors text-slate-600">Privacy</a></li>
-            <li><a href="#" class="text-base sm:text-lg hover:text-blue-600 transition-colors text-slate-600">Terms</a></li>
-            <li><a href="#" class="text-base sm:text-lg hover:text-blue-600 transition-colors text-slate-600">GDPR & HIPAA</a></li>
-          </ul>
-        </div>
-      </div>
-      
-      <div class="pt-10 border-t border-slate-200">
-        <div class="flex flex-col sm:flex-row items-center justify-between gap-6">
-          <div class="flex items-center gap-4">
-            <img src="logo.svg" alt="Prescription Clarity Logo" class="w-10 h-10" style="object-fit: contain;">
-            <span class="text-xl font-bold text-slate-900">Prescription Clarity</span>
-          </div>
-          <p class="text-lg text-slate-600">© 2025 Prescription Clarity. All rights reserved.</p>
-        </div>
-      </div>
-    </div>
-  </footer>
-
-  <script>
-    lucide.createIcons();
-
-    let currentTestimonialIndex = 0;
-    const testimonialSlides = document.querySelectorAll('.testimonial-slide');
-    const testimonialIndicators = document.querySelectorAll('.testimonial-indicator');
-
-    function showTestimonial(index) {
-      testimonialSlides.forEach((slide, i) => {
-        slide.classList.remove('active');
-        testimonialIndicators[i].classList.remove('w-8', 'bg-blue-600');
-        testimonialIndicators[i].classList.add('w-2', 'bg-slate-300');
-      });
-      
-      testimonialSlides[index].classList.add('active');
-      testimonialIndicators[index].classList.remove('w-2', 'bg-slate-300');
-      testimonialIndicators[index].classList.add('w-8', 'bg-blue-600');
-      currentTestimonialIndex = index;
-      
-      lucide.createIcons();
-    }
-
-    setInterval(() => {
-      currentTestimonialIndex = (currentTestimonialIndex + 1) % testimonialSlides.length;
-      showTestimonial(currentTestimonialIndex);
-    }, 6000);
-
-    function toggleFAQ(index) {
-      const faqContents = document.querySelectorAll('.faq-content');
-      const chevrons = document.querySelectorAll('.chevron');
-      
-      faqContents.forEach((content, i) => {
-        if (i !== index) {
-          content.classList.remove('active');
-          chevrons[i].classList.remove('active');
-        }
-      });
-      
-      faqContents[index].classList.toggle('active');
-      chevrons[index].classList.toggle('active');
-    }
-
-    function toggleBilling(plan) {
-      const monthlyBtn = document.getElementById('monthly-btn');
-      const yearlyBtn = document.getElementById('yearly-btn');
-      const monthlyPrices = document.querySelectorAll('.price-monthly');
-      const yearlyPrices = document.querySelectorAll('.price-yearly');
-      const yearlyNotes = document.querySelectorAll('.price-yearly-note');
-      
-      if (plan === 'monthly') {
-        monthlyBtn.classList.add('bg-blue-600', 'text-white', 'shadow-lg');
-        monthlyBtn.classList.remove('text-slate-600');
-        yearlyBtn.classList.remove('bg-blue-600', 'text-white', 'shadow-lg');
-        yearlyBtn.classList.add('text-slate-600');
-        
-        monthlyPrices.forEach(p => p.classList.remove('hidden'));
-        yearlyPrices.forEach(p => p.classList.add('hidden'));
-        yearlyNotes.forEach(n => n.classList.add('hidden'));
-      } else {
-        yearlyBtn.classList.add('bg-blue-600', 'text-white', 'shadow-lg');
-        yearlyBtn.classList.remove('text-slate-600');
-        monthlyBtn.classList.remove('bg-blue-600', 'text-white', 'shadow-lg');
-        monthlyBtn.classList.add('text-slate-600');
-        
-        monthlyPrices.forEach(p => p.classList.add('hidden'));
-        yearlyPrices.forEach(p => p.classList.remove('hidden'));
-        yearlyNotes.forEach(n => n.classList.remove('hidden'));
+      * {
+        font-family: "Inter", sans-serif;
       }
-    }
-  </script>
-</body>
+
+      @keyframes fadeInUp {
+        from {
+          opacity: 0;
+          transform: translateY(30px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+
+      @keyframes float {
+        0%,
+        100% {
+          transform: scale(1) rotate(0deg);
+        }
+        50% {
+          transform: scale(1.2) rotate(90deg);
+        }
+      }
+
+      .hero-section {
+        opacity: 0;
+        animation: fadeInUp 0.7s ease-out 0.1s forwards;
+      }
+      .stat-card {
+        opacity: 0;
+      }
+      .stat-card:nth-child(1) {
+        animation: fadeInUp 0.6s ease-out 0.6s forwards;
+      }
+      .stat-card:nth-child(2) {
+        animation: fadeInUp 0.6s ease-out 0.7s forwards;
+      }
+      .stat-card:nth-child(3) {
+        animation: fadeInUp 0.6s ease-out 0.8s forwards;
+      }
+      .stat-card:nth-child(4) {
+        animation: fadeInUp 0.6s ease-out 0.9s forwards;
+      }
+
+      .testimonial-slide {
+        display: none;
+        opacity: 0;
+        transition: opacity 0.5s ease-in-out;
+      }
+      .testimonial-slide.active {
+        display: block;
+        opacity: 1;
+      }
+
+      .faq-content {
+        max-height: 0;
+        overflow: hidden;
+        transition: max-height 0.3s ease-out;
+      }
+      .faq-content.active {
+        max-height: 500px;
+      }
+
+      .chevron {
+        transition: transform 0.3s ease;
+      }
+      .chevron.active {
+        transform: rotate(180deg);
+      }
+    </style>
+  </head>
+  <body class="bg-white">
+    <header
+      class="sticky top-0 z-50 border-b border-slate-200 bg-white/95 shadow-sm backdrop-blur-md"
+    >
+      <div class="mx-auto max-w-7xl px-3 sm:px-6 lg:px-8">
+        <div class="flex items-center justify-between py-3 sm:py-4 lg:py-5">
+          <div
+            class="flex min-w-0 flex-shrink-0 items-center gap-2 sm:gap-3 lg:gap-4"
+          >
+            <img
+              src="logo.svg"
+              alt="Prescription Clarity Logo"
+              class="h-10 w-10 flex-shrink-0 sm:h-12 sm:w-12 lg:h-16 lg:w-16"
+              style="object-fit: contain"
+            />
+            <div class="min-w-0 flex-shrink-0">
+              <h1
+                class="truncate text-base font-bold tracking-tight text-slate-900 sm:text-lg lg:text-xl"
+              >
+                Prescription Clarity
+              </h1>
+              <p
+                class="mt-0.5 hidden text-xs text-slate-500 sm:text-sm md:block"
+              >
+                Medication Management Made Simple
+              </p>
+            </div>
+          </div>
+          <div class="flex flex-shrink-0 items-center gap-2 sm:gap-3 lg:gap-4">
+            <button
+              onclick="alert('Sign In functionality')"
+              class="h-12 min-w-[80px] rounded-lg border-2 border-slate-300 px-3 text-sm transition-colors hover:bg-slate-50 sm:h-14 sm:min-w-[100px] sm:px-4 sm:text-base lg:h-16 lg:min-w-[120px] lg:px-6 lg:text-lg"
+            >
+              Sign In
+            </button>
+            <button
+              onclick="alert('Get Started functionality')"
+              class="h-12 min-w-[80px] rounded-lg bg-blue-600 px-3 text-sm text-white shadow-lg transition-colors hover:bg-blue-700 sm:h-14 sm:min-w-[100px] sm:px-4 sm:text-base lg:h-16 lg:min-w-[120px] lg:px-6 lg:text-lg"
+            >
+              <span class="hidden sm:inline">Get Started</span>
+              <span class="sm:hidden">Start</span>
+            </button>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <section
+      class="relative overflow-hidden bg-gradient-to-br from-blue-50 via-white to-purple-50 py-16 sm:py-20 lg:py-28 xl:py-32"
+    >
+      <div class="absolute inset-0 overflow-hidden">
+        <div
+          class="absolute top-1/4 left-1/4 h-96 w-96 rounded-full bg-blue-500/10 blur-3xl"
+          style="animation: float 20s ease-in-out infinite"
+        ></div>
+        <div
+          class="absolute right-1/4 bottom-1/4 h-96 w-96 rounded-full bg-purple-500/10 blur-3xl"
+          style="
+            animation: float 20s ease-in-out infinite;
+            animation-delay: -10s;
+          "
+        ></div>
+      </div>
+
+      <div class="relative z-10 mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+        <div
+          class="grid grid-cols-1 items-center gap-8 lg:grid-cols-2 lg:gap-16"
+        >
+          <div class="hero-section text-center lg:text-left">
+            <div
+              class="mb-6 inline-flex items-center gap-2 rounded-full border border-blue-200 bg-blue-100 px-4 py-2"
+            >
+              <i data-lucide="sparkles" class="h-5 w-5 text-blue-600"></i>
+              <span class="text-sm font-medium text-blue-900 lg:text-base"
+                >Trusted by 10,000+ users worldwide</span
+              >
+            </div>
+
+            <h1
+              class="mb-6 text-3xl leading-tight font-bold text-slate-900 sm:text-4xl lg:text-5xl xl:text-6xl"
+            >
+              Stay on Track<br />
+              <span class="text-blue-600">With Your Medications</span>
+            </h1>
+
+            <p
+              class="mb-6 text-lg leading-relaxed text-slate-600 sm:text-xl lg:text-2xl"
+            >
+              The complete medication management platform trusted by patients,
+              caregivers, and healthcare professionals.
+            </p>
+
+            <div
+              class="mb-8 flex flex-wrap justify-center gap-3 lg:justify-start"
+            >
+              <div
+                class="flex items-center gap-2 rounded-lg border border-green-200 bg-green-50 px-4 py-2"
+              >
+                <i
+                  data-lucide="check-circle-2"
+                  class="h-5 w-5 text-green-600"
+                ></i>
+                <span class="text-sm text-green-700 lg:text-base"
+                  >95% Adherence Rate</span
+                >
+              </div>
+              <div
+                class="flex items-center gap-2 rounded-lg border border-green-200 bg-green-50 px-4 py-2"
+              >
+                <i
+                  data-lucide="check-circle-2"
+                  class="h-5 w-5 text-green-600"
+                ></i>
+                <span class="text-sm text-green-700 lg:text-base"
+                  >GDPR & HIPAA Compliant</span
+                >
+              </div>
+              <div
+                class="flex items-center gap-2 rounded-lg border border-green-200 bg-green-50 px-4 py-2"
+              >
+                <i
+                  data-lucide="check-circle-2"
+                  class="h-5 w-5 text-green-600"
+                ></i>
+                <span class="text-sm text-green-700 lg:text-base"
+                  >Free 30-Day Trial</span
+                >
+              </div>
+            </div>
+
+            <div
+              class="flex flex-col justify-center gap-4 sm:flex-row lg:justify-start"
+            >
+              <button
+                onclick="alert('Start Free Trial')"
+                class="group flex h-14 items-center justify-center gap-2 rounded-lg bg-blue-600 px-8 text-lg text-white shadow-xl transition-all hover:bg-blue-700 hover:shadow-2xl lg:h-16 lg:px-12 lg:text-xl"
+              >
+                Start Free Trial
+                <i
+                  data-lucide="arrow-right"
+                  class="h-6 w-6 transition-transform group-hover:translate-x-1"
+                ></i>
+              </button>
+              <button
+                onclick="alert('Try Demo')"
+                class="flex h-14 items-center justify-center gap-2 rounded-lg border-2 border-slate-300 px-8 text-lg transition-colors hover:bg-slate-50 lg:h-16 lg:px-12 lg:text-xl"
+              >
+                <i data-lucide="pill" class="h-6 w-6"></i>
+                Try Demo
+              </button>
+            </div>
+          </div>
+
+          <div class="relative hidden lg:block">
+            <div class="relative overflow-hidden rounded-3xl shadow-2xl">
+              <img
+                src="https://images.unsplash.com/photo-1576091160550-2173dba999ef?w=800"
+                alt="Medication management dashboard"
+                class="h-auto w-full object-cover"
+              />
+              <div
+                class="absolute inset-0 bg-gradient-to-t from-blue-900/30 to-transparent"
+              ></div>
+            </div>
+
+            <div
+              class="absolute right-8 -bottom-6 left-8 rounded-2xl border border-slate-200 bg-white/90 p-6 shadow-2xl backdrop-blur-xl"
+            >
+              <div class="grid grid-cols-2 gap-6">
+                <div class="flex items-center gap-3">
+                  <div
+                    class="flex h-12 w-12 items-center justify-center rounded-xl bg-green-100"
+                  >
+                    <i
+                      data-lucide="trending-up"
+                      class="h-6 w-6 text-green-600"
+                    ></i>
+                  </div>
+                  <div>
+                    <p class="text-2xl font-bold text-slate-900">95%</p>
+                    <p class="text-sm text-slate-600">Adherence</p>
+                  </div>
+                </div>
+                <div class="flex items-center gap-3">
+                  <div
+                    class="flex h-12 w-12 items-center justify-center rounded-xl bg-blue-100"
+                  >
+                    <i data-lucide="users" class="h-6 w-6 text-blue-600"></i>
+                  </div>
+                  <div>
+                    <p class="text-2xl font-bold text-slate-900">10K+</p>
+                    <p class="text-sm text-slate-600">Users</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="mt-16 sm:mt-20 lg:mt-32">
+          <p
+            class="mb-6 px-4 text-center text-sm text-slate-600 sm:mb-8 sm:text-base lg:text-lg"
+          >
+            Trusted by healthcare providers and patients worldwide
+          </p>
+          <div
+            class="mx-auto grid max-w-5xl grid-cols-2 gap-4 sm:gap-6 lg:grid-cols-4"
+          >
+            <div
+              class="stat-card rounded-2xl border border-slate-200 bg-white p-4 shadow-lg transition-all hover:shadow-xl sm:p-6"
+            >
+              <div class="flex flex-col items-center text-center">
+                <div
+                  class="mb-3 flex h-12 w-12 items-center justify-center rounded-xl bg-blue-100 sm:mb-4 sm:h-14 sm:w-14"
+                >
+                  <i
+                    data-lucide="users"
+                    class="h-6 w-6 text-blue-600 sm:h-7 sm:w-7"
+                  ></i>
+                </div>
+                <p
+                  class="mb-1 text-2xl font-bold text-slate-900 sm:mb-2 sm:text-3xl lg:text-4xl"
+                >
+                  10,000+
+                </p>
+                <p class="text-sm text-slate-600 sm:text-base">Active Users</p>
+              </div>
+            </div>
+            <div
+              class="stat-card rounded-2xl border border-slate-200 bg-white p-4 shadow-lg transition-all hover:shadow-xl sm:p-6"
+            >
+              <div class="flex flex-col items-center text-center">
+                <div
+                  class="mb-3 flex h-12 w-12 items-center justify-center rounded-xl bg-blue-100 sm:mb-4 sm:h-14 sm:w-14"
+                >
+                  <i
+                    data-lucide="check-circle-2"
+                    class="h-6 w-6 text-blue-600 sm:h-7 sm:w-7"
+                  ></i>
+                </div>
+                <p
+                  class="mb-1 text-2xl font-bold text-slate-900 sm:mb-2 sm:text-3xl lg:text-4xl"
+                >
+                  95%
+                </p>
+                <p class="text-sm text-slate-600 sm:text-base">
+                  Adherence Rate
+                </p>
+              </div>
+            </div>
+            <div
+              class="stat-card rounded-2xl border border-slate-200 bg-white p-4 shadow-lg transition-all hover:shadow-xl sm:p-6"
+            >
+              <div class="flex flex-col items-center text-center">
+                <div
+                  class="mb-3 flex h-12 w-12 items-center justify-center rounded-xl bg-blue-100 sm:mb-4 sm:h-14 sm:w-14"
+                >
+                  <i
+                    data-lucide="star"
+                    class="h-6 w-6 text-blue-600 sm:h-7 sm:w-7"
+                  ></i>
+                </div>
+                <p
+                  class="mb-1 text-2xl font-bold text-slate-900 sm:mb-2 sm:text-3xl lg:text-4xl"
+                >
+                  4.9/5
+                </p>
+                <p class="text-sm text-slate-600 sm:text-base">User Rating</p>
+              </div>
+            </div>
+            <div
+              class="stat-card rounded-2xl border border-slate-200 bg-white p-4 shadow-lg transition-all hover:shadow-xl sm:p-6"
+            >
+              <div class="flex flex-col items-center text-center">
+                <div
+                  class="mb-3 flex h-12 w-12 items-center justify-center rounded-xl bg-blue-100 sm:mb-4 sm:h-14 sm:w-14"
+                >
+                  <i
+                    data-lucide="shield"
+                    class="h-6 w-6 text-blue-600 sm:h-7 sm:w-7"
+                  ></i>
+                </div>
+                <p
+                  class="mb-1 text-2xl font-bold text-slate-900 sm:mb-2 sm:text-3xl lg:text-4xl"
+                >
+                  50+
+                </p>
+                <p class="text-sm text-slate-600 sm:text-base">Countries</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="bg-white py-16 lg:py-24">
+      <div class="mx-auto max-w-7xl px-3 sm:px-6 lg:px-8">
+        <div class="mb-16 text-center">
+          <h2 class="mb-4 text-3xl font-bold text-slate-900 lg:text-5xl">
+            Everything You Need to Stay on Track
+          </h2>
+          <p class="mx-auto max-w-3xl text-lg text-slate-600 lg:text-xl">
+            Powerful features designed for patients, caregivers, and healthcare
+            professionals
+          </p>
+        </div>
+
+        <div class="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
+          <div
+            class="rounded-2xl border border-slate-200 bg-slate-50 p-8 shadow-lg transition-all hover:border-slate-300 hover:shadow-xl"
+          >
+            <div
+              class="mb-5 flex h-14 w-14 items-center justify-center rounded-xl border border-blue-200 bg-blue-50 text-blue-600"
+            >
+              <i data-lucide="calendar" class="h-7 w-7"></i>
+            </div>
+            <h3 class="mb-3 text-xl font-bold text-slate-900">
+              Smart Scheduling
+            </h3>
+            <p class="mb-4 text-base leading-relaxed text-slate-600">
+              Stay on track with intelligent time-based reminders. Coordinate
+              with meals and track adherence automatically.
+            </p>
+            <div
+              class="inline-flex items-center gap-2 rounded-full bg-green-100 px-3 py-1 text-sm text-green-700"
+            >
+              <i data-lucide="zap" class="h-4 w-4"></i>
+              95% adherence rate
+            </div>
+          </div>
+
+          <div
+            class="rounded-2xl border border-slate-200 bg-slate-50 p-8 shadow-lg transition-all hover:border-slate-300 hover:shadow-xl"
+          >
+            <div
+              class="mb-5 flex h-14 w-14 items-center justify-center rounded-xl border border-orange-200 bg-orange-50 text-orange-600"
+            >
+              <i data-lucide="users" class="h-7 w-7"></i>
+            </div>
+            <h3 class="mb-3 text-xl font-bold text-slate-900">Family Care</h3>
+            <p class="mb-4 text-base leading-relaxed text-slate-600">
+              Manage medications for your entire family from one dashboard.
+              Perfect for caregivers managing elderly parents.
+            </p>
+            <div
+              class="inline-flex items-center gap-2 rounded-full bg-green-100 px-3 py-1 text-sm text-green-700"
+            >
+              <i data-lucide="zap" class="h-4 w-4"></i>
+              Manage unlimited family members
+            </div>
+          </div>
+
+          <div
+            class="rounded-2xl border border-slate-200 bg-slate-50 p-8 shadow-lg transition-all hover:border-slate-300 hover:shadow-xl"
+          >
+            <div
+              class="mb-5 flex h-14 w-14 items-center justify-center rounded-xl border border-purple-200 bg-purple-50 text-purple-600"
+            >
+              <i data-lucide="stethoscope" class="h-7 w-7"></i>
+            </div>
+            <h3 class="mb-3 text-xl font-bold text-slate-900">
+              Healthcare Integration
+            </h3>
+            <p class="mb-4 text-base leading-relaxed text-slate-600">
+              Doctors can monitor patient adherence in real-time and adjust
+              prescriptions directly through the platform.
+            </p>
+            <div
+              class="inline-flex items-center gap-2 rounded-full bg-green-100 px-3 py-1 text-sm text-green-700"
+            >
+              <i data-lucide="zap" class="h-4 w-4"></i>
+              Real-time provider collaboration
+            </div>
+          </div>
+
+          <div
+            class="rounded-2xl border border-slate-200 bg-slate-50 p-8 shadow-lg transition-all hover:border-slate-300 hover:shadow-xl"
+          >
+            <div
+              class="mb-5 flex h-14 w-14 items-center justify-center rounded-xl border border-green-200 bg-green-50 text-green-600"
+            >
+              <i data-lucide="bar-chart-3" class="h-7 w-7"></i>
+            </div>
+            <h3 class="mb-3 text-xl font-bold text-slate-900">
+              Analytics & Insights
+            </h3>
+            <p class="mb-4 text-base leading-relaxed text-slate-600">
+              Visual reports, trend analysis, and streak counters help identify
+              patterns and celebrate consistency.
+            </p>
+            <div
+              class="inline-flex items-center gap-2 rounded-full bg-green-100 px-3 py-1 text-sm text-green-700"
+            >
+              <i data-lucide="zap" class="h-4 w-4"></i>
+              Data-driven health decisions
+            </div>
+          </div>
+
+          <div
+            class="rounded-2xl border border-slate-200 bg-slate-50 p-8 shadow-lg transition-all hover:border-slate-300 hover:shadow-xl"
+          >
+            <div
+              class="mb-5 flex h-14 w-14 items-center justify-center rounded-xl border border-amber-200 bg-amber-50 text-amber-600"
+            >
+              <i data-lucide="bell" class="h-7 w-7"></i>
+            </div>
+            <h3 class="mb-3 text-xl font-bold text-slate-900">
+              Smart Notifications
+            </h3>
+            <p class="mb-4 text-base leading-relaxed text-slate-600">
+              Customizable push notifications with sound alerts ensure
+              medications are taken at the right time.
+            </p>
+            <div
+              class="inline-flex items-center gap-2 rounded-full bg-green-100 px-3 py-1 text-sm text-green-700"
+            >
+              <i data-lucide="zap" class="h-4 w-4"></i>
+              99.9% notification reliability
+            </div>
+          </div>
+
+          <div
+            class="rounded-2xl border border-slate-200 bg-slate-50 p-8 shadow-lg transition-all hover:border-slate-300 hover:shadow-xl"
+          >
+            <div
+              class="mb-5 flex h-14 w-14 items-center justify-center rounded-xl border border-slate-200 bg-slate-50 text-slate-600"
+            >
+              <i data-lucide="shield" class="h-7 w-7"></i>
+            </div>
+            <h3 class="mb-3 text-xl font-bold text-slate-900">
+              Secure & Private
+            </h3>
+            <p class="mb-4 text-base leading-relaxed text-slate-600">
+              End-to-end encryption with full GDPR and HIPAA compliance. Your
+              health data is always protected.
+            </p>
+            <div
+              class="inline-flex items-center gap-2 rounded-full bg-green-100 px-3 py-1 text-sm text-green-700"
+            >
+              <i data-lucide="zap" class="h-4 w-4"></i>
+              Bank-level security
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="bg-gradient-to-b from-slate-50 to-white py-16 lg:py-24">
+      <div class="mx-auto max-w-7xl px-3 sm:px-6 lg:px-8">
+        <div class="mb-16 text-center">
+          <h2 class="mb-4 text-3xl font-bold text-slate-900 lg:text-5xl">
+            Loved by Users Worldwide
+          </h2>
+          <p class="text-lg text-slate-600 lg:text-xl">
+            See what our community has to say
+          </p>
+        </div>
+
+        <div class="mx-auto max-w-4xl">
+          <div
+            class="rounded-3xl border border-slate-200 bg-white p-10 shadow-2xl lg:p-12"
+          >
+            <div class="testimonial-slide active">
+              <div class="mb-6 flex gap-2">
+                <i
+                  data-lucide="star"
+                  class="h-8 w-8 fill-current text-amber-400"
+                ></i>
+                <i
+                  data-lucide="star"
+                  class="h-8 w-8 fill-current text-amber-400"
+                ></i>
+                <i
+                  data-lucide="star"
+                  class="h-8 w-8 fill-current text-amber-400"
+                ></i>
+                <i
+                  data-lucide="star"
+                  class="h-8 w-8 fill-current text-amber-400"
+                ></i>
+                <i
+                  data-lucide="star"
+                  class="h-8 w-8 fill-current text-amber-400"
+                ></i>
+              </div>
+              <blockquote>
+                <p
+                  class="mb-8 text-2xl leading-relaxed text-slate-700 lg:text-3xl"
+                >
+                  "Prescription Clarity has transformed how I manage my
+                  medications. The reminders are perfectly timed, and I haven't
+                  missed a dose in months."
+                </p>
+                <footer class="flex items-center gap-5">
+                  <img
+                    src="https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=200"
+                    alt="Margaret Williams"
+                    class="h-20 w-20 rounded-full border-2 border-blue-600 object-cover"
+                  />
+                  <div>
+                    <p class="mb-1 text-2xl font-bold text-slate-900">
+                      Margaret Williams
+                    </p>
+                    <p class="text-lg text-slate-600">
+                      Patient • 3 months using the platform
+                    </p>
+                  </div>
+                </footer>
+              </blockquote>
+            </div>
+
+            <div class="testimonial-slide">
+              <div class="mb-6 flex gap-2">
+                <i
+                  data-lucide="star"
+                  class="h-8 w-8 fill-current text-amber-400"
+                ></i>
+                <i
+                  data-lucide="star"
+                  class="h-8 w-8 fill-current text-amber-400"
+                ></i>
+                <i
+                  data-lucide="star"
+                  class="h-8 w-8 fill-current text-amber-400"
+                ></i>
+                <i
+                  data-lucide="star"
+                  class="h-8 w-8 fill-current text-amber-400"
+                ></i>
+                <i
+                  data-lucide="star"
+                  class="h-8 w-8 fill-current text-amber-400"
+                ></i>
+              </div>
+              <blockquote>
+                <p
+                  class="mb-8 text-2xl leading-relaxed text-slate-700 lg:text-3xl"
+                >
+                  "As a caregiver for my elderly parents, this app is a
+                  lifesaver. I can manage both their medications from anywhere
+                  and get notified if they miss a dose."
+                </p>
+                <footer class="flex items-center gap-5">
+                  <img
+                    src="https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=200"
+                    alt="Michael O'Brien"
+                    class="h-20 w-20 rounded-full border-2 border-blue-600 object-cover"
+                  />
+                  <div>
+                    <p class="mb-1 text-2xl font-bold text-slate-900">
+                      Michael O'Brien
+                    </p>
+                    <p class="text-lg text-slate-600">
+                      Caregiver • Managing 2 family members
+                    </p>
+                  </div>
+                </footer>
+              </blockquote>
+            </div>
+
+            <div class="testimonial-slide">
+              <div class="mb-6 flex gap-2">
+                <i
+                  data-lucide="star"
+                  class="h-8 w-8 fill-current text-amber-400"
+                ></i>
+                <i
+                  data-lucide="star"
+                  class="h-8 w-8 fill-current text-amber-400"
+                ></i>
+                <i
+                  data-lucide="star"
+                  class="h-8 w-8 fill-current text-amber-400"
+                ></i>
+                <i
+                  data-lucide="star"
+                  class="h-8 w-8 fill-current text-amber-400"
+                ></i>
+                <i
+                  data-lucide="star"
+                  class="h-8 w-8 fill-current text-amber-400"
+                ></i>
+              </div>
+              <blockquote>
+                <p
+                  class="mb-8 text-2xl leading-relaxed text-slate-700 lg:text-3xl"
+                >
+                  "The analytics dashboard helps me monitor patient adherence
+                  patterns. I can intervene early when I see someone struggling
+                  with their medication schedule."
+                </p>
+                <footer class="flex items-center gap-5">
+                  <img
+                    src="https://images.unsplash.com/photo-1559839734-2b71ea197ec2?w=200"
+                    alt="Dr. Sarah Mitchell"
+                    class="h-20 w-20 rounded-full border-2 border-blue-600 object-cover"
+                  />
+                  <div>
+                    <p class="mb-1 text-2xl font-bold text-slate-900">
+                      Dr. Sarah Mitchell
+                    </p>
+                    <p class="text-lg text-slate-600">
+                      Family Physician • 12 patients on platform
+                    </p>
+                  </div>
+                </footer>
+              </blockquote>
+            </div>
+          </div>
+
+          <div class="mt-6 flex justify-center gap-2">
+            <button
+              onclick="showTestimonial(0)"
+              class="testimonial-indicator h-2 w-8 rounded-full bg-blue-600 transition-all duration-300"
+            ></button>
+            <button
+              onclick="showTestimonial(1)"
+              class="testimonial-indicator h-2 w-2 rounded-full bg-slate-300 transition-all duration-300"
+            ></button>
+            <button
+              onclick="showTestimonial(2)"
+              class="testimonial-indicator h-2 w-2 rounded-full bg-slate-300 transition-all duration-300"
+            ></button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="pricing" class="bg-white py-12 sm:py-16 lg:py-24">
+      <div class="mx-auto max-w-7xl px-3 sm:px-6 lg:px-8">
+        <div class="mb-8 text-center sm:mb-12">
+          <h2
+            class="mb-3 text-2xl font-bold text-slate-900 sm:mb-4 sm:text-3xl lg:text-5xl"
+          >
+            Choose Your Plan
+          </h2>
+          <p
+            class="mb-6 text-base text-slate-600 sm:mb-8 sm:text-lg lg:text-xl"
+          >
+            Start free, upgrade when you need more
+          </p>
+
+          <div
+            class="inline-flex items-center gap-1 rounded-full border border-slate-200 bg-slate-100 p-1 sm:gap-3"
+          >
+            <button
+              onclick="toggleBilling('monthly')"
+              id="monthly-btn"
+              class="rounded-full bg-blue-600 px-4 py-2 text-sm text-white shadow-lg transition-all sm:px-6 sm:py-3 sm:text-base"
+            >
+              Monthly
+            </button>
+            <button
+              onclick="toggleBilling('yearly')"
+              id="yearly-btn"
+              class="relative rounded-full px-4 py-2 text-sm text-slate-600 transition-all sm:px-6 sm:py-3 sm:text-base"
+            >
+              Yearly
+              <span
+                class="absolute -top-2 -right-1 rounded-full bg-green-500 px-1.5 py-0.5 text-xs text-white sm:-right-2 sm:px-2"
+                >Save 17%</span
+              >
+            </button>
+          </div>
+        </div>
+
+        <div
+          class="grid grid-cols-1 gap-4 sm:grid-cols-2 sm:gap-6 lg:grid-cols-4"
+        >
+          <div
+            class="relative rounded-2xl border-2 border-slate-200 bg-white p-6 shadow-xl transition-all hover:border-slate-300 sm:p-8"
+          >
+            <div class="mb-5 text-center sm:mb-6">
+              <h3 class="mb-2 text-xl font-bold text-slate-900 sm:text-2xl">
+                Free
+              </h3>
+              <p class="mb-3 text-xs text-slate-600 sm:mb-4 sm:text-sm">
+                Perfect for individuals managing their own medications
+              </p>
+              <div class="mb-2">
+                <span
+                  class="text-3xl font-bold text-slate-900 sm:text-4xl lg:text-5xl"
+                  >€0.00</span
+                >
+                <span class="text-base text-slate-600 sm:text-lg">/month</span>
+              </div>
+            </div>
+
+            <button
+              onclick="alert('Get Started')"
+              class="mb-5 h-12 w-full rounded-lg bg-blue-600 text-sm text-white transition-colors hover:bg-blue-700 sm:mb-6 sm:h-14 sm:text-base"
+            >
+              Get Started Free
+            </button>
+
+            <div class="space-y-2 sm:space-y-3">
+              <div class="flex items-start gap-2 sm:gap-3">
+                <i
+                  data-lucide="check"
+                  class="mt-0.5 h-4 w-4 flex-shrink-0 text-green-600 sm:h-5 sm:w-5"
+                ></i>
+                <span class="text-sm text-slate-700 sm:text-base"
+                  >Up to 5 medications</span
+                >
+              </div>
+              <div class="flex items-start gap-2 sm:gap-3">
+                <i
+                  data-lucide="check"
+                  class="mt-0.5 h-4 w-4 flex-shrink-0 text-green-600 sm:h-5 sm:w-5"
+                ></i>
+                <span class="text-sm text-slate-700 sm:text-base"
+                  >Basic reminders</span
+                >
+              </div>
+              <div class="flex items-start gap-2 sm:gap-3">
+                <i
+                  data-lucide="check"
+                  class="mt-0.5 h-4 w-4 flex-shrink-0 text-green-600 sm:h-5 sm:w-5"
+                ></i>
+                <span class="text-sm text-slate-700 sm:text-base"
+                  >Daily schedule view</span
+                >
+              </div>
+              <div class="flex items-start gap-2 sm:gap-3">
+                <i
+                  data-lucide="check"
+                  class="mt-0.5 h-4 w-4 flex-shrink-0 text-green-600 sm:h-5 sm:w-5"
+                ></i>
+                <span class="text-sm text-slate-700 sm:text-base"
+                  >Adherence tracking</span
+                >
+              </div>
+              <div class="flex items-start gap-2 sm:gap-3">
+                <i
+                  data-lucide="check"
+                  class="mt-0.5 h-4 w-4 flex-shrink-0 text-green-600 sm:h-5 sm:w-5"
+                ></i>
+                <span class="text-sm text-slate-700 sm:text-base"
+                  >Mobile & web access</span
+                >
+              </div>
+            </div>
+          </div>
+
+          <div
+            class="relative rounded-2xl border-2 border-slate-200 bg-white p-6 shadow-xl transition-all hover:border-slate-300 sm:p-8"
+          >
+            <div class="mb-5 text-center sm:mb-6">
+              <h3 class="mb-2 text-xl font-bold text-slate-900 sm:text-2xl">
+                Personal
+              </h3>
+              <p class="mb-3 text-xs text-slate-600 sm:mb-4 sm:text-sm">
+                For patients who need advanced medication management
+              </p>
+              <div class="mb-2">
+                <span
+                  class="price-monthly text-3xl font-bold text-slate-900 sm:text-4xl lg:text-5xl"
+                  >€8.99</span
+                >
+                <span
+                  class="price-yearly hidden text-3xl font-bold text-slate-900 sm:text-4xl lg:text-5xl"
+                  >€7.42</span
+                >
+                <span class="text-base text-slate-600 sm:text-lg">/month</span>
+              </div>
+              <p
+                class="price-yearly-note hidden text-xs text-slate-500 sm:text-sm"
+              >
+                €89/year billed annually
+              </p>
+            </div>
+
+            <button
+              onclick="alert('Start Free Trial')"
+              class="mb-5 h-12 w-full rounded-lg bg-blue-600 text-sm text-white transition-colors hover:bg-blue-700 sm:mb-6 sm:h-14 sm:text-base"
+            >
+              Start Free Trial
+            </button>
+
+            <div class="space-y-2 sm:space-y-3">
+              <div class="flex items-start gap-2 sm:gap-3">
+                <i
+                  data-lucide="check"
+                  class="mt-0.5 h-4 w-4 flex-shrink-0 text-green-600 sm:h-5 sm:w-5"
+                ></i>
+                <span class="text-sm text-slate-700 sm:text-base"
+                  >Unlimited medications</span
+                >
+              </div>
+              <div class="flex items-start gap-2 sm:gap-3">
+                <i
+                  data-lucide="check"
+                  class="mt-0.5 h-4 w-4 flex-shrink-0 text-green-600 sm:h-5 sm:w-5"
+                ></i>
+                <span class="text-sm text-slate-700 sm:text-base"
+                  >Smart notifications</span
+                >
+              </div>
+              <div class="flex items-start gap-2 sm:gap-3">
+                <i
+                  data-lucide="check"
+                  class="mt-0.5 h-4 w-4 flex-shrink-0 text-green-600 sm:h-5 sm:w-5"
+                ></i>
+                <span class="text-sm text-slate-700 sm:text-base"
+                  >Weekly analytics</span
+                >
+              </div>
+              <div class="flex items-start gap-2 sm:gap-3">
+                <i
+                  data-lucide="check"
+                  class="mt-0.5 h-4 w-4 flex-shrink-0 text-green-600 sm:h-5 sm:w-5"
+                ></i>
+                <span class="text-sm text-slate-700 sm:text-base"
+                  >Medication database</span
+                >
+              </div>
+              <div class="flex items-start gap-2 sm:gap-3">
+                <i
+                  data-lucide="check"
+                  class="mt-0.5 h-4 w-4 flex-shrink-0 text-green-600 sm:h-5 sm:w-5"
+                ></i>
+                <span class="text-sm text-slate-700 sm:text-base"
+                  >Print schedules</span
+                >
+              </div>
+              <div class="flex items-start gap-2 sm:gap-3">
+                <i
+                  data-lucide="check"
+                  class="mt-0.5 h-4 w-4 flex-shrink-0 text-green-600 sm:h-5 sm:w-5"
+                ></i>
+                <span class="text-sm text-slate-700 sm:text-base"
+                  >Photo uploads</span
+                >
+              </div>
+              <div class="flex items-start gap-2 sm:gap-3">
+                <i
+                  data-lucide="check"
+                  class="mt-0.5 h-4 w-4 flex-shrink-0 text-green-600 sm:h-5 sm:w-5"
+                ></i>
+                <span class="text-sm text-slate-700 sm:text-base"
+                  >Achievement system</span
+                >
+              </div>
+              <div class="flex items-start gap-2 sm:gap-3">
+                <i
+                  data-lucide="check"
+                  class="mt-0.5 h-4 w-4 flex-shrink-0 text-green-600 sm:h-5 sm:w-5"
+                ></i>
+                <span class="text-sm text-slate-700 sm:text-base"
+                  >Priority support</span
+                >
+              </div>
+            </div>
+          </div>
+
+          <div
+            class="relative rounded-2xl border-2 border-orange-500 bg-orange-50/20 p-6 shadow-xl transition-all sm:p-8"
+          >
+            <div
+              class="absolute -top-3 left-1/2 -translate-x-1/2 rounded-full bg-gradient-to-r from-orange-500 to-orange-600 px-3 py-1 text-xs font-bold text-white shadow-lg sm:-top-4 sm:px-4 sm:text-sm"
+            >
+              Most Popular
+            </div>
+
+            <div class="mb-5 text-center sm:mb-6">
+              <h3 class="mb-2 text-xl font-bold text-slate-900 sm:text-2xl">
+                Family
+              </h3>
+              <p class="mb-3 text-xs text-slate-600 sm:mb-4 sm:text-sm">
+                Best for caregivers managing multiple family members
+              </p>
+              <div class="mb-2">
+                <span
+                  class="price-monthly text-3xl font-bold text-slate-900 sm:text-4xl lg:text-5xl"
+                  >€17.99</span
+                >
+                <span
+                  class="price-yearly hidden text-3xl font-bold text-slate-900 sm:text-4xl lg:text-5xl"
+                  >€14.92</span
+                >
+                <span class="text-base text-slate-600 sm:text-lg">/month</span>
+              </div>
+              <p
+                class="price-yearly-note hidden text-xs text-slate-500 sm:text-sm"
+              >
+                €179/year billed annually
+              </p>
+            </div>
+
+            <button
+              onclick="alert('Start Free Trial')"
+              class="mb-5 h-12 w-full rounded-lg bg-orange-600 text-sm text-white transition-colors hover:bg-orange-700 sm:mb-6 sm:h-14 sm:text-base"
+            >
+              Start Free Trial
+            </button>
+
+            <div class="space-y-2 sm:space-y-3">
+              <div class="flex items-start gap-2 sm:gap-3">
+                <i
+                  data-lucide="check"
+                  class="mt-0.5 h-4 w-4 flex-shrink-0 text-green-600 sm:h-5 sm:w-5"
+                ></i>
+                <span class="text-sm text-slate-700 sm:text-base"
+                  >Everything in Personal</span
+                >
+              </div>
+              <div class="flex items-start gap-2 sm:gap-3">
+                <i
+                  data-lucide="check"
+                  class="mt-0.5 h-4 w-4 flex-shrink-0 text-green-600 sm:h-5 sm:w-5"
+                ></i>
+                <span class="text-sm text-slate-700 sm:text-base"
+                  >Manage up to 5 family members</span
+                >
+              </div>
+              <div class="flex items-start gap-2 sm:gap-3">
+                <i
+                  data-lucide="check"
+                  class="mt-0.5 h-4 w-4 flex-shrink-0 text-green-600 sm:h-5 sm:w-5"
+                ></i>
+                <span class="text-sm text-slate-700 sm:text-base"
+                  >Caregiver dashboard</span
+                >
+              </div>
+              <div class="flex items-start gap-2 sm:gap-3">
+                <i
+                  data-lucide="check"
+                  class="mt-0.5 h-4 w-4 flex-shrink-0 text-green-600 sm:h-5 sm:w-5"
+                ></i>
+                <span class="text-sm text-slate-700 sm:text-base"
+                  >Cross-user analytics</span
+                >
+              </div>
+              <div class="flex items-start gap-2 sm:gap-3">
+                <i
+                  data-lucide="check"
+                  class="mt-0.5 h-4 w-4 flex-shrink-0 text-green-600 sm:h-5 sm:w-5"
+                ></i>
+                <span class="text-sm text-slate-700 sm:text-base"
+                  >Shared medication history</span
+                >
+              </div>
+              <div class="flex items-start gap-2 sm:gap-3">
+                <i
+                  data-lucide="check"
+                  class="mt-0.5 h-4 w-4 flex-shrink-0 text-green-600 sm:h-5 sm:w-5"
+                ></i>
+                <span class="text-sm text-slate-700 sm:text-base"
+                  >Email notifications</span
+                >
+              </div>
+              <div class="flex items-start gap-2 sm:gap-3">
+                <i
+                  data-lucide="check"
+                  class="mt-0.5 h-4 w-4 flex-shrink-0 text-green-600 sm:h-5 sm:w-5"
+                ></i>
+                <span class="text-sm text-slate-700 sm:text-base"
+                  >Multi-device sync</span
+                >
+              </div>
+              <div class="flex items-start gap-2 sm:gap-3">
+                <i
+                  data-lucide="check"
+                  class="mt-0.5 h-4 w-4 flex-shrink-0 text-green-600 sm:h-5 sm:w-5"
+                ></i>
+                <span class="text-sm text-slate-700 sm:text-base"
+                  >Family insights</span
+                >
+              </div>
+            </div>
+          </div>
+
+          <div
+            class="relative rounded-2xl border-2 border-slate-200 bg-white p-6 shadow-xl transition-all hover:border-slate-300 sm:p-8"
+          >
+            <div class="mb-5 text-center sm:mb-6">
+              <h3 class="mb-2 text-xl font-bold text-slate-900 sm:text-2xl">
+                Professional
+              </h3>
+              <p class="mb-3 text-xs text-slate-600 sm:mb-4 sm:text-sm">
+                For healthcare providers managing patient cohorts
+              </p>
+              <div class="mb-2">
+                <span
+                  class="price-monthly text-3xl font-bold text-slate-900 sm:text-4xl lg:text-5xl"
+                  >€44.99</span
+                >
+                <span
+                  class="price-yearly hidden text-3xl font-bold text-slate-900 sm:text-4xl lg:text-5xl"
+                  >€37.42</span
+                >
+                <span class="text-base text-slate-600 sm:text-lg">/month</span>
+              </div>
+              <p
+                class="price-yearly-note hidden text-xs text-slate-500 sm:text-sm"
+              >
+                €449/year billed annually
+              </p>
+            </div>
+
+            <button
+              onclick="alert('Start Free Trial')"
+              class="mb-5 h-12 w-full rounded-lg bg-blue-600 text-sm text-white transition-colors hover:bg-blue-700 sm:mb-6 sm:h-14 sm:text-base"
+            >
+              Start Free Trial
+            </button>
+
+            <div class="space-y-2 sm:space-y-3">
+              <div class="flex items-start gap-2 sm:gap-3">
+                <i
+                  data-lucide="check"
+                  class="mt-0.5 h-4 w-4 flex-shrink-0 text-green-600 sm:h-5 sm:w-5"
+                ></i>
+                <span class="text-sm text-slate-700 sm:text-base"
+                  >Everything in Family</span
+                >
+              </div>
+              <div class="flex items-start gap-2 sm:gap-3">
+                <i
+                  data-lucide="check"
+                  class="mt-0.5 h-4 w-4 flex-shrink-0 text-green-600 sm:h-5 sm:w-5"
+                ></i>
+                <span class="text-sm text-slate-700 sm:text-base"
+                  >Manage unlimited patients</span
+                >
+              </div>
+              <div class="flex items-start gap-2 sm:gap-3">
+                <i
+                  data-lucide="check"
+                  class="mt-0.5 h-4 w-4 flex-shrink-0 text-green-600 sm:h-5 sm:w-5"
+                ></i>
+                <span class="text-sm text-slate-700 sm:text-base"
+                  >Doctor dashboard</span
+                >
+              </div>
+              <div class="flex items-start gap-2 sm:gap-3">
+                <i
+                  data-lucide="check"
+                  class="mt-0.5 h-4 w-4 flex-shrink-0 text-green-600 sm:h-5 sm:w-5"
+                ></i>
+                <span class="text-sm text-slate-700 sm:text-base"
+                  >Cohort analytics</span
+                >
+              </div>
+              <div class="flex items-start gap-2 sm:gap-3">
+                <i
+                  data-lucide="check"
+                  class="mt-0.5 h-4 w-4 flex-shrink-0 text-green-600 sm:h-5 sm:w-5"
+                ></i>
+                <span class="text-sm text-slate-700 sm:text-base"
+                  >At-risk patient alerts</span
+                >
+              </div>
+              <div class="flex items-start gap-2 sm:gap-3">
+                <i
+                  data-lucide="check"
+                  class="mt-0.5 h-4 w-4 flex-shrink-0 text-green-600 sm:h-5 sm:w-5"
+                ></i>
+                <span class="text-sm text-slate-700 sm:text-base"
+                  >Prescribing tools</span
+                >
+              </div>
+              <div class="flex items-start gap-2 sm:gap-3">
+                <i
+                  data-lucide="check"
+                  class="mt-0.5 h-4 w-4 flex-shrink-0 text-green-600 sm:h-5 sm:w-5"
+                ></i>
+                <span class="text-sm text-slate-700 sm:text-base"
+                  >Medication interaction checker</span
+                >
+              </div>
+              <div class="flex items-start gap-2 sm:gap-3">
+                <i
+                  data-lucide="check"
+                  class="mt-0.5 h-4 w-4 flex-shrink-0 text-green-600 sm:h-5 sm:w-5"
+                ></i>
+                <span class="text-sm text-slate-700 sm:text-base"
+                  >HIPAA compliance tools</span
+                >
+              </div>
+              <div class="flex items-start gap-2 sm:gap-3">
+                <i
+                  data-lucide="check"
+                  class="mt-0.5 h-4 w-4 flex-shrink-0 text-green-600 sm:h-5 sm:w-5"
+                ></i>
+                <span class="text-sm text-slate-700 sm:text-base"
+                  >Priority support</span
+                >
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <p class="mt-8 text-center text-base text-slate-600">
+          All plans include a 30-day free trial. No credit card required.
+        </p>
+      </div>
+    </section>
+
+    <section
+      id="faq"
+      class="bg-gradient-to-b from-slate-50 to-white py-16 lg:py-24"
+    >
+      <div class="mx-auto max-w-4xl px-3 sm:px-6 lg:px-8">
+        <div class="mb-16 text-center">
+          <h2 class="mb-4 text-3xl font-bold text-slate-900 lg:text-5xl">
+            Frequently Asked Questions
+          </h2>
+          <p class="text-lg text-slate-600 lg:text-xl">
+            Everything you need to know about Prescription Clarity
+          </p>
+        </div>
+
+        <div class="space-y-4">
+          <div
+            class="overflow-hidden rounded-2xl border border-slate-200 bg-white"
+          >
+            <button
+              onclick="toggleFAQ(0)"
+              class="faq-button flex w-full items-center justify-between p-6 text-left transition-colors hover:bg-slate-50"
+            >
+              <span class="pr-8 text-lg font-bold text-slate-900"
+                >How does the free trial work?</span
+              >
+              <i
+                data-lucide="chevron-down"
+                class="chevron h-6 w-6 flex-shrink-0 text-slate-600"
+              ></i>
+            </button>
+            <div class="faq-content">
+              <div class="px-6 pb-6 text-base leading-relaxed text-slate-600">
+                All paid plans include a 30-day free trial with full access to
+                features. No credit card required to start. Cancel anytime
+                during the trial without being charged.
+              </div>
+            </div>
+          </div>
+
+          <div
+            class="overflow-hidden rounded-2xl border border-slate-200 bg-white"
+          >
+            <button
+              onclick="toggleFAQ(1)"
+              class="faq-button flex w-full items-center justify-between p-6 text-left transition-colors hover:bg-slate-50"
+            >
+              <span class="pr-8 text-lg font-bold text-slate-900"
+                >Is my health data secure?</span
+              >
+              <i
+                data-lucide="chevron-down"
+                class="chevron h-6 w-6 flex-shrink-0 text-slate-600"
+              ></i>
+            </button>
+            <div class="faq-content">
+              <div class="px-6 pb-6 text-base leading-relaxed text-slate-600">
+                Yes! We use bank-level 256-bit encryption for all data. We're
+                fully GDPR and HIPAA compliant. Your data is never shared with
+                third parties without your explicit consent.
+              </div>
+            </div>
+          </div>
+
+          <div
+            class="overflow-hidden rounded-2xl border border-slate-200 bg-white"
+          >
+            <button
+              onclick="toggleFAQ(2)"
+              class="faq-button flex w-full items-center justify-between p-6 text-left transition-colors hover:bg-slate-50"
+            >
+              <span class="pr-8 text-lg font-bold text-slate-900"
+                >Can I switch plans later?</span
+              >
+              <i
+                data-lucide="chevron-down"
+                class="chevron h-6 w-6 flex-shrink-0 text-slate-600"
+              ></i>
+            </button>
+            <div class="faq-content">
+              <div class="px-6 pb-6 text-base leading-relaxed text-slate-600">
+                Absolutely! You can upgrade or downgrade your plan at any time.
+                If you upgrade, you'll get immediate access to new features. If
+                you downgrade, changes take effect at the end of your billing
+                cycle.
+              </div>
+            </div>
+          </div>
+
+          <div
+            class="overflow-hidden rounded-2xl border border-slate-200 bg-white"
+          >
+            <button
+              onclick="toggleFAQ(3)"
+              class="faq-button flex w-full items-center justify-between p-6 text-left transition-colors hover:bg-slate-50"
+            >
+              <span class="pr-8 text-lg font-bold text-slate-900"
+                >Do you offer refunds?</span
+              >
+              <i
+                data-lucide="chevron-down"
+                class="chevron h-6 w-6 flex-shrink-0 text-slate-600"
+              ></i>
+            </button>
+            <div class="faq-content">
+              <div class="px-6 pb-6 text-base leading-relaxed text-slate-600">
+                Yes, we offer a 30-day money-back guarantee on all paid plans.
+                If you're not satisfied for any reason, contact us within 30
+                days for a full refund.
+              </div>
+            </div>
+          </div>
+
+          <div
+            class="overflow-hidden rounded-2xl border border-slate-200 bg-white"
+          >
+            <button
+              onclick="toggleFAQ(4)"
+              class="faq-button flex w-full items-center justify-between p-6 text-left transition-colors hover:bg-slate-50"
+            >
+              <span class="pr-8 text-lg font-bold text-slate-900"
+                >How do notifications work?</span
+              >
+              <i
+                data-lucide="chevron-down"
+                class="chevron h-6 w-6 flex-shrink-0 text-slate-600"
+              ></i>
+            </button>
+            <div class="faq-content">
+              <div class="px-6 pb-6 text-base leading-relaxed text-slate-600">
+                You can receive notifications via push (mobile), email, and SMS.
+                Set custom reminder times before each dose. Notifications are
+                smart - they adapt to your adherence patterns over time.
+              </div>
+            </div>
+          </div>
+
+          <div
+            class="overflow-hidden rounded-2xl border border-slate-200 bg-white"
+          >
+            <button
+              onclick="toggleFAQ(5)"
+              class="faq-button flex w-full items-center justify-between p-6 text-left transition-colors hover:bg-slate-50"
+            >
+              <span class="pr-8 text-lg font-bold text-slate-900"
+                >Can family members share a subscription?</span
+              >
+              <i
+                data-lucide="chevron-down"
+                class="chevron h-6 w-6 flex-shrink-0 text-slate-600"
+              ></i>
+            </button>
+            <div class="faq-content">
+              <div class="px-6 pb-6 text-base leading-relaxed text-slate-600">
+                Yes! The Family plan allows up to 5 family members under one
+                subscription. Each member gets their own secure account with
+                privacy controls.
+              </div>
+            </div>
+          </div>
+
+          <div
+            class="overflow-hidden rounded-2xl border border-slate-200 bg-white"
+          >
+            <button
+              onclick="toggleFAQ(6)"
+              class="faq-button flex w-full items-center justify-between p-6 text-left transition-colors hover:bg-slate-50"
+            >
+              <span class="pr-8 text-lg font-bold text-slate-900"
+                >Is there a mobile app?</span
+              >
+              <i
+                data-lucide="chevron-down"
+                class="chevron h-6 w-6 flex-shrink-0 text-slate-600"
+              ></i>
+            </button>
+            <div class="faq-content">
+              <div class="px-6 pb-6 text-base leading-relaxed text-slate-600">
+                Yes! Our web app works seamlessly on all devices and is
+                optimized for mobile. We also have native iOS and Android apps
+                (coming soon) with offline support.
+              </div>
+            </div>
+          </div>
+
+          <div
+            class="overflow-hidden rounded-2xl border border-slate-200 bg-white"
+          >
+            <button
+              onclick="toggleFAQ(7)"
+              class="faq-button flex w-full items-center justify-between p-6 text-left transition-colors hover:bg-slate-50"
+            >
+              <span class="pr-8 text-lg font-bold text-slate-900"
+                >What if I need help?</span
+              >
+              <i
+                data-lucide="chevron-down"
+                class="chevron h-6 w-6 flex-shrink-0 text-slate-600"
+              ></i>
+            </button>
+            <div class="faq-content">
+              <div class="px-6 pb-6 text-base leading-relaxed text-slate-600">
+                We offer comprehensive support via email, live chat, and our
+                help center. Personal and higher plans get priority support with
+                faster response times.
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section
+      class="relative overflow-hidden bg-gradient-to-br from-blue-600 via-blue-700 to-blue-800 py-16 sm:py-20 lg:py-32"
+    >
+      <div
+        class="relative z-10 mx-auto max-w-5xl px-4 text-center sm:px-6 lg:px-8"
+      >
+        <h2
+          class="mb-6 px-4 text-2xl leading-tight font-bold text-white sm:mb-8 sm:text-3xl md:text-4xl lg:text-5xl xl:text-6xl"
+        >
+          Ready to Transform Your Medication Management?
+        </h2>
+        <p
+          class="mx-auto mb-8 max-w-3xl px-4 text-base leading-relaxed text-blue-100 sm:mb-10 sm:text-lg md:text-xl lg:mb-12 lg:text-2xl"
+        >
+          Join thousands of users managing their medications with confidence.
+          Start your free 30-day trial today.
+        </p>
+        <div
+          class="flex flex-col items-center justify-center gap-3 px-4 sm:flex-row sm:gap-4"
+        >
+          <button
+            onclick="alert('Start Free Trial')"
+            class="group flex h-14 w-full items-center justify-center gap-2 rounded-lg bg-white px-8 text-base text-blue-600 shadow-2xl transition-all hover:bg-blue-50 sm:h-16 sm:w-auto sm:px-10 sm:text-lg lg:px-12 lg:text-xl"
+          >
+            Start Your Free Trial
+            <i
+              data-lucide="arrow-right"
+              class="h-5 w-5 transition-transform group-hover:translate-x-1 sm:h-6 sm:w-6 lg:h-7 lg:w-7"
+            ></i>
+          </button>
+          <button
+            onclick="alert('Try Demo')"
+            class="h-14 w-full rounded-lg border-2 border-white bg-white/10 px-8 text-base text-white transition-colors hover:bg-white/20 sm:h-16 sm:w-auto sm:px-10 sm:text-lg lg:px-12 lg:text-xl"
+          >
+            Try Demo
+          </button>
+        </div>
+
+        <div
+          class="mt-12 grid grid-cols-1 gap-6 border-t border-blue-500/30 pt-10 sm:mt-14 sm:grid-cols-3 sm:gap-8 sm:pt-12 lg:mt-16"
+        >
+          <div class="flex flex-col items-center gap-2 sm:gap-3">
+            <i
+              data-lucide="shield"
+              class="h-10 w-10 text-blue-200 sm:h-12 sm:w-12"
+            ></i>
+            <p class="text-sm text-blue-100 sm:text-base lg:text-lg">
+              GDPR & HIPAA Compliant
+            </p>
+          </div>
+          <div class="flex flex-col items-center gap-2 sm:gap-3">
+            <i
+              data-lucide="check-circle-2"
+              class="h-10 w-10 text-blue-200 sm:h-12 sm:w-12"
+            ></i>
+            <p class="text-sm text-blue-100 sm:text-base lg:text-lg">
+              No Credit Card Required
+            </p>
+          </div>
+          <div class="flex flex-col items-center gap-2 sm:gap-3">
+            <i
+              data-lucide="clock"
+              class="h-10 w-10 text-blue-200 sm:h-12 sm:w-12"
+            ></i>
+            <p class="text-sm text-blue-100 sm:text-base lg:text-lg">
+              Free 30-Day Trial
+            </p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <footer class="border-t border-slate-200 bg-white py-12 sm:py-16">
+      <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+        <div
+          class="mb-10 grid grid-cols-2 gap-8 sm:mb-12 sm:grid-cols-2 sm:gap-10 md:grid-cols-4 lg:gap-12"
+        >
+          <div>
+            <h3
+              class="mb-4 text-lg font-bold text-slate-900 sm:mb-6 sm:text-xl"
+            >
+              Product
+            </h3>
+            <ul class="space-y-3 sm:space-y-4">
+              <li>
+                <a
+                  href="#"
+                  class="text-base text-slate-600 transition-colors hover:text-blue-600 sm:text-lg"
+                  >Features</a
+                >
+              </li>
+              <li>
+                <a
+                  href="#pricing"
+                  class="text-base text-slate-600 transition-colors hover:text-blue-600 sm:text-lg"
+                  >Pricing</a
+                >
+              </li>
+              <li>
+                <a
+                  href="#"
+                  class="text-base text-slate-600 transition-colors hover:text-blue-600 sm:text-lg"
+                  >Security</a
+                >
+              </li>
+            </ul>
+          </div>
+          <div>
+            <h3
+              class="mb-4 text-lg font-bold text-slate-900 sm:mb-6 sm:text-xl"
+            >
+              Company
+            </h3>
+            <ul class="space-y-3 sm:space-y-4">
+              <li>
+                <a
+                  href="#"
+                  class="text-base text-slate-600 transition-colors hover:text-blue-600 sm:text-lg"
+                  >About</a
+                >
+              </li>
+              <li>
+                <a
+                  href="#"
+                  class="text-base text-slate-600 transition-colors hover:text-blue-600 sm:text-lg"
+                  >Blog</a
+                >
+              </li>
+              <li>
+                <a
+                  href="#"
+                  class="text-base text-slate-600 transition-colors hover:text-blue-600 sm:text-lg"
+                  >Careers</a
+                >
+              </li>
+            </ul>
+          </div>
+          <div>
+            <h3
+              class="mb-4 text-lg font-bold text-slate-900 sm:mb-6 sm:text-xl"
+            >
+              Resources
+            </h3>
+            <ul class="space-y-3 sm:space-y-4">
+              <li>
+                <a
+                  href="#"
+                  class="text-base text-slate-600 transition-colors hover:text-blue-600 sm:text-lg"
+                  >Help Center</a
+                >
+              </li>
+              <li>
+                <a
+                  href="#"
+                  class="text-base text-slate-600 transition-colors hover:text-blue-600 sm:text-lg"
+                  >Community</a
+                >
+              </li>
+              <li>
+                <a
+                  href="#"
+                  class="text-base text-slate-600 transition-colors hover:text-blue-600 sm:text-lg"
+                  >Contact</a
+                >
+              </li>
+            </ul>
+          </div>
+          <div>
+            <h3
+              class="mb-4 text-lg font-bold text-slate-900 sm:mb-6 sm:text-xl"
+            >
+              Legal
+            </h3>
+            <ul class="space-y-3 sm:space-y-4">
+              <li>
+                <a
+                  href="#"
+                  class="text-base text-slate-600 transition-colors hover:text-blue-600 sm:text-lg"
+                  >Privacy</a
+                >
+              </li>
+              <li>
+                <a
+                  href="#"
+                  class="text-base text-slate-600 transition-colors hover:text-blue-600 sm:text-lg"
+                  >Terms</a
+                >
+              </li>
+              <li>
+                <a
+                  href="#"
+                  class="text-base text-slate-600 transition-colors hover:text-blue-600 sm:text-lg"
+                  >GDPR & HIPAA</a
+                >
+              </li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="border-t border-slate-200 pt-10">
+          <div
+            class="flex flex-col items-center justify-between gap-6 sm:flex-row"
+          >
+            <div class="flex items-center gap-4">
+              <img
+                src="logo.svg"
+                alt="Prescription Clarity Logo"
+                class="h-10 w-10"
+                style="object-fit: contain"
+              />
+              <span class="text-xl font-bold text-slate-900"
+                >Prescription Clarity</span
+              >
+            </div>
+            <p class="text-lg text-slate-600">
+              © 2025 Prescription Clarity. All rights reserved.
+            </p>
+          </div>
+        </div>
+      </div>
+    </footer>
+
+    <script>
+      lucide.createIcons();
+
+      let currentTestimonialIndex = 0;
+      const testimonialSlides = document.querySelectorAll(".testimonial-slide");
+      const testimonialIndicators = document.querySelectorAll(
+        ".testimonial-indicator",
+      );
+
+      function showTestimonial(index) {
+        testimonialSlides.forEach((slide, i) => {
+          slide.classList.remove("active");
+          testimonialIndicators[i].classList.remove("w-8", "bg-blue-600");
+          testimonialIndicators[i].classList.add("w-2", "bg-slate-300");
+        });
+
+        testimonialSlides[index].classList.add("active");
+        testimonialIndicators[index].classList.remove("w-2", "bg-slate-300");
+        testimonialIndicators[index].classList.add("w-8", "bg-blue-600");
+        currentTestimonialIndex = index;
+
+        lucide.createIcons();
+      }
+
+      setInterval(() => {
+        currentTestimonialIndex =
+          (currentTestimonialIndex + 1) % testimonialSlides.length;
+        showTestimonial(currentTestimonialIndex);
+      }, 6000);
+
+      function toggleFAQ(index) {
+        const faqContents = document.querySelectorAll(".faq-content");
+        const chevrons = document.querySelectorAll(".chevron");
+
+        faqContents.forEach((content, i) => {
+          if (i !== index) {
+            content.classList.remove("active");
+            chevrons[i].classList.remove("active");
+          }
+        });
+
+        faqContents[index].classList.toggle("active");
+        chevrons[index].classList.toggle("active");
+      }
+
+      function toggleBilling(plan) {
+        const monthlyBtn = document.getElementById("monthly-btn");
+        const yearlyBtn = document.getElementById("yearly-btn");
+        const monthlyPrices = document.querySelectorAll(".price-monthly");
+        const yearlyPrices = document.querySelectorAll(".price-yearly");
+        const yearlyNotes = document.querySelectorAll(".price-yearly-note");
+
+        if (plan === "monthly") {
+          monthlyBtn.classList.add("bg-blue-600", "text-white", "shadow-lg");
+          monthlyBtn.classList.remove("text-slate-600");
+          yearlyBtn.classList.remove("bg-blue-600", "text-white", "shadow-lg");
+          yearlyBtn.classList.add("text-slate-600");
+
+          monthlyPrices.forEach((p) => p.classList.remove("hidden"));
+          yearlyPrices.forEach((p) => p.classList.add("hidden"));
+          yearlyNotes.forEach((n) => n.classList.add("hidden"));
+        } else {
+          yearlyBtn.classList.add("bg-blue-600", "text-white", "shadow-lg");
+          yearlyBtn.classList.remove("text-slate-600");
+          monthlyBtn.classList.remove("bg-blue-600", "text-white", "shadow-lg");
+          monthlyBtn.classList.add("text-slate-600");
+
+          monthlyPrices.forEach((p) => p.classList.add("hidden"));
+          yearlyPrices.forEach((p) => p.classList.remove("hidden"));
+          yearlyNotes.forEach((n) => n.classList.remove("hidden"));
+        }
+      }
+    </script>
+  </body>
 </html>
