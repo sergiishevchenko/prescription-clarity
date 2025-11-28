@@ -55,83 +55,83 @@ export default function HomePage() {
 
   useEffect(() => {
     const interval = setInterval(() => {
-      setCurrentTestimonial(
-        (prev) => (prev + 1) % testimonials.length,
-      );
+      setCurrentTestimonial((prev) => (prev + 1) % testimonials.length);
     }, 6000);
     return () => clearInterval(interval);
   }, [testimonials.length]);
 
   return (
-    <div className="min-h-screen bg-white" style={{ backgroundColor: 'white' }}>
+    <div className="min-h-screen bg-white" style={{ backgroundColor: "white" }}>
       {/* Hero Section */}
       <section className="relative overflow-hidden bg-gradient-to-br from-blue-50 via-white to-purple-50 py-12 sm:py-16 lg:py-20 xl:py-24">
         <div className="absolute inset-0 overflow-hidden">
-          <div className="absolute top-1/4 left-1/4 h-96 w-96 rounded-full bg-blue-500/10 blur-3xl animate-pulse" />
-          <div className="absolute bottom-1/4 right-1/4 h-96 w-96 rounded-full bg-purple-500/10 blur-3xl animate-pulse delay-1000" />
+          <div className="absolute top-1/4 left-1/4 h-96 w-96 animate-pulse rounded-full bg-blue-500/10 blur-3xl" />
+          <div className="absolute right-1/4 bottom-1/4 h-96 w-96 animate-pulse rounded-full bg-purple-500/10 blur-3xl delay-1000" />
         </div>
 
-        <div className="max-w-7xl mx-auto px-2 sm:px-3 lg:px-4 relative z-10">
-          <div className="grid grid-cols-1 xl:grid-cols-2 gap-8 xl:gap-16 items-center">
+        <div className="relative z-10 mx-auto max-w-7xl px-2 sm:px-3 lg:px-4">
+          <div className="grid grid-cols-1 items-center gap-8 xl:grid-cols-2 xl:gap-16">
             {/* Left Content */}
             <div className="text-center xl:text-left">
-              <div className="inline-flex items-center gap-2 px-3 py-1.5 sm:px-4 sm:py-2 rounded-full bg-blue-100 border border-blue-200 mb-4 sm:mb-6">
-                <Sparkles className="w-4 h-4 sm:w-5 sm:h-5 text-blue-600" />
-                <span className="text-xs sm:text-sm lg:text-base font-medium text-blue-900">
+              <div className="mb-4 inline-flex items-center gap-2 rounded-full border border-blue-200 bg-blue-100 px-3 py-1.5 sm:mb-6 sm:px-4 sm:py-2">
+                <Sparkles className="h-4 w-4 text-blue-600 sm:h-5 sm:w-5" />
+                <span className="text-xs font-medium text-blue-900 sm:text-sm lg:text-base">
                   Trusted by 10,000+ users worldwide
                 </span>
               </div>
 
-              <h1 className="text-2xl sm:text-3xl lg:text-4xl xl:text-6xl font-bold mb-4 sm:mb-6 leading-tight text-slate-900">
+              <h1 className="mb-4 text-2xl leading-tight font-bold text-slate-900 sm:mb-6 sm:text-3xl lg:text-4xl xl:text-6xl">
                 Stay on Track
                 <br />
-                <span className="text-blue-600 whitespace-nowrap">With Your Medications</span>
-            </h1>
+                <span className="whitespace-nowrap text-blue-600">
+                  With Your Medications
+                </span>
+              </h1>
 
-              <p className="text-sm sm:text-base lg:text-lg xl:text-xl mb-4 sm:mb-6 leading-relaxed text-slate-600">
+              <p className="mb-4 text-sm leading-relaxed text-slate-600 sm:mb-6 sm:text-base lg:text-lg xl:text-xl">
                 The complete medication management platform trusted by patients,
                 caregivers, and healthcare professionals.
               </p>
 
-              <div className="flex flex-wrap gap-2 sm:gap-3 justify-center xl:justify-start mb-6 sm:mb-8">
-                <div className="flex items-center gap-1.5 sm:gap-2 px-3 py-1.5 sm:px-4 sm:py-2 rounded-lg bg-green-50 border border-green-200">
-                  <CheckCircle2 className="w-4 h-4 sm:w-5 sm:h-5 text-green-600" />
-                  <span className="text-xs sm:text-sm lg:text-base text-green-700">
+              <div className="mb-6 flex flex-wrap justify-center gap-2 sm:mb-8 sm:gap-3 xl:justify-start">
+                <div className="flex items-center gap-1.5 rounded-lg border border-green-200 bg-green-50 px-3 py-1.5 sm:gap-2 sm:px-4 sm:py-2">
+                  <CheckCircle2 className="h-4 w-4 text-green-600 sm:h-5 sm:w-5" />
+                  <span className="text-xs text-green-700 sm:text-sm lg:text-base">
                     95% Adherence Rate
                   </span>
                 </div>
-                <div className="flex items-center gap-1.5 sm:gap-2 px-3 py-1.5 sm:px-4 sm:py-2 rounded-lg bg-green-50 border border-green-200">
-                  <CheckCircle2 className="w-4 h-4 sm:w-5 sm:h-5 text-green-600" />
-                  <span className="text-xs sm:text-sm lg:text-base text-green-700">
+                <div className="flex items-center gap-1.5 rounded-lg border border-green-200 bg-green-50 px-3 py-1.5 sm:gap-2 sm:px-4 sm:py-2">
+                  <CheckCircle2 className="h-4 w-4 text-green-600 sm:h-5 sm:w-5" />
+                  <span className="text-xs text-green-700 sm:text-sm lg:text-base">
                     GDPR & HIPAA Compliant
                   </span>
                 </div>
-                <div className="flex items-center gap-1.5 sm:gap-2 px-3 py-1.5 sm:px-4 sm:py-2 rounded-lg bg-green-50 border border-green-200">
-                  <CheckCircle2 className="w-4 h-4 sm:w-5 sm:h-5 text-green-600" />
-                  <span className="text-xs sm:text-sm lg:text-base text-green-700">
+                <div className="flex items-center gap-1.5 rounded-lg border border-green-200 bg-green-50 px-3 py-1.5 sm:gap-2 sm:px-4 sm:py-2">
+                  <CheckCircle2 className="h-4 w-4 text-green-600 sm:h-5 sm:w-5" />
+                  <span className="text-xs text-green-700 sm:text-sm lg:text-base">
                     Free 30-Day Trial
                   </span>
                 </div>
               </div>
 
-              <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 justify-center xl:justify-start">
+              <div className="flex flex-col justify-center gap-3 sm:flex-row sm:gap-4 xl:justify-start">
                 <Link href="/register" className="w-full sm:w-auto">
                   <Button
                     size="lg"
-                    className="w-full sm:w-auto h-12 sm:h-14 lg:h-16 px-6 sm:px-8 lg:px-12 text-base sm:text-lg lg:text-xl bg-blue-600 hover:bg-blue-700 shadow-xl hover:shadow-2xl transition-all rounded-lg text-white flex items-center justify-center gap-2 group"
+                    className="group flex h-12 w-full items-center justify-center gap-2 rounded-lg bg-blue-600 px-6 text-base text-white shadow-xl transition-all hover:bg-blue-700 hover:shadow-2xl sm:h-14 sm:w-auto sm:px-8 sm:text-lg lg:h-16 lg:px-12 lg:text-xl"
                   >
                     <span className="xl:hidden">Start</span>
                     <span className="hidden xl:inline">Start Free Trial</span>
-                    <ArrowRight className="w-5 h-5 sm:w-6 sm:h-6 group-hover:translate-x-1 transition-transform" />
+                    <ArrowRight className="h-5 w-5 transition-transform group-hover:translate-x-1 sm:h-6 sm:w-6" />
                   </Button>
                 </Link>
-              <Link href="/login" className="w-full sm:w-auto">
-                <Button
-                  variant="outline"
-                  size="lg"
-                    className="w-full sm:w-auto h-12 sm:h-14 lg:h-16 px-6 sm:px-8 lg:px-12 text-base sm:text-lg lg:text-xl border-2 border-slate-300 text-slate-900 rounded-lg hover:bg-slate-50 transition-colors flex items-center justify-center gap-2"
+                <Link href="/login" className="w-full sm:w-auto">
+                  <Button
+                    variant="outline"
+                    size="lg"
+                    className="flex h-12 w-full items-center justify-center gap-2 rounded-lg border-2 border-slate-300 px-6 text-base text-slate-900 transition-colors hover:bg-slate-50 sm:h-14 sm:w-auto sm:px-8 sm:text-lg lg:h-16 lg:px-12 lg:text-xl"
                   >
-                    <Pill className="w-5 h-5 sm:w-6 sm:h-6" />
+                    <Pill className="h-5 w-5 sm:h-6 sm:w-6" />
                     Try Demo
                   </Button>
                 </Link>
@@ -140,22 +140,22 @@ export default function HomePage() {
 
             {/* Right Image */}
             <div className="relative hidden xl:block">
-              <div className="relative rounded-3xl overflow-hidden shadow-2xl">
+              <div className="relative overflow-hidden rounded-3xl shadow-2xl">
                 <Image
                   src="/images/hero-medication-dashboard.jpg"
                   alt="Medication management dashboard"
                   width={800}
                   height={600}
-                  className="w-full h-auto object-cover"
+                  className="h-auto w-full object-cover"
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-blue-900/30 to-transparent" />
               </div>
 
-              <div className="absolute -bottom-6 left-8 right-8 p-6 rounded-2xl backdrop-blur-xl bg-white/90 border border-slate-200 shadow-2xl">
+              <div className="absolute right-8 -bottom-6 left-8 rounded-2xl border border-slate-200 bg-white/90 p-6 shadow-2xl backdrop-blur-xl">
                 <div className="grid grid-cols-2 gap-6">
                   <div className="flex items-center gap-3">
-                    <div className="h-12 w-12 rounded-xl bg-green-100 flex items-center justify-center">
-                      <TrendingUp className="w-6 h-6 text-green-600" />
+                    <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-green-100">
+                      <TrendingUp className="h-6 w-6 text-green-600" />
                     </div>
                     <div>
                       <p className="text-2xl font-bold text-slate-900">95%</p>
@@ -163,8 +163,8 @@ export default function HomePage() {
                     </div>
                   </div>
                   <div className="flex items-center gap-3">
-                    <div className="h-12 w-12 rounded-xl bg-blue-100 flex items-center justify-center">
-                      <Users className="w-6 h-6 text-blue-600" />
+                    <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-blue-100">
+                      <Users className="h-6 w-6 text-blue-600" />
                     </div>
                     <div>
                       <p className="text-2xl font-bold text-slate-900">10K+</p>
@@ -178,10 +178,10 @@ export default function HomePage() {
 
           {/* Stats Section */}
           <div className="mt-16 sm:mt-20 lg:mt-32">
-            <p className="text-center text-sm sm:text-base lg:text-lg mb-6 sm:mb-8 px-4 text-slate-600">
+            <p className="mb-6 px-4 text-center text-sm text-slate-600 sm:mb-8 sm:text-base lg:text-lg">
               Trusted by healthcare providers and patients worldwide
             </p>
-            <div className="grid grid-cols-2 md:grid-cols-2 xl:grid-cols-4 gap-3 sm:gap-4 lg:gap-6">
+            <div className="grid grid-cols-2 gap-3 sm:gap-4 md:grid-cols-2 lg:gap-6 xl:grid-cols-4">
               {[
                 { icon: Users, value: "10,000+", label: "Active Users" },
                 { icon: CheckCircle2, value: "95%", label: "Adherence Rate" },
@@ -190,16 +190,16 @@ export default function HomePage() {
               ].map((stat, index) => (
                 <div
                   key={index}
-                  className="p-3 sm:p-4 lg:p-6 rounded-2xl bg-white border border-slate-200 shadow-lg hover:shadow-xl transition-all"
+                  className="rounded-2xl border border-slate-200 bg-white p-3 shadow-lg transition-all hover:shadow-xl sm:p-4 lg:p-6"
                 >
                   <div className="flex flex-col items-center text-center">
-                    <div className="h-10 w-10 sm:h-12 sm:w-12 lg:h-14 lg:w-14 rounded-xl bg-blue-100 flex items-center justify-center mb-2 sm:mb-3 lg:mb-4">
-                      <stat.icon className="w-5 h-5 sm:w-6 sm:h-6 lg:w-7 lg:h-7 text-blue-600" />
+                    <div className="mb-2 flex h-10 w-10 items-center justify-center rounded-xl bg-blue-100 sm:mb-3 sm:h-12 sm:w-12 lg:mb-4 lg:h-14 lg:w-14">
+                      <stat.icon className="h-5 w-5 text-blue-600 sm:h-6 sm:w-6 lg:h-7 lg:w-7" />
                     </div>
-                    <p className="text-xl sm:text-2xl lg:text-3xl xl:text-4xl font-bold mb-1 sm:mb-2 text-slate-900">
+                    <p className="mb-1 text-xl font-bold text-slate-900 sm:mb-2 sm:text-2xl lg:text-3xl xl:text-4xl">
                       {stat.value}
                     </p>
-                    <p className="text-xs sm:text-sm lg:text-base text-slate-600">
+                    <p className="text-xs text-slate-600 sm:text-sm lg:text-base">
                       {stat.label}
                     </p>
                   </div>
@@ -212,18 +212,18 @@ export default function HomePage() {
 
       {/* Features Section */}
       <section className="bg-white py-16 lg:py-24">
-        <div className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8">
-          <div className="text-center mb-16">
-            <h2 className="text-2xl md:text-3xl xl:text-5xl font-bold mb-4 text-slate-900">
+        <div className="mx-auto max-w-7xl px-3 sm:px-6 lg:px-8">
+          <div className="mb-16 text-center">
+            <h2 className="mb-4 text-2xl font-bold text-slate-900 md:text-3xl xl:text-5xl">
               Everything You Need to Stay on Track
             </h2>
-            <p className="text-lg lg:text-xl max-w-3xl mx-auto text-slate-600">
+            <p className="mx-auto max-w-3xl text-lg text-slate-600 lg:text-xl">
               Powerful features designed for patients, caregivers, and
               healthcare professionals
             </p>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
+          <div className="grid grid-cols-1 gap-6 md:grid-cols-2 xl:grid-cols-3">
             {[
               {
                 icon: Calendar,
@@ -288,21 +288,21 @@ export default function HomePage() {
             ].map((feature, index) => (
               <div
                 key={index}
-                className="p-5 sm:p-6 lg:p-8 rounded-2xl border shadow-lg hover:shadow-xl transition-all bg-slate-50 border-slate-200 hover:border-slate-300"
+                className="rounded-2xl border border-slate-200 bg-slate-50 p-5 shadow-lg transition-all hover:border-slate-300 hover:shadow-xl sm:p-6 lg:p-8"
               >
                 <div
-                  className={`h-12 w-12 sm:h-[52px] sm:w-[52px] lg:h-14 lg:w-14 rounded-xl flex items-center justify-center mb-4 sm:mb-5 ${feature.iconBg} ${feature.iconColor} border ${feature.iconBorder}`}
+                  className={`mb-4 flex h-12 w-12 items-center justify-center rounded-xl sm:mb-5 sm:h-[52px] sm:w-[52px] lg:h-14 lg:w-14 ${feature.iconBg} ${feature.iconColor} border ${feature.iconBorder}`}
                 >
-                  <feature.icon className="w-6 h-6 sm:w-[26px] sm:h-[26px] lg:w-7 lg:h-7" />
+                  <feature.icon className="h-6 w-6 sm:h-[26px] sm:w-[26px] lg:h-7 lg:w-7" />
                 </div>
-                <h3 className="text-lg sm:text-xl font-bold mb-2 sm:mb-3 text-slate-900">
+                <h3 className="mb-2 text-lg font-bold text-slate-900 sm:mb-3 sm:text-xl">
                   {feature.title}
                 </h3>
-                <p className="text-sm sm:text-base leading-relaxed mb-3 sm:mb-4 text-slate-600">
+                <p className="mb-3 text-sm leading-relaxed text-slate-600 sm:mb-4 sm:text-base">
                   {feature.description}
                 </p>
-                <div className="inline-flex items-center gap-1.5 sm:gap-2 px-2.5 sm:px-3 py-0.5 sm:py-1 rounded-full text-xs sm:text-sm bg-green-100 text-green-700">
-                  <Zap className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
+                <div className="inline-flex items-center gap-1.5 rounded-full bg-green-100 px-2.5 py-0.5 text-xs text-green-700 sm:gap-2 sm:px-3 sm:py-1 sm:text-sm">
+                  <Zap className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
                   {feature.badge}
                 </div>
               </div>
@@ -312,39 +312,39 @@ export default function HomePage() {
       </section>
 
       {/* Testimonials Section */}
-      <section className="py-16 lg:py-24 bg-gradient-to-b from-slate-50 to-white">
-        <div className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8">
-          <div className="text-center mb-16">
-            <h2 className="text-2xl md:text-3xl xl:text-5xl font-bold mb-4 text-slate-900">
+      <section className="bg-gradient-to-b from-slate-50 to-white py-16 lg:py-24">
+        <div className="mx-auto max-w-7xl px-3 sm:px-6 lg:px-8">
+          <div className="mb-16 text-center">
+            <h2 className="mb-4 text-2xl font-bold text-slate-900 md:text-3xl xl:text-5xl">
               Loved by Users Worldwide
             </h2>
-            <p className="text-base md:text-lg xl:text-xl text-slate-600">
+            <p className="text-base text-slate-600 md:text-lg xl:text-xl">
               See what our community has to say
             </p>
           </div>
 
-          <div className="max-w-4xl mx-auto">
-            <div className="p-10 lg:p-12 rounded-3xl border shadow-2xl bg-white border-slate-200">
-              <div className="min-h-[300px] relative">
+          <div className="mx-auto max-w-4xl">
+            <div className="rounded-3xl border border-slate-200 bg-white p-10 shadow-2xl lg:p-12">
+              <div className="relative min-h-[300px]">
                 {testimonials.map((testimonial, index) => (
                   <div
                     key={`${currentTestimonial}-${index}`}
                     className={`${
                       currentTestimonial === index
-                        ? "block animate-fade-up"
+                        ? "animate-fade-up block"
                         : "hidden"
                     }`}
                   >
-                    <div className="flex gap-2 mb-6">
+                    <div className="mb-6 flex gap-2">
                       {[...Array(5)].map((_, i) => (
                         <Star
                           key={i}
-                          className="w-6 h-6 md:w-7 md:h-7 xl:w-8 xl:h-8 text-amber-400 fill-current"
+                          className="h-6 w-6 fill-current text-amber-400 md:h-7 md:w-7 xl:h-8 xl:w-8"
                         />
                       ))}
                     </div>
                     <blockquote>
-                      <p className="text-base sm:text-lg md:text-2xl xl:text-3xl mb-6 sm:mb-8 leading-relaxed text-slate-700">
+                      <p className="mb-6 text-base leading-relaxed text-slate-700 sm:mb-8 sm:text-lg md:text-2xl xl:text-3xl">
                         {testimonial.quote}
                       </p>
                       <footer className="flex items-center gap-3 sm:gap-4 md:gap-5">
@@ -353,13 +353,13 @@ export default function HomePage() {
                           alt={testimonial.author}
                           width={80}
                           height={80}
-                          className="h-12 w-12 sm:h-14 sm:w-14 md:h-[72px] md:w-[72px] xl:h-20 xl:w-20 rounded-full border-2 border-blue-600 object-cover"
+                          className="h-12 w-12 rounded-full border-2 border-blue-600 object-cover sm:h-14 sm:w-14 md:h-[72px] md:w-[72px] xl:h-20 xl:w-20"
                         />
                         <div>
-                          <p className="text-base sm:text-lg md:text-xl xl:text-2xl font-bold mb-0.5 sm:mb-1 text-slate-900">
+                          <p className="mb-0.5 text-base font-bold text-slate-900 sm:mb-1 sm:text-lg md:text-xl xl:text-2xl">
                             {testimonial.author}
                           </p>
-                          <p className="text-xs sm:text-sm md:text-base xl:text-lg text-slate-600">
+                          <p className="text-xs text-slate-600 sm:text-sm md:text-base xl:text-lg">
                             {testimonial.role}
                           </p>
                         </div>
@@ -370,7 +370,7 @@ export default function HomePage() {
               </div>
             </div>
 
-            <div className="flex justify-center gap-2 mt-6">
+            <div className="mt-6 flex justify-center gap-2">
               {testimonials.map((_, index) => (
                 <button
                   key={index}
@@ -389,20 +389,20 @@ export default function HomePage() {
       </section>
 
       {/* Pricing Section */}
-      <section id="pricing" className="py-12 sm:py-16 lg:py-24 bg-white">
-        <div className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8">
-          <div className="text-center mb-8 sm:mb-12">
-            <h2 className="text-2xl md:text-3xl xl:text-5xl font-bold mb-3 sm:mb-4 text-slate-900">
+      <section id="pricing" className="bg-white py-12 sm:py-16 lg:py-24">
+        <div className="mx-auto max-w-7xl px-3 sm:px-6 lg:px-8">
+          <div className="mb-8 text-center sm:mb-12">
+            <h2 className="mb-3 text-2xl font-bold text-slate-900 sm:mb-4 md:text-3xl xl:text-5xl">
               Choose Your Plan
             </h2>
-            <p className="text-base md:text-lg xl:text-xl mb-6 sm:mb-8 text-slate-600">
+            <p className="mb-6 text-base text-slate-600 sm:mb-8 md:text-lg xl:text-xl">
               Start free, upgrade when you need more
             </p>
 
-            <div className="inline-flex items-center gap-1 sm:gap-3 p-1 rounded-full bg-slate-100 border border-slate-200">
+            <div className="inline-flex items-center gap-1 rounded-full border border-slate-200 bg-slate-100 p-1 sm:gap-3">
               <button
                 onClick={() => setBillingPeriod("monthly")}
-                className={`px-4 sm:px-6 py-2 sm:py-3 text-sm sm:text-base rounded-full transition-all ${
+                className={`rounded-full px-4 py-2 text-sm transition-all sm:px-6 sm:py-3 sm:text-base ${
                   billingPeriod === "monthly"
                     ? "bg-blue-600 text-white shadow-lg"
                     : "text-slate-600"
@@ -412,25 +412,26 @@ export default function HomePage() {
               </button>
               <button
                 onClick={() => setBillingPeriod("yearly")}
-                className={`px-4 sm:px-6 py-2 sm:py-3 text-sm sm:text-base rounded-full transition-all relative ${
+                className={`relative rounded-full px-4 py-2 text-sm transition-all sm:px-6 sm:py-3 sm:text-base ${
                   billingPeriod === "yearly"
                     ? "bg-blue-600 text-white shadow-lg"
                     : "text-slate-600"
                 }`}
               >
                 Yearly
-                <span className="absolute -top-2 -right-1 sm:-right-2 bg-green-500 text-white text-xs px-1.5 sm:px-2 py-0.5 rounded-full">
+                <span className="absolute -top-2 -right-1 rounded-full bg-green-500 px-1.5 py-0.5 text-xs text-white sm:-right-2 sm:px-2">
                   Save 17%
                 </span>
               </button>
             </div>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-4 sm:gap-6">
+          <div className="grid grid-cols-1 gap-4 sm:gap-6 md:grid-cols-2 xl:grid-cols-4">
             {[
               {
                 name: "Free",
-                description: "Perfect for individuals managing their own medications",
+                description:
+                  "Perfect for individuals managing their own medications",
                 monthlyPrice: "€0.00",
                 yearlyPrice: "€0.00",
                 features: [
@@ -445,7 +446,8 @@ export default function HomePage() {
               },
               {
                 name: "Personal",
-                description: "For patients who need advanced medication management",
+                description:
+                  "For patients who need advanced medication management",
                 monthlyPrice: "€8.99",
                 yearlyPrice: "€7.42",
                 yearlyNote: "€89/year billed annually",
@@ -464,7 +466,8 @@ export default function HomePage() {
               },
               {
                 name: "Family",
-                description: "Best for caregivers managing multiple family members",
+                description:
+                  "Best for caregivers managing multiple family members",
                 monthlyPrice: "€17.99",
                 yearlyPrice: "€14.92",
                 yearlyNote: "€179/year billed annually",
@@ -483,7 +486,8 @@ export default function HomePage() {
               },
               {
                 name: "Professional",
-                description: "For healthcare providers managing patient cohorts",
+                description:
+                  "For healthcare providers managing patient cohorts",
                 monthlyPrice: "€44.99",
                 yearlyPrice: "€37.42",
                 yearlyNote: "€449/year billed annually",
@@ -504,59 +508,62 @@ export default function HomePage() {
             ].map((plan, index) => (
               <div
                 key={index}
-                className={`relative p-6 sm:p-8 rounded-2xl border-2 shadow-xl transition-all ${
+                className={`relative rounded-2xl border-2 p-6 shadow-xl transition-all sm:p-8 ${
                   plan.highlighted
                     ? "border-orange-500 bg-orange-50/20"
                     : "border-slate-200 bg-white hover:border-slate-300"
                 }`}
               >
                 {plan.highlighted && (
-                  <div className="absolute -top-3 sm:-top-4 left-1/2 -translate-x-1/2 bg-gradient-to-r from-orange-500 to-orange-600 text-white px-3 sm:px-4 py-1 rounded-full text-xs sm:text-sm font-bold shadow-lg">
+                  <div className="absolute -top-3 left-1/2 -translate-x-1/2 rounded-full bg-gradient-to-r from-orange-500 to-orange-600 px-3 py-1 text-xs font-bold text-white shadow-lg sm:-top-4 sm:px-4 sm:text-sm">
                     Most Popular
                   </div>
                 )}
 
-                <div className="text-center mb-5 sm:mb-6">
-                  <h3 className="text-xl sm:text-2xl font-bold mb-2 text-slate-900">
+                <div className="mb-5 text-center sm:mb-6">
+                  <h3 className="mb-2 text-xl font-bold text-slate-900 sm:text-2xl">
                     {plan.name}
                   </h3>
-                  <p className="text-xs sm:text-sm mb-3 sm:mb-4 text-slate-600">
+                  <p className="mb-3 text-xs text-slate-600 sm:mb-4 sm:text-sm">
                     {plan.description}
                   </p>
                   <div className="mb-2">
-                    <span className="text-3xl sm:text-4xl lg:text-5xl font-bold text-slate-900">
+                    <span className="text-3xl font-bold text-slate-900 sm:text-4xl lg:text-5xl">
                       {billingPeriod === "monthly"
                         ? plan.monthlyPrice
                         : plan.yearlyPrice}
                     </span>
-                    <span className="text-base sm:text-lg text-slate-600">
+                    <span className="text-base text-slate-600 sm:text-lg">
                       /month
                     </span>
                   </div>
                   {plan.yearlyNote && billingPeriod === "yearly" && (
-                    <p className="text-xs sm:text-sm text-slate-500">
+                    <p className="text-xs text-slate-500 sm:text-sm">
                       {plan.yearlyNote}
                     </p>
                   )}
                 </div>
 
-                <Link href="/register" className="block mb-5 sm:mb-6">
+                <Link href="/register" className="mb-5 block sm:mb-6">
                   <Button
-                    className={`w-full h-12 sm:h-14 text-sm sm:text-base ${
+                    className={`h-12 w-full text-sm sm:h-14 sm:text-base ${
                       plan.highlighted
                         ? "bg-orange-600 hover:bg-orange-700"
                         : "bg-blue-600 hover:bg-blue-700"
-                    } text-white rounded-lg transition-colors`}
+                    } rounded-lg text-white transition-colors`}
                   >
                     {plan.buttonText}
-                </Button>
-              </Link>
+                  </Button>
+                </Link>
 
                 <div className="space-y-2 sm:space-y-3">
                   {plan.features.map((feature, featureIndex) => (
-                    <div key={featureIndex} className="flex items-start gap-2 sm:gap-3">
-                      <CheckCircle2 className="w-4 h-4 sm:w-5 sm:h-5 text-green-600 flex-shrink-0 mt-0.5" />
-                      <span className="text-sm sm:text-base text-slate-700">
+                    <div
+                      key={featureIndex}
+                      className="flex items-start gap-2 sm:gap-3"
+                    >
+                      <CheckCircle2 className="mt-0.5 h-4 w-4 flex-shrink-0 text-green-600 sm:h-5 sm:w-5" />
+                      <span className="text-sm text-slate-700 sm:text-base">
                         {feature}
                       </span>
                     </div>
@@ -566,20 +573,23 @@ export default function HomePage() {
             ))}
           </div>
 
-          <p className="text-center text-base mt-8 text-slate-600">
+          <p className="mt-8 text-center text-base text-slate-600">
             All plans include a 30-day free trial. No credit card required.
           </p>
         </div>
       </section>
 
       {/* FAQ Section */}
-      <section id="faq" className="py-16 lg:py-24 bg-gradient-to-b from-slate-50 to-white">
-        <div className="max-w-4xl mx-auto px-3 sm:px-6 lg:px-8">
-          <div className="text-center mb-16">
-            <h2 className="text-2xl md:text-3xl xl:text-5xl font-bold mb-4 text-slate-900">
+      <section
+        id="faq"
+        className="bg-gradient-to-b from-slate-50 to-white py-16 lg:py-24"
+      >
+        <div className="mx-auto max-w-4xl px-3 sm:px-6 lg:px-8">
+          <div className="mb-16 text-center">
+            <h2 className="mb-4 text-2xl font-bold text-slate-900 md:text-3xl xl:text-5xl">
               Frequently Asked Questions
             </h2>
-            <p className="text-sm sm:text-base md:text-lg lg:text-xl text-slate-600">
+            <p className="text-sm text-slate-600 sm:text-base md:text-lg lg:text-xl">
               Everything you need to know about Prescription Clarity
             </p>
           </div>
@@ -629,25 +639,23 @@ export default function HomePage() {
             ].map((faq, index) => (
               <div
                 key={index}
-                className="rounded-2xl border overflow-hidden bg-white border-slate-200"
+                className="overflow-hidden rounded-2xl border border-slate-200 bg-white"
               >
                 <button
-                  onClick={() =>
-                    setOpenFaq(openFaq === index ? null : index)
-                  }
-                  className="w-full p-4 sm:p-5 md:p-6 flex items-center justify-between text-left hover:bg-slate-50 transition-colors"
+                  onClick={() => setOpenFaq(openFaq === index ? null : index)}
+                  className="flex w-full items-center justify-between p-4 text-left transition-colors hover:bg-slate-50 sm:p-5 md:p-6"
                 >
-                  <span className="text-sm sm:text-base md:text-lg font-bold pr-6 sm:pr-8 text-slate-900">
+                  <span className="pr-6 text-sm font-bold text-slate-900 sm:pr-8 sm:text-base md:text-lg">
                     {faq.question}
                   </span>
                   <ChevronDown
-                    className={`w-5 h-5 sm:w-6 sm:h-6 flex-shrink-0 text-slate-600 transition-transform ${
+                    className={`h-5 w-5 flex-shrink-0 text-slate-600 transition-transform sm:h-6 sm:w-6 ${
                       openFaq === index ? "rotate-180" : ""
                     }`}
                   />
                 </button>
                 {openFaq === index && (
-                  <div className="px-4 sm:px-6 pb-4 sm:pb-6 text-sm sm:text-base leading-relaxed text-slate-600">
+                  <div className="px-4 pb-4 text-sm leading-relaxed text-slate-600 sm:px-6 sm:pb-6 sm:text-base">
                     {faq.answer}
                   </div>
                 )}
@@ -658,52 +666,52 @@ export default function HomePage() {
       </section>
 
       {/* Final CTA Section */}
-      <section className="bg-gradient-to-br from-blue-600 via-blue-700 to-blue-800 py-16 sm:py-20 lg:py-32 relative overflow-hidden">
-        <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 text-center relative z-10">
-          <h2 className="text-2xl md:text-3xl xl:text-5xl font-bold text-white mb-6 sm:mb-8 leading-tight px-4">
+      <section className="relative overflow-hidden bg-gradient-to-br from-blue-600 via-blue-700 to-blue-800 py-16 sm:py-20 lg:py-32">
+        <div className="relative z-10 mx-auto max-w-5xl px-4 text-center sm:px-6 lg:px-8">
+          <h2 className="mb-6 px-4 text-2xl leading-tight font-bold text-white sm:mb-8 md:text-3xl xl:text-5xl">
             Ready to Transform Your Medication Management?
           </h2>
-          <p className="text-base sm:text-lg md:text-xl lg:text-2xl text-blue-100 mb-8 sm:mb-10 lg:mb-12 leading-relaxed max-w-3xl mx-auto px-4">
+          <p className="mx-auto mb-8 max-w-3xl px-4 text-base leading-relaxed text-blue-100 sm:mb-10 sm:text-lg md:text-xl lg:mb-12 lg:text-2xl">
             Join thousands of users managing their medications with confidence.
             Start your free 30-day trial today.
           </p>
-          <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 justify-center items-center px-4">
-              <Link href="/register">
-                <Button
-                  size="lg"
-                className="w-full sm:w-auto h-14 sm:h-16 px-8 sm:px-10 lg:px-12 text-base sm:text-lg lg:text-xl bg-white text-blue-600 hover:bg-blue-50 shadow-2xl rounded-lg transition-all flex items-center justify-center gap-2 group"
+          <div className="flex flex-col items-center justify-center gap-3 px-4 sm:flex-row sm:gap-4">
+            <Link href="/register">
+              <Button
+                size="lg"
+                className="group flex h-14 w-full items-center justify-center gap-2 rounded-lg bg-white px-8 text-base text-blue-600 shadow-2xl transition-all hover:bg-blue-50 sm:h-16 sm:w-auto sm:px-10 sm:text-lg lg:px-12 lg:text-xl"
               >
                 Start Your Free Trial
-                <ArrowRight className="w-5 h-5 sm:w-6 sm:h-6 lg:w-7 lg:h-7 group-hover:translate-x-1 transition-transform" />
+                <ArrowRight className="h-5 w-5 transition-transform group-hover:translate-x-1 sm:h-6 sm:w-6 lg:h-7 lg:w-7" />
               </Button>
             </Link>
             <Link href="/login">
               <Button
                 variant="outline"
                 size="lg"
-                className="w-full sm:w-auto h-14 sm:h-16 px-8 sm:px-10 lg:px-12 text-base sm:text-lg lg:text-xl border-2 border-white text-white hover:bg-white/20 bg-white/10 rounded-lg transition-colors"
+                className="h-14 w-full rounded-lg border-2 border-white bg-white/10 px-8 text-base text-white transition-colors hover:bg-white/20 sm:h-16 sm:w-auto sm:px-10 sm:text-lg lg:px-12 lg:text-xl"
               >
                 Try Demo
-                </Button>
-              </Link>
+              </Button>
+            </Link>
           </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 sm:gap-8 mt-12 sm:mt-14 lg:mt-16 pt-10 sm:pt-12 border-t border-blue-500/30">
+          <div className="mt-12 grid grid-cols-1 gap-6 border-t border-blue-500/30 pt-10 sm:mt-14 sm:grid-cols-3 sm:gap-8 sm:pt-12 lg:mt-16">
             <div className="flex flex-col items-center gap-2 sm:gap-3">
-              <Shield className="w-10 h-10 sm:w-12 sm:h-12 text-blue-200" />
-              <p className="text-sm sm:text-base lg:text-lg text-blue-100">
+              <Shield className="h-10 w-10 text-blue-200 sm:h-12 sm:w-12" />
+              <p className="text-sm text-blue-100 sm:text-base lg:text-lg">
                 GDPR & HIPAA Compliant
               </p>
             </div>
             <div className="flex flex-col items-center gap-2 sm:gap-3">
-              <CheckCircle2 className="w-10 h-10 sm:w-12 sm:h-12 text-blue-200" />
-              <p className="text-sm sm:text-base lg:text-lg text-blue-100">
+              <CheckCircle2 className="h-10 w-10 text-blue-200 sm:h-12 sm:w-12" />
+              <p className="text-sm text-blue-100 sm:text-base lg:text-lg">
                 No Credit Card Required
               </p>
             </div>
             <div className="flex flex-col items-center gap-2 sm:gap-3">
-              <Clock className="w-10 h-10 sm:w-12 sm:h-12 text-blue-200" />
-              <p className="text-sm sm:text-base lg:text-lg text-blue-100">
+              <Clock className="h-10 w-10 text-blue-200 sm:h-12 sm:w-12" />
+              <p className="text-sm text-blue-100 sm:text-base lg:text-lg">
                 Free 30-Day Trial
               </p>
             </div>
@@ -712,18 +720,18 @@ export default function HomePage() {
       </section>
 
       {/* Footer */}
-      <footer className="border-t py-12 sm:py-16 bg-white border-slate-200">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-4 gap-6 sm:gap-8 md:gap-10 lg:gap-12 mb-8 sm:mb-10 md:mb-12">
+      <footer className="border-t border-slate-200 bg-white py-12 sm:py-16">
+        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+          <div className="mb-8 grid grid-cols-2 gap-6 sm:mb-10 sm:grid-cols-2 sm:gap-8 md:mb-12 md:grid-cols-4 md:gap-10 lg:gap-12">
             <div>
-              <h3 className="text-sm sm:text-base md:text-lg lg:text-xl font-bold mb-3 sm:mb-4 md:mb-6 text-slate-900">
+              <h3 className="mb-3 text-sm font-bold text-slate-900 sm:mb-4 sm:text-base md:mb-6 md:text-lg lg:text-xl">
                 Product
               </h3>
               <ul className="space-y-2 sm:space-y-3 md:space-y-4">
                 <li>
                   <Link
                     href="#"
-                    className="text-sm sm:text-sm md:text-base lg:text-lg hover:text-blue-600 transition-colors text-slate-600"
+                    className="text-sm text-slate-600 transition-colors hover:text-blue-600 sm:text-sm md:text-base lg:text-lg"
                   >
                     Features
                   </Link>
@@ -731,7 +739,7 @@ export default function HomePage() {
                 <li>
                   <Link
                     href="#pricing"
-                    className="text-sm sm:text-sm md:text-base lg:text-lg hover:text-blue-600 transition-colors text-slate-600"
+                    className="text-sm text-slate-600 transition-colors hover:text-blue-600 sm:text-sm md:text-base lg:text-lg"
                   >
                     Pricing
                   </Link>
@@ -739,7 +747,7 @@ export default function HomePage() {
                 <li>
                   <Link
                     href="#"
-                    className="text-sm sm:text-sm md:text-base lg:text-lg hover:text-blue-600 transition-colors text-slate-600"
+                    className="text-sm text-slate-600 transition-colors hover:text-blue-600 sm:text-sm md:text-base lg:text-lg"
                   >
                     Security
                   </Link>
@@ -747,14 +755,14 @@ export default function HomePage() {
               </ul>
             </div>
             <div>
-              <h3 className="text-sm sm:text-base md:text-lg lg:text-xl font-bold mb-3 sm:mb-4 md:mb-6 text-slate-900">
+              <h3 className="mb-3 text-sm font-bold text-slate-900 sm:mb-4 sm:text-base md:mb-6 md:text-lg lg:text-xl">
                 Company
               </h3>
               <ul className="space-y-2 sm:space-y-3 md:space-y-4">
                 <li>
                   <Link
                     href="#"
-                    className="text-sm sm:text-sm md:text-base lg:text-lg hover:text-blue-600 transition-colors text-slate-600"
+                    className="text-sm text-slate-600 transition-colors hover:text-blue-600 sm:text-sm md:text-base lg:text-lg"
                   >
                     About
                   </Link>
@@ -762,7 +770,7 @@ export default function HomePage() {
                 <li>
                   <Link
                     href="#"
-                    className="text-sm sm:text-sm md:text-base lg:text-lg hover:text-blue-600 transition-colors text-slate-600"
+                    className="text-sm text-slate-600 transition-colors hover:text-blue-600 sm:text-sm md:text-base lg:text-lg"
                   >
                     Blog
                   </Link>
@@ -770,7 +778,7 @@ export default function HomePage() {
                 <li>
                   <Link
                     href="#"
-                    className="text-sm sm:text-sm md:text-base lg:text-lg hover:text-blue-600 transition-colors text-slate-600"
+                    className="text-sm text-slate-600 transition-colors hover:text-blue-600 sm:text-sm md:text-base lg:text-lg"
                   >
                     Careers
                   </Link>
@@ -778,14 +786,14 @@ export default function HomePage() {
               </ul>
             </div>
             <div>
-              <h3 className="text-sm sm:text-base md:text-lg lg:text-xl font-bold mb-3 sm:mb-4 md:mb-6 text-slate-900">
+              <h3 className="mb-3 text-sm font-bold text-slate-900 sm:mb-4 sm:text-base md:mb-6 md:text-lg lg:text-xl">
                 Resources
               </h3>
               <ul className="space-y-2 sm:space-y-3 md:space-y-4">
                 <li>
                   <Link
                     href="#"
-                    className="text-sm sm:text-sm md:text-base lg:text-lg hover:text-blue-600 transition-colors text-slate-600"
+                    className="text-sm text-slate-600 transition-colors hover:text-blue-600 sm:text-sm md:text-base lg:text-lg"
                   >
                     Help Center
                   </Link>
@@ -793,7 +801,7 @@ export default function HomePage() {
                 <li>
                   <Link
                     href="#"
-                    className="text-sm sm:text-sm md:text-base lg:text-lg hover:text-blue-600 transition-colors text-slate-600"
+                    className="text-sm text-slate-600 transition-colors hover:text-blue-600 sm:text-sm md:text-base lg:text-lg"
                   >
                     Community
                   </Link>
@@ -801,7 +809,7 @@ export default function HomePage() {
                 <li>
                   <Link
                     href="#"
-                    className="text-sm sm:text-sm md:text-base lg:text-lg hover:text-blue-600 transition-colors text-slate-600"
+                    className="text-sm text-slate-600 transition-colors hover:text-blue-600 sm:text-sm md:text-base lg:text-lg"
                   >
                     Contact
                   </Link>
@@ -809,14 +817,14 @@ export default function HomePage() {
               </ul>
             </div>
             <div>
-              <h3 className="text-sm sm:text-base md:text-lg lg:text-xl font-bold mb-3 sm:mb-4 md:mb-6 text-slate-900">
+              <h3 className="mb-3 text-sm font-bold text-slate-900 sm:mb-4 sm:text-base md:mb-6 md:text-lg lg:text-xl">
                 Legal
               </h3>
               <ul className="space-y-2 sm:space-y-3 md:space-y-4">
                 <li>
                   <Link
                     href="#"
-                    className="text-sm sm:text-sm md:text-base lg:text-lg hover:text-blue-600 transition-colors text-slate-600"
+                    className="text-sm text-slate-600 transition-colors hover:text-blue-600 sm:text-sm md:text-base lg:text-lg"
                   >
                     Privacy
                   </Link>
@@ -824,7 +832,7 @@ export default function HomePage() {
                 <li>
                   <Link
                     href="#"
-                    className="text-sm sm:text-sm md:text-base lg:text-lg hover:text-blue-600 transition-colors text-slate-600"
+                    className="text-sm text-slate-600 transition-colors hover:text-blue-600 sm:text-sm md:text-base lg:text-lg"
                   >
                     Terms
                   </Link>
@@ -832,7 +840,7 @@ export default function HomePage() {
                 <li>
                   <Link
                     href="#"
-                    className="text-sm sm:text-sm md:text-base lg:text-lg hover:text-blue-600 transition-colors text-slate-600"
+                    className="text-sm text-slate-600 transition-colors hover:text-blue-600 sm:text-sm md:text-base lg:text-lg"
                   >
                     GDPR & HIPAA
                   </Link>
@@ -841,8 +849,8 @@ export default function HomePage() {
             </div>
           </div>
 
-          <div className="pt-6 sm:pt-8 md:pt-10 border-t border-slate-200">
-            <div className="flex flex-col sm:flex-row items-center justify-between gap-4 sm:gap-6">
+          <div className="border-t border-slate-200 pt-6 sm:pt-8 md:pt-10">
+            <div className="flex flex-col items-center justify-between gap-4 sm:flex-row sm:gap-6">
               <div className="flex items-center gap-3 sm:gap-4">
                 <Image
                   src="/logo.svg"
@@ -851,16 +859,16 @@ export default function HomePage() {
                   height={40}
                   className="h-8 w-8 sm:h-10 sm:w-10"
                 />
-                <span className="text-sm sm:text-base md:text-lg lg:text-xl font-bold text-slate-900">
+                <span className="text-sm font-bold text-slate-900 sm:text-base md:text-lg lg:text-xl">
                   Prescription Clarity
                 </span>
               </div>
-              <p className="text-xs sm:text-sm md:text-base lg:text-lg text-slate-600">
+              <p className="text-xs text-slate-600 sm:text-sm md:text-base lg:text-lg">
                 © 2025 Prescription Clarity. All rights reserved.
               </p>
+            </div>
           </div>
         </div>
-      </div>
       </footer>
     </div>
   );
