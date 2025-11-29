@@ -55,7 +55,11 @@ function Spinner({ className }: { className?: string }) {
   );
 }
 
-export function PrintButton({ weekStart, weekEnd, timezone }: PrintButtonProps) {
+export function PrintButton({
+  weekStart,
+  weekEnd,
+  timezone,
+}: PrintButtonProps) {
   const [isLoading, setIsLoading] = useState(false);
   const [userId, setUserId] = useState<string | null>(null);
   const showToast = useToast();
@@ -91,26 +95,30 @@ export function PrintButton({ weekStart, weekEnd, timezone }: PrintButtonProps) 
     try {
       // Format dates as ISO strings
       // Create UTC dates at start of day (from) and end of day (to)
-      const fromDate = new Date(Date.UTC(
-        weekStart.getFullYear(),
-        weekStart.getMonth(),
-        weekStart.getDate(),
-        0,
-        0,
-        0,
-        0
-      ));
+      const fromDate = new Date(
+        Date.UTC(
+          weekStart.getFullYear(),
+          weekStart.getMonth(),
+          weekStart.getDate(),
+          0,
+          0,
+          0,
+          0,
+        ),
+      );
       const fromISO = fromDate.toISOString();
 
-      const toDate = new Date(Date.UTC(
-        weekEnd.getFullYear(),
-        weekEnd.getMonth(),
-        weekEnd.getDate(),
-        23,
-        59,
-        59,
-        999
-      ));
+      const toDate = new Date(
+        Date.UTC(
+          weekEnd.getFullYear(),
+          weekEnd.getMonth(),
+          weekEnd.getDate(),
+          23,
+          59,
+          59,
+          999,
+        ),
+      );
       const toISO = toDate.toISOString();
 
       const response = await fetch("/api/export/pdf", {
@@ -179,4 +187,3 @@ export function PrintButton({ weekStart, weekEnd, timezone }: PrintButtonProps) 
     </>
   );
 }
-
