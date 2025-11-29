@@ -7,6 +7,8 @@ import { WeekFilterProvider } from "./WeekFilterContext";
 import { WeekFiltersPlaceholder } from "./WeekFiltersPlaceholder";
 import { WeekTableWrapper } from "./WeekTableWrapper";
 import { PrintButton } from "./PrintButton";
+import { FilterToggleWrapper } from "./FilterToggleWrapper";
+import { HeaderButtons } from "./HeaderButtons";
 
 export const dynamic = "force-dynamic";
 
@@ -118,56 +120,50 @@ export default async function WeekPage({ searchParams }: WeekPageProps) {
 
   return (
     <WeekFilterProvider>
-      <div className={styles.page}>
-        <header className={styles.stickyHeader}>
-          <div className={styles.headerInner}>
-            <div className={styles.headerTop}>
-              <h1 className={styles.title}>Week View</h1>
-              <div className={styles.headerButtons}>
-                <PrintButton
-                  weekStart={weekStart}
-                  weekEnd={weekEnd}
-                  timezone={timezone}
-                />
+      <FilterToggleWrapper>
+        <div className={styles.page}>
+          <header className={styles.stickyHeader}>
+            <div className={styles.headerInner}>
+              <div className={styles.headerTop}>
+                <h1 className={styles.title}>Week View</h1>
+                <HeaderButtons>
+                  <PrintButton
+                    weekStart={weekStart}
+                    weekEnd={weekEnd}
+                    timezone={timezone}
+                  />
+                </HeaderButtons>
+              </div>
+              <div className={styles.weekNavigation}>
                 <Link
-                  href="/week"
-                  className={styles.todayButton}
-                  aria-label="Go to current week"
+                  href={`/week?week=${prevWeekParam}`}
+                  className={styles.navButton}
+                  aria-label="Previous week"
                 >
-                  <CalendarIcon className={styles.calendarIcon} />
-                  <span>Today</span>
+                  <ChevronLeftIcon className={styles.navIcon} />
+                  <span className={styles.navText}>Previous</span>
+                </Link>
+                <div className={styles.weekRange}>{weekRange}</div>
+                <Link
+                  href={`/week?week=${nextWeekParam}`}
+                  className={styles.navButton}
+                  aria-label="Next week"
+                >
+                  <span className={styles.navText}>Next</span>
+                  <ChevronRightIcon className={styles.navIcon} />
                 </Link>
               </div>
+              <WeekFiltersPlaceholder />
             </div>
-            <div className={styles.weekNavigation}>
-              <Link
-                href={`/week?week=${prevWeekParam}`}
-                className={styles.navButton}
-                aria-label="Previous week"
-              >
-                <ChevronLeftIcon className={styles.navIcon} />
-                <span className={styles.navText}>Previous</span>
-              </Link>
-              <div className={styles.weekRange}>{weekRange}</div>
-              <Link
-                href={`/week?week=${nextWeekParam}`}
-                className={styles.navButton}
-                aria-label="Next week"
-              >
-                <span className={styles.navText}>Next</span>
-                <ChevronRightIcon className={styles.navIcon} />
-              </Link>
-            </div>
-            <WeekFiltersPlaceholder />
-          </div>
-        </header>
+          </header>
 
-        <WeekTableWrapper
-          initialEntries={scheduleEntries}
-          weekDays={weekDays}
-          today={today}
-        />
-      </div>
+          <WeekTableWrapper
+            initialEntries={scheduleEntries}
+            weekDays={weekDays}
+            today={today}
+          />
+        </div>
+      </FilterToggleWrapper>
     </WeekFilterProvider>
   );
 }
@@ -176,26 +172,6 @@ export default async function WeekPage({ searchParams }: WeekPageProps) {
 type IconProps = {
   className?: string;
 };
-
-function CalendarIcon({ className }: IconProps) {
-  return (
-    <svg
-      className={className}
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth={2}
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      aria-hidden="true"
-    >
-      <path d="M8 2v4" />
-      <path d="M16 2v4" />
-      <rect width="18" height="18" x="3" y="4" rx="2" />
-      <path d="M3 10h18" />
-    </svg>
-  );
-}
 
 function ChevronLeftIcon({ className }: IconProps) {
   return (
