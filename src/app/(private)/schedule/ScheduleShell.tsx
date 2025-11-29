@@ -55,7 +55,7 @@ export function ScheduleShell({ initialSchedules }: ScheduleShellProps) {
               </p>
             </div>
             <div className={styles.heroActions}>
-              <button
+              {/* <button
                 type="button"
                 className={clsx(styles.heroButton, styles.heroSecondary)}
               >
@@ -64,7 +64,7 @@ export function ScheduleShell({ initialSchedules }: ScheduleShellProps) {
                   aria-hidden="true"
                 />
                 <span>Export</span>
-              </button>
+              </button> */}
               <Link
                 href="/medications/new"
                 className={clsx(styles.heroButton, styles.heroPrimary)}

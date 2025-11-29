@@ -3,6 +3,7 @@ import { cookies } from "next/headers";
 import MedicationsOverview from "@/components/medications/MedicationsOverview";
 import { absoluteUrl } from "@/lib/url";
 import type { MedicationListItem } from "@/lib/medicationsListTypes";
+import styles from "@/components/medications/medications.module.css";
 
 async function getMedications(): Promise<MedicationListItem[]> {
   const store = await cookies();
@@ -34,5 +35,9 @@ async function getMedications(): Promise<MedicationListItem[]> {
 export default async function MedicationsListPage() {
   const medications = await getMedications();
 
-  return <MedicationsOverview initial={medications} />;
+  return (
+    <div className={styles.page}>
+      <MedicationsOverview initial={medications} />
+    </div>
+  );
 }
