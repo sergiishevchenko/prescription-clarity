@@ -157,17 +157,29 @@ export function ScheduleManager({
             return (
               <article key={schedule.id} className={styles.scheduleCompactCard}>
                 <div className={styles.compactHeader}>
-                  <div className={styles.compactIcon}>
-                    <PillIcon className={styles.compactIconGlyph} />
+                  <div className={styles.compactHeaderLeft}>
+                    <div className={styles.compactIcon}>
+                      <PillIcon className={styles.compactIconGlyph} />
+                    </div>
+                    <div>
+                      <p className={styles.compactTitle}>
+                        {schedule.medication?.name ?? "Medication removed"}
+                      </p>
+                      {doseLabel ? (
+                        <p className={styles.compactDose}>{doseLabel}</p>
+                      ) : null}
+                    </div>
                   </div>
-                  <div>
-                    <p className={styles.compactTitle}>
-                      {schedule.medication?.name ?? "Medication removed"}
-                    </p>
-                    {doseLabel ? (
-                      <p className={styles.compactDose}>{doseLabel}</p>
-                    ) : null}
-                  </div>
+                  <span
+                    className={clsx(
+                      styles.badge,
+                      status === "active"
+                        ? styles.badgePositive
+                        : styles.badgeNeutral,
+                    )}
+                  >
+                    {status === "active" ? "Active" : "Completed"}
+                  </span>
                 </div>
 
                 <div className={styles.compactTimeRow}>
@@ -189,16 +201,6 @@ export function ScheduleManager({
                 </div>
 
                 <div className={styles.compactBadges}>
-                  <span
-                    className={clsx(
-                      styles.badge,
-                      status === "active"
-                        ? styles.badgePositive
-                        : styles.badgeNeutral,
-                    )}
-                  >
-                    {status === "active" ? "Active" : "Completed"}
-                  </span>
                   <span className={clsx(styles.badge, styles.badgeOutline)}>
                     {frequencyLabel}
                   </span>
@@ -209,18 +211,26 @@ export function ScheduleManager({
                 <div className={styles.compactFooter}>
                   <button
                     type="button"
-                    onClick={() => setEditingSchedule(schedule)}
-                    className={styles.compactMoreButton}
+                    onClick={() => router.push("/week")}
+                    className={clsx(
+                      styles.heroButton,
+                      styles.heroSecondary,
+                      styles.compactCalendarButton,
+                    )}
                   >
-                    <DotsIcon className={styles.compactDotsIcon} />
-                    More
+                    <CalendarIcon className={styles.heroButtonIcon} />
+                    <span>View</span>
                   </button>
                   <button
                     type="button"
-                    onClick={() => router.push("/week")}
-                    className={styles.compactCalendarButton}
+                    onClick={() => setEditingSchedule(schedule)}
+                    className={clsx(
+                      styles.heroButton,
+                      styles.heroSecondary,
+                      styles.compactEditButton,
+                    )}
                   >
-                    View calendar
+                    <span>Edit</span>
                   </button>
                 </div>
               </article>
@@ -676,7 +686,7 @@ function ClockIcon({ className }: IconProps) {
   );
 }
 
-function DotsIcon({ className }: IconProps) {
+/*function DotsIcon({ className }: IconProps) {
   return (
     <svg
       className={className}
@@ -687,6 +697,26 @@ function DotsIcon({ className }: IconProps) {
       <circle cx="5" cy="12" r="1.5" />
       <circle cx="12" cy="12" r="1.5" />
       <circle cx="19" cy="12" r="1.5" />
+    </svg>
+  );
+}*/
+
+function CalendarIcon({ className }: IconProps) {
+  return (
+    <svg
+      className={className}
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth={2}
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      aria-hidden="true"
+    >
+      <path d="M8 2v4" />
+      <path d="M16 2v4" />
+      <rect x="3" y="4" width="18" height="18" rx="2" />
+      <path d="M3 10h18" />
     </svg>
   );
 }

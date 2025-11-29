@@ -55,7 +55,7 @@ export function ScheduleShell({ initialSchedules }: ScheduleShellProps) {
               </p>
             </div>
             <div className={styles.heroActions}>
-              <button
+              {/* <button
                 type="button"
                 className={clsx(styles.heroButton, styles.heroSecondary)}
               >
@@ -64,7 +64,7 @@ export function ScheduleShell({ initialSchedules }: ScheduleShellProps) {
                   aria-hidden="true"
                 />
                 <span>Export</span>
-              </button>
+              </button> */}
               <Link
                 href="/medications/new"
                 className={clsx(styles.heroButton, styles.heroPrimary)}
@@ -230,7 +230,7 @@ type IconProps = {
   className?: string;
 };
 
-function DownloadIcon({ className }: IconProps) {
+/*function DownloadIcon({ className }: IconProps) {
   return (
     <svg
       className={className}
@@ -247,7 +247,7 @@ function DownloadIcon({ className }: IconProps) {
       <line x1="12" x2="12" y1="3" y2="15" />
     </svg>
   );
-}
+}*/
 
 function PlusIcon({ className }: IconProps) {
   return (

@@ -2,14 +2,12 @@
 
 import { useMemo, useState } from "react";
 import Link from "next/link";
+import clsx from "clsx";
 
-import { Button } from "@/components/ui/Button";
-import { Input } from "@/components/ui/Input";
-import AddMedicationButton from "@/components/medications/AddMedicationButton";
 import DeleteMedicationButton from "@/components/medications/DeleteMedicationButton";
 import { getMedicationFormLabel } from "@/lib/medicationTypes";
-import { cn } from "@/lib/utils";
 import type { MedicationListItem } from "@/lib/medicationsListTypes";
+import styles from "./medications.module.css";
 
 type MedicationsOverviewProps = {
   initial: MedicationListItem[];
@@ -57,7 +55,7 @@ export default function MedicationsOverview({
   }, [filters.hasDoseOnly, initial, search]);
 
   const hasAnyMedications = initial.length > 0;
-  const hasQueryOrFilters = search.trim().length > 0 || activeFilterCount > 0;
+  //const hasQueryOrFilters = search.trim().length > 0 || activeFilterCount > 0;
   const resultCount = filteredMedications.length;
 
   const handleClearAll = () => {
@@ -69,75 +67,90 @@ export default function MedicationsOverview({
     setFilters((prev) => ({ ...prev, hasDoseOnly: !prev.hasDoseOnly }));
   };
 
-  return (
-    <div className="min-h-[calc(100vh-4rem)] bg-gray-50">
-      <div className="mx-auto flex max-w-6xl flex-col px-4 py-6 sm:px-6 lg:px-8">
-        <div className="mb-4 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-          <div>
-            <h1 className="text-2xl font-semibold text-gray-900">
-              All Medications
-            </h1>
-            <p className="mt-1 text-sm text-gray-600">
-              {initial.length}{" "}
-              {initial.length === 1 ? "medication" : "medications"}
-            </p>
-          </div>
-          <div className="flex items-center gap-3">
-            <ExportMenu medications={filteredMedications} />
-            <AddMedicationButton />
-          </div>
-        </div>
+  const [filtersOpen, setFiltersOpen] = useState(false);
 
-        <div className="rounded-xl bg-white p-4 shadow-sm lg:p-5">
-          <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
-            <div className="flex-1">
-              <Input
-                placeholder="Search medications by name, dosage, or form..."
-                value={search}
-                onChange={(e) => setSearch(e.target.value)}
+  return (
+    <>
+      <header className={styles.hero}>
+        <div className={styles.heroInner}>
+          <div className={styles.heroTop}>
+            <div>
+              <h1>Medications</h1>
+              <p>
+                View and manage all your medications. Add new ones or edit
+                existing entries.
+              </p>
+            </div>
+            <div className={styles.heroActions}>
+              {/* <ExportMenu medications={filteredMedications} /> */}
+              <Link
+                href="/medications/new"
+                className={clsx(styles.heroButton, styles.heroPrimary)}
+              >
+                <PlusIcon
+                  className={styles.heroButtonIcon}
+                  aria-hidden="true"
+                />
+                <span>Add Medication</span>
+              </Link>
+            </div>
+          </div>
+          <div className={styles.searchRow}>
+            <div className={styles.searchInputWrapper}>
+              <div className={styles.searchInputContainer}>
+                <span className={styles.searchIcon}>
+                  <SearchIcon
+                    className={styles.searchIconIcon}
+                    aria-hidden="true"
+                  />
+                </span>
+                <input
+                  type="search"
+                  value={search}
+                  onChange={(e) => setSearch(e.target.value)}
+                  placeholder="Search medications by name, dosage, or form..."
+                  className={styles.searchInput}
+                />
+              </div>
+              <p className={styles.searchMeta}>
+                {resultCount} of {initial.length} medications visible
+              </p>
+            </div>
+            <button
+              type="button"
+              onClick={() => setFiltersOpen((prev) => !prev)}
+              className={clsx(
+                styles.heroButton,
+                styles.heroSecondary,
+                styles.filtersToggleButton,
+                filtersOpen && styles.filtersToggleActive,
+              )}
+            >
+              <FilterIcon
+                className={styles.heroButtonIcon}
+                aria-hidden="true"
+              />
+              <span>{filtersOpen ? "Hide filters" : "Filters"}</span>
+              {activeFilterCount > 0 && (
+                <span className={styles.filtersBadge}>{activeFilterCount}</span>
+              )}
+            </button>
+          </div>
+          {filtersOpen && (
+            <div className={styles.filtersPanel}>
+              <FiltersPanel
+                hasFilters={filters.hasDoseOnly}
+                onToggleDose={handleToggleDoseFilter}
+                onClear={handleClearAll}
+                onClose={() => setFiltersOpen(false)}
               />
             </div>
-            <FiltersButton
-              activeCount={activeFilterCount}
-              hasFilters={filters.hasDoseOnly}
-              onToggleDose={handleToggleDoseFilter}
-            />
-          </div>
+          )}
+        </div>
+      </header>
 
-          <div className="mt-3 flex flex-wrap items-center justify-between gap-2 text-sm text-gray-600">
-            <div>
-              {hasAnyMedications ? (
-                hasQueryOrFilters ? (
-                  <span>
-                    {resultCount} results found
-                    {search.trim() && (
-                      <>
-                        {" "}
-                        for{" "}
-                        <span className="font-medium">
-                          &quot;{search.trim()}&quot;
-                        </span>
-                      </>
-                    )}
-                  </span>
-                ) : (
-                  <span>{resultCount} results found</span>
-                )
-              ) : (
-                <span>No medications yet</span>
-              )}
-            </div>
-            {hasQueryOrFilters && (
-              <button
-                type="button"
-                onClick={handleClearAll}
-                className="text-sm font-medium text-indigo-600 hover:text-indigo-700"
-              >
-                Clear all
-              </button>
-            )}
-          </div>
-
+      <div className={styles.content}>
+        <div className={styles.sectionStack}>
           {resultCount === 0 ? (
             <NoResultsState
               hasAnyMedications={hasAnyMedications}
@@ -148,69 +161,56 @@ export default function MedicationsOverview({
           )}
         </div>
       </div>
-    </div>
+    </>
   );
 }
 
-type FiltersButtonProps = {
-  activeCount: number;
+type FiltersPanelProps = {
   hasFilters: boolean;
   onToggleDose: () => void;
+  onClear: () => void;
+  onClose: () => void;
 };
 
-function FiltersButton({
-  activeCount,
+function FiltersPanel({
   hasFilters,
   onToggleDose,
-}: FiltersButtonProps) {
-  const [open, setOpen] = useState(false);
-
+  onClear,
+  onClose,
+}: FiltersPanelProps) {
   return (
-    <div className="relative">
-      <Button
-        type="button"
-        variant="outline"
-        size="md"
-        className={cn(
-          "flex items-center gap-2 border-gray-300 text-sm text-gray-700",
-          hasFilters && "border-indigo-500 bg-indigo-50 text-indigo-700",
-        )}
-        onClick={() => setOpen((prev) => !prev)}
-      >
-        <FilterIcon className="h-4 w-4" />
-        <span>Filters</span>
-        {activeCount > 0 && (
-          <span className="inline-flex h-5 min-w-[1.25rem] items-center justify-center rounded-full bg-indigo-600 px-1 text-xs font-semibold text-white">
-            {activeCount}
-          </span>
-        )}
-      </Button>
-
-      {open && (
-        <div className="absolute right-0 z-20 mt-2 w-64 rounded-lg bg-white p-3 text-sm shadow-lg ring-1 ring-black/5">
-          <p className="mb-2 text-xs font-semibold tracking-wide text-gray-500 uppercase">
-            Filters
-          </p>
-          <label className="flex cursor-pointer items-center gap-2 rounded-md px-2 py-1.5 hover:bg-gray-50">
-            <input
-              type="checkbox"
-              className="h-4 w-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-500"
-              checked={hasFilters}
-              onChange={onToggleDose}
-            />
-            <span>Only medications with dosage</span>
-          </label>
-          <div className="mt-3 flex justify-end">
-            <button
-              type="button"
-              onClick={() => setOpen(false)}
-              className="text-xs font-medium text-gray-600 hover:text-gray-800"
-            >
-              Close
-            </button>
-          </div>
-        </div>
-      )}
+    <div className={styles.filtersPanelInner}>
+      <label className={styles.filtersPanelLabel}>
+        <input
+          type="checkbox"
+          className={styles.filtersPanelCheckbox}
+          checked={hasFilters}
+          onChange={onToggleDose}
+        />
+        <span>Only medications with dosage</span>
+      </label>
+      <div className={styles.filtersPanelActions}>
+        <button
+          type="button"
+          onClick={onClear}
+          className={clsx(
+            styles.filtersPanelActionButton,
+            styles.filtersPanelClearButton,
+          )}
+        >
+          Clear
+        </button>
+        <button
+          type="button"
+          onClick={onClose}
+          className={clsx(
+            styles.filtersPanelActionButton,
+            styles.filtersPanelCloseButton,
+          )}
+        >
+          Close
+        </button>
+      </div>
     </div>
   );
 }
@@ -221,7 +221,7 @@ type MedicationsGridProps = {
 
 function MedicationsGrid({ items }: MedicationsGridProps) {
   return (
-    <div className="mt-5 grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
+    <div className={styles.medicationsGrid}>
       {items.map((medication) => (
         <MedicationCard key={medication.id} medication={medication} />
       ))}
@@ -236,44 +236,44 @@ type MedicationCardProps = {
 function MedicationCard({ medication }: MedicationCardProps) {
   const doseText =
     medication.dose != null && !Number.isNaN(medication.dose)
-      ? `${medication.dose} mg`
+      ? `${medication.dose}mg`
       : "No dose specified";
   const formLabel = getMedicationFormLabel(
     (medication.form as never) || undefined,
   );
 
   return (
-    <article className="flex h-52 flex-col justify-between rounded-2xl border border-gray-200 bg-white p-5 shadow-sm">
-      <div className="flex items-start gap-3">
-        {/* Іконка як у дизайні: квадрат з м’якими кутами + синя outline-пігулка */}
-        <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-indigo-50 text-[#2196F3]">
-          <PillIcon className="h-6 w-6" />
+    <article className={styles.medicationCard}>
+      <div className={styles.cardHeader}>
+        <div className={styles.cardHeaderLeft}>
+          <div className={styles.cardIcon}>
+            <PillIcon className={styles.cardIconGlyph} />
+          </div>
+          <div>
+            <h2 className={styles.cardTitle}>{medication.name}</h2>
+            <p className={styles.cardDose}>{doseText}</p>
+            {formLabel && <p className={styles.cardForm}>{formLabel}</p>}
+          </div>
         </div>
-        <div className="flex-1">
-          <h2 className="text-base font-semibold text-gray-900">
-            {medication.name}
-          </h2>
-          <p className="mt-0.5 text-sm text-indigo-600">{doseText}</p>
-          {formLabel && (
-            <p className="mt-1 text-xs text-gray-500">{formLabel}</p>
-          )}
-        </div>
+        <span className={clsx(styles.badge, styles.badgePositive)}>Active</span>
       </div>
 
-      <div className="mt-4 flex items-center justify-between border-t border-gray-100 pt-3 text-sm">
-        <span className="inline-flex items-center rounded-full bg-green-50 px-2.5 py-1 text-xs font-medium text-green-700">
-          <span className="mr-1.5 h-2 w-2 rounded-full bg-green-500" />
-          Active
-        </span>
-        <div className="flex items-center gap-3 text-xs text-gray-500">
-          <Link
-            href={`/medications/${medication.id}/edit`}
-            className="font-medium text-indigo-600 hover:text-indigo-700"
-          >
-            Edit
-          </Link>
+      <div className={styles.cardDivider} />
+
+      <div className={styles.cardFooter}>
+        <div className={styles.cardDeleteButton}>
           <DeleteMedicationButton id={medication.id} />
         </div>
+        <Link
+          href={`/medications/${medication.id}/edit`}
+          className={clsx(
+            styles.heroButton,
+            styles.heroSecondary,
+            styles.cardEditButton,
+          )}
+        >
+          <span>Edit</span>
+        </Link>
       </div>
     </article>
   );
@@ -289,40 +289,38 @@ function NoResultsState({
   onClearFilters,
 }: NoResultsStateProps) {
   return (
-    <div className="mt-6 rounded-2xl border border-dashed border-gray-300 bg-gray-50 py-10 text-center text-gray-600">
-      <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-2xl bg-indigo-50 text-[#2196F3] shadow-sm">
-        <PillIcon className="h-9 w-9" />
+    <div className={styles.emptyState}>
+      <div className={styles.emptyStateIcon}>
+        <PillIcon className={styles.emptyStateIconGlyph} />
       </div>
-      <h2 className="text-base font-semibold text-gray-900">
+      <h2 className={styles.emptyStateTitle}>
         {hasAnyMedications ? "No medications found" : "No medications yet"}
       </h2>
-      <p className="mt-1 text-sm text-gray-500">
+      <p className={styles.emptyStateText}>
         {hasAnyMedications
           ? "Try adjusting your search or filters."
           : "Add a medication to get started."}
       </p>
       {hasAnyMedications && (
-        <div className="mt-6 flex justify-center">
-          <Button
+        <div className={styles.emptyStateButton}>
+          <button
             type="button"
-            variant="outline"
-            size="md"
-            className="border-gray-300"
             onClick={onClearFilters}
+            className={clsx(styles.heroButton, styles.heroSecondary)}
           >
             Clear Filters
-          </Button>
+          </button>
         </div>
       )}
     </div>
   );
 }
 
-type ExportMenuProps = {
+/*type ExportMenuProps = {
   medications: MedicationListItem[];
-};
+};*/
 
-function ExportMenu({ medications }: ExportMenuProps) {
+/*function ExportMenu({ medications }: ExportMenuProps) {
   const [open, setOpen] = useState(false);
 
   const handleExportCsv = () => {
@@ -372,17 +370,15 @@ function ExportMenu({ medications }: ExportMenuProps) {
   };
 
   return (
-    <div className="relative">
-      <Button
+    <div style={{ position: "relative" }}>
+      <button
         type="button"
-        variant="outline"
-        size="md"
-        className="flex items-center gap-2 border-gray-300 text-sm text-gray-700"
+        className={clsx(styles.heroButton, styles.heroSecondary)}
         onClick={() => setOpen((prev) => !prev)}
       >
-        <DownloadIcon className="h-4 w-4" />
+        <DownloadIcon className={styles.heroButtonIcon} />
         <span>Export</span>
-      </Button>
+      </button>
 
       {open && (
         <div className="absolute right-0 z-20 mt-2 w-64 rounded-lg bg-white py-2 text-sm shadow-lg ring-1 ring-black/5">
@@ -444,9 +440,9 @@ function ExportMenu({ medications }: ExportMenuProps) {
       )}
     </div>
   );
-}
+}*/
 
-function downloadTextFile(filename: string, content: string, mimeType: string) {
+/*function downloadTextFile(filename: string, content: string, mimeType: string) {
   if (typeof window === "undefined") return;
   const blob = new Blob([content], { type: mimeType });
   const url = URL.createObjectURL(blob);
@@ -457,7 +453,7 @@ function downloadTextFile(filename: string, content: string, mimeType: string) {
   link.click();
   document.body.removeChild(link);
   URL.revokeObjectURL(url);
-}
+}*/
 
 type IconProps = {
   className?: string;
@@ -490,19 +486,37 @@ function FilterIcon({ className }: IconProps) {
       viewBox="0 0 24 24"
       fill="none"
       stroke="currentColor"
-      strokeWidth={2}
+      strokeWidth={2.2}
       strokeLinecap="round"
       strokeLinejoin="round"
       aria-hidden="true"
     >
-      <path d="M4 5h16" />
+      <path d="M4 4h16" />
       <path d="M7 12h10" />
-      <path d="M10 19h4" />
+      <path d="M10 20h4" />
     </svg>
   );
 }
 
-function DownloadIcon({ className }: IconProps) {
+function PlusIcon({ className }: IconProps) {
+  return (
+    <svg
+      className={className}
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth={2.5}
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      aria-hidden="true"
+    >
+      <path d="M5 12h14" />
+      <path d="M12 5v14" />
+    </svg>
+  );
+}
+
+function SearchIcon({ className }: IconProps) {
   return (
     <svg
       className={className}
@@ -514,14 +528,32 @@ function DownloadIcon({ className }: IconProps) {
       strokeLinejoin="round"
       aria-hidden="true"
     >
-      <path d="M4 20h16" />
-      <path d="M12 4v11" />
-      <path d="m6 11 6 6 6-6" />
+      <circle cx="11" cy="11" r="8" />
+      <path d="m21 21-4.35-4.35" />
     </svg>
   );
 }
 
-function SheetIcon({ className }: IconProps) {
+/*function DownloadIcon({ className }: IconProps) {
+  return (
+    <svg
+      className={className}
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth={2}
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      aria-hidden="true"
+    >
+      <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+      <polyline points="7 10 12 15 17 10" />
+      <line x1="12" x2="12" y1="3" y2="15" />
+    </svg>
+  );
+}*/
+
+/*function SheetIcon({ className }: IconProps) {
   return (
     <svg
       className={className}
@@ -539,9 +571,9 @@ function SheetIcon({ className }: IconProps) {
       <path d="M8 18h5" />
     </svg>
   );
-}
+}*/
 
-function BracesIcon({ className }: IconProps) {
+/*function BracesIcon({ className }: IconProps) {
   return (
     <svg
       className={className}
@@ -557,9 +589,9 @@ function BracesIcon({ className }: IconProps) {
       <path d="M17 4c1.1 0 2 .9 2 2v3c0 1.1.9 2 2 2-1.1 0-2 .9-2 2v3c0 1.1-.9 2-2 2" />
     </svg>
   );
-}
+}*/
 
-function PrinterIcon({ className }: IconProps) {
+/*function PrinterIcon({ className }: IconProps) {
   return (
     <svg
       className={className}
@@ -576,4 +608,4 @@ function PrinterIcon({ className }: IconProps) {
       <path d="M6 14h12v8H6z" />
     </svg>
   );
-}
+}*/
