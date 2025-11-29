@@ -6,6 +6,7 @@ import { getScheduleEntries, type ScheduleEntryItem } from "@/lib/schedule";
 import { WeekFilterProvider } from "./WeekFilterContext";
 import { WeekFiltersPlaceholder } from "./WeekFiltersPlaceholder";
 import { WeekTableWrapper } from "./WeekTableWrapper";
+import { PrintButton } from "./PrintButton";
 
 export const dynamic = "force-dynamic";
 
@@ -123,14 +124,11 @@ export default async function WeekPage({ searchParams }: WeekPageProps) {
             <div className={styles.headerTop}>
               <h1 className={styles.title}>Week View</h1>
               <div className={styles.headerButtons}>
-                <button
-                  type="button"
-                  className={styles.printButton}
-                  aria-label="Print week schedule"
-                >
-                  <PrintIcon className={styles.printIcon} />
-                  <span className={styles.printText}>Print</span>
-                </button>
+                <PrintButton
+                  weekStart={weekStart}
+                  weekEnd={weekEnd}
+                  timezone={timezone}
+                />
                 <Link
                   href="/week"
                   className={styles.todayButton}
@@ -178,25 +176,6 @@ export default async function WeekPage({ searchParams }: WeekPageProps) {
 type IconProps = {
   className?: string;
 };
-
-function PrintIcon({ className }: IconProps) {
-  return (
-    <svg
-      className={className}
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth={2.2}
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      aria-hidden="true"
-    >
-      <path d="M6 9V3a1 1 0 0 1 1-1h10a1 1 0 0 1 1 1v6" />
-      <path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2" />
-      <path d="M6 14h12v8H6z" />
-    </svg>
-  );
-}
 
 function CalendarIcon({ className }: IconProps) {
   return (
