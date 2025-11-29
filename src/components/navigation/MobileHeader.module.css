@@ -28,6 +28,16 @@
   min-width: 0;
 }
 
+.logoLink {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex: 1;
+  min-width: 0;
+  text-decoration: none;
+  color: inherit;
+}
+
 .logoMark {
   width: 40px;
   height: 40px;

@@ -224,17 +224,19 @@ export function SidebarNav({ user, onClose }: SidebarNavProps) {
     <aside className={styles.sidebar}>
       <div className={styles.logoSection}>
         <div className={styles.logoRow}>
-          <div className={styles.logoMark}>
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img
-              src="/logo.svg"
-              alt="Prescription Clarity Logo"
-              className={styles.logoImage}
-            />
-          </div>
-          <Link href="/dashboard" className={styles.logoTitle}>
-            <h1>Prescription</h1>
-            <p>Clarity</p>
+          <Link href="/dashboard" className={styles.logoLink}>
+            <div className={styles.logoMark}>
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img
+                src="/logo.svg"
+                alt="Prescription Clarity Logo"
+                className={styles.logoImage}
+              />
+            </div>
+            <div className={styles.logoTitle}>
+              <h1>Prescription</h1>
+              <p>Clarity</p>
+            </div>
           </Link>
           {onClose && (
             <button
@@ -249,7 +251,8 @@ export function SidebarNav({ user, onClose }: SidebarNavProps) {
         </div>
       </div>
 
-      <div className={styles.userSection}>
+      {/* User section at top - commented out as same info is shown in footer */}
+      {/* <div className={styles.userSection}>
         <div className={styles.userRow}>
           <span className={styles.userAvatar}>
             <span className={styles.avatarFallback}>{initials}</span>
@@ -265,7 +268,7 @@ export function SidebarNav({ user, onClose }: SidebarNavProps) {
             </button>
           </div>
         </div>
-      </div>
+      </div> */}
 
       <nav className={clsx(styles.nav, styles.scrollArea)} aria-label="Sidebar">
         <div className={styles.navSections}>
@@ -344,7 +347,11 @@ export function SidebarNav({ user, onClose }: SidebarNavProps) {
       </nav>
 
       <div className={styles.footer}>
-        <button type="button" className={styles.accountButton}>
+        <Link
+          href="/profile"
+          className={styles.accountButton}
+          onClick={onClose}
+        >
           <span className={styles.accountAvatar}>
             <span className={styles.avatarFallback}>{initials}</span>
           </span>
@@ -354,7 +361,7 @@ export function SidebarNav({ user, onClose }: SidebarNavProps) {
             </p>
             <p className={styles.accountRole}>Patient</p>
           </span>
-        </button>
+        </Link>
         <button
           type="button"
           className={styles.signOutButton}
