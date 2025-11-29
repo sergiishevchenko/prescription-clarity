@@ -347,7 +347,11 @@ export function SidebarNav({ user, onClose }: SidebarNavProps) {
       </nav>
 
       <div className={styles.footer}>
-        <Link href="/profile" className={styles.accountButton} onClick={onClose}>
+        <Link
+          href="/profile"
+          className={styles.accountButton}
+          onClick={onClose}
+        >
           <span className={styles.accountAvatar}>
             <span className={styles.avatarFallback}>{initials}</span>
           </span>

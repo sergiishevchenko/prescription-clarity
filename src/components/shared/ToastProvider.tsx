@@ -125,7 +125,7 @@ export default function ToastProvider({
       <div
         aria-live="polite"
         aria-atomic="true"
-        className="pointer-events-none fixed left-0 right-0 top-[72px] z-[60] flex items-start justify-center p-4 sm:inset-0 sm:top-0 sm:justify-end sm:p-6"
+        className="pointer-events-none fixed top-[72px] right-0 left-0 z-[60] flex items-start justify-center p-4 sm:inset-0 sm:top-0 sm:justify-end sm:p-6"
       >
         <div className="flex w-full max-w-sm flex-col gap-2">
           {toasts.map((t) => (
