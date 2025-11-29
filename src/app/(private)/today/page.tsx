@@ -182,12 +182,12 @@ export default async function TodayPage({ searchParams }: TodayPageProps) {
     calendarMonth = selectedDate.getMonth();
   }
 
-  const displayName =
+  /*const displayName =
     user.name?.trim() ||
     user.email?.split("@")[0]?.replace(/\./g, " ") ||
-    "Patient";
+    "Patient";*/
   const today = new Date();
-  const { full, short, weekday } = formatDateParts(selectedDate);
+  const { short, weekday } = formatDateParts(selectedDate); //full, not used
 
   // Fetch selected day's schedule entries
   const startOfDay = new Date(selectedDate);
@@ -308,11 +308,11 @@ export default async function TodayPage({ searchParams }: TodayPageProps) {
   );
 }
 
-type IconProps = {
+/*type IconProps = {
   className?: string;
-};
+};*/
 
-function PrintIcon({ className }: IconProps) {
+/*function PrintIcon({ className }: IconProps) {
   return (
     <svg
       className={className}
@@ -329,9 +329,9 @@ function PrintIcon({ className }: IconProps) {
       <path d="M6 14h12v8H6z" />
     </svg>
   );
-}
+}*/
 
-function MoonIcon({ className }: IconProps) {
+/*function MoonIcon({ className }: IconProps) {
   return (
     <svg
       className={className}
@@ -343,4 +343,4 @@ function MoonIcon({ className }: IconProps) {
       <path d="M21 12.79A9 9 0 1 1 11.21 3a7 7 0 1 0 9.79 9.79z" />
     </svg>
   );
-}
+}*/

@@ -28,4 +28,3 @@ export function useFilterToggle() {
   }
   return context;
 }
-

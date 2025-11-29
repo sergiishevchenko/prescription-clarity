@@ -47,11 +47,7 @@ export function HeaderButtons({ children }: HeaderButtonsProps) {
         <CalendarIcon className={styles.calendarIcon} />
         <span>Today</span>
       </Link>
-      <FilterToggleButton
-        isOpen={isOpen}
-        onToggle={() => setIsOpen(!isOpen)}
-      />
+      <FilterToggleButton isOpen={isOpen} onToggle={() => setIsOpen(!isOpen)} />
     </div>
   );
 }
-
