@@ -13,17 +13,19 @@ export function MobileHeader({ onMenuToggle, isMenuOpen }: MobileHeaderProps) {
     <header className={styles.mobileHeader}>
       <div className={styles.headerContent}>
         <div className={styles.logoSection}>
-          <div className={styles.logoMark}>
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img
-              src="/logo.svg"
-              alt="Prescription Clarity Logo"
-              className={styles.logoImage}
-            />
-          </div>
-          <Link href="/dashboard" className={styles.logoTitle}>
-            <h1>Prescription</h1>
-            <p>Clarity</p>
+          <Link href="/dashboard" className={styles.logoLink}>
+            <div className={styles.logoMark}>
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img
+                src="/logo.svg"
+                alt="Prescription Clarity Logo"
+                className={styles.logoImage}
+              />
+            </div>
+            <div className={styles.logoTitle}>
+              <h1>Prescription</h1>
+              <p>Clarity</p>
+            </div>
           </Link>
         </div>
         <button
