@@ -686,7 +686,7 @@ function ClockIcon({ className }: IconProps) {
   );
 }
 
-function DotsIcon({ className }: IconProps) {
+/*function DotsIcon({ className }: IconProps) {
   return (
     <svg
       className={className}
@@ -699,7 +699,7 @@ function DotsIcon({ className }: IconProps) {
       <circle cx="19" cy="12" r="1.5" />
     </svg>
   );
-}
+}*/
 
 function CalendarIcon({ className }: IconProps) {
   return (

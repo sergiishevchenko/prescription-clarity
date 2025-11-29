@@ -55,7 +55,7 @@ export default function MedicationsOverview({
   }, [filters.hasDoseOnly, initial, search]);
 
   const hasAnyMedications = initial.length > 0;
-  const hasQueryOrFilters = search.trim().length > 0 || activeFilterCount > 0;
+  //const hasQueryOrFilters = search.trim().length > 0 || activeFilterCount > 0;
   const resultCount = filteredMedications.length;
 
   const handleClearAll = () => {
@@ -266,7 +266,11 @@ function MedicationCard({ medication }: MedicationCardProps) {
         </div>
         <Link
           href={`/medications/${medication.id}/edit`}
-          className={clsx(styles.heroButton, styles.heroSecondary, styles.cardEditButton)}
+          className={clsx(
+            styles.heroButton,
+            styles.heroSecondary,
+            styles.cardEditButton,
+          )}
         >
           <span>Edit</span>
         </Link>
@@ -312,11 +316,11 @@ function NoResultsState({
   );
 }
 
-type ExportMenuProps = {
+/*type ExportMenuProps = {
   medications: MedicationListItem[];
-};
+};*/
 
-function ExportMenu({ medications }: ExportMenuProps) {
+/*function ExportMenu({ medications }: ExportMenuProps) {
   const [open, setOpen] = useState(false);
 
   const handleExportCsv = () => {
@@ -436,9 +440,9 @@ function ExportMenu({ medications }: ExportMenuProps) {
       )}
     </div>
   );
-}
+}*/
 
-function downloadTextFile(filename: string, content: string, mimeType: string) {
+/*function downloadTextFile(filename: string, content: string, mimeType: string) {
   if (typeof window === "undefined") return;
   const blob = new Blob([content], { type: mimeType });
   const url = URL.createObjectURL(blob);
@@ -449,7 +453,7 @@ function downloadTextFile(filename: string, content: string, mimeType: string) {
   link.click();
   document.body.removeChild(link);
   URL.revokeObjectURL(url);
-}
+}*/
 
 type IconProps = {
   className?: string;
@@ -530,7 +534,7 @@ function SearchIcon({ className }: IconProps) {
   );
 }
 
-function DownloadIcon({ className }: IconProps) {
+/*function DownloadIcon({ className }: IconProps) {
   return (
     <svg
       className={className}
@@ -547,9 +551,9 @@ function DownloadIcon({ className }: IconProps) {
       <line x1="12" x2="12" y1="3" y2="15" />
     </svg>
   );
-}
+}*/
 
-function SheetIcon({ className }: IconProps) {
+/*function SheetIcon({ className }: IconProps) {
   return (
     <svg
       className={className}
@@ -567,9 +571,9 @@ function SheetIcon({ className }: IconProps) {
       <path d="M8 18h5" />
     </svg>
   );
-}
+}*/
 
-function BracesIcon({ className }: IconProps) {
+/*function BracesIcon({ className }: IconProps) {
   return (
     <svg
       className={className}
@@ -585,9 +589,9 @@ function BracesIcon({ className }: IconProps) {
       <path d="M17 4c1.1 0 2 .9 2 2v3c0 1.1.9 2 2 2-1.1 0-2 .9-2 2v3c0 1.1-.9 2-2 2" />
     </svg>
   );
-}
+}*/
 
-function PrinterIcon({ className }: IconProps) {
+/*function PrinterIcon({ className }: IconProps) {
   return (
     <svg
       className={className}
@@ -604,4 +608,4 @@ function PrinterIcon({ className }: IconProps) {
       <path d="M6 14h12v8H6z" />
     </svg>
   );
-}
+}*/

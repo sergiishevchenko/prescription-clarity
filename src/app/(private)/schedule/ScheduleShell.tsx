@@ -230,7 +230,7 @@ type IconProps = {
   className?: string;
 };
 
-function DownloadIcon({ className }: IconProps) {
+/*function DownloadIcon({ className }: IconProps) {
   return (
     <svg
       className={className}
@@ -247,7 +247,7 @@ function DownloadIcon({ className }: IconProps) {
       <line x1="12" x2="12" y1="3" y2="15" />
     </svg>
   );
-}
+}*/
 
 function PlusIcon({ className }: IconProps) {
   return (
