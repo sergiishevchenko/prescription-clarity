@@ -235,7 +235,7 @@ export default async function TodayPage({ searchParams }: TodayPageProps) {
   return (
     <div className={styles.page}>
       <div className={styles.outer}>
-        <header className={styles.stickyHeader}>
+        {/* <header className={styles.stickyHeader}>
           <div className={styles.headerInner}>
             <div className={styles.profileBlock}>
               <span className={styles.profileName}>{displayName}</span>
@@ -258,7 +258,7 @@ export default async function TodayPage({ searchParams }: TodayPageProps) {
               </button>
             </div>
           </div>
-        </header>
+        </header> */}
 
         <div className={styles.content}>
           <ScheduleList
