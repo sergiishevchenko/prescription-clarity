@@ -143,7 +143,7 @@ export default function TimeOfDayChips({ selected, onToggle, error }: Props) {
         )}
         {selectedCount} of {required} selected
       </div>
-      <div className="mt-3 sm:mt-4 grid grid-cols-1 gap-2.5 sm:gap-4 md:grid-cols-2 lg:grid-cols-3 time-of-day-grid">
+      <div className="time-of-day-grid mt-3 grid grid-cols-1 gap-2.5 sm:mt-4 sm:gap-4 md:grid-cols-2 lg:grid-cols-3">
         {(["morning", "afternoon", "evening"] as TimeOfDay[]).map((slot) => {
           const active = selected.includes(slot);
           const timeValue =
@@ -167,7 +167,7 @@ export default function TimeOfDayChips({ selected, onToggle, error }: Props) {
               key={slot}
               type="button"
               onClick={() => onToggle(slot)}
-              className={`rounded-[18px] sm:rounded-[22px] border-2 px-3.5 py-3 sm:px-4 sm:py-4 text-left transition focus-visible:ring-4 focus-visible:ring-[#1479FF]/20 focus-visible:outline-none ${
+              className={`rounded-[18px] border-2 px-3.5 py-3 text-left transition focus-visible:ring-4 focus-visible:ring-[#1479FF]/20 focus-visible:outline-none sm:rounded-[22px] sm:px-4 sm:py-4 ${
                 active
                   ? "border-[#1479FF] bg-[#F0F7FF] shadow-[0_18px_35px_rgba(20,121,255,0.2)]"
                   : "border-[#E5E7EB] bg-white hover:border-[#93C5FD] hover:bg-[#F8FAFF]"
@@ -175,7 +175,7 @@ export default function TimeOfDayChips({ selected, onToggle, error }: Props) {
             >
               <div className="flex items-center gap-3 sm:gap-4">
                 <div
-                  className={`flex h-10 w-10 sm:h-12 sm:w-12 items-center justify-center ${iconColor}`}
+                  className={`flex h-10 w-10 items-center justify-center sm:h-12 sm:w-12 ${iconColor}`}
                 >
                   {TIME_OF_DAY_ICONS[slot]}
                 </div>
@@ -190,9 +190,9 @@ export default function TimeOfDayChips({ selected, onToggle, error }: Props) {
         <button
           type="button"
           onClick={openCustomPicker}
-          className={`flex items-center gap-3 sm:gap-4 rounded-[18px] sm:rounded-[22px] border-2 border-dashed border-[#CBD5F5] bg-white px-3.5 py-3 sm:px-4 sm:py-4 text-left text-[#1F2A44] transition hover:border-[#1479FF] focus-visible:ring-4 focus-visible:ring-[#1479FF]/20 focus-visible:outline-none custom-time-button`}
+          className={`custom-time-button flex items-center gap-3 rounded-[18px] border-2 border-dashed border-[#CBD5F5] bg-white px-3.5 py-3 text-left text-[#1F2A44] transition hover:border-[#1479FF] focus-visible:ring-4 focus-visible:ring-[#1479FF]/20 focus-visible:outline-none sm:gap-4 sm:rounded-[22px] sm:px-4 sm:py-4`}
         >
-          <div className="flex h-10 w-10 sm:h-14 sm:w-14 min-w-[2.5rem] sm:min-w-[3.5rem] items-center justify-center rounded-full bg-[#EEF2FF] text-[#4338CA]">
+          <div className="flex h-10 w-10 min-w-[2.5rem] items-center justify-center rounded-full bg-[#EEF2FF] text-[#4338CA] sm:h-14 sm:w-14 sm:min-w-[3.5rem]">
             <svg
               viewBox="0 0 20 20"
               fill="none"
@@ -210,11 +210,11 @@ export default function TimeOfDayChips({ selected, onToggle, error }: Props) {
         </button>
       </div>
       {customTimes.length > 0 && (
-        <div className="mt-3 sm:mt-4 space-y-1.5 sm:space-y-2">
+        <div className="mt-3 space-y-1.5 sm:mt-4 sm:space-y-2">
           {customTimes.map((time, index) => (
             <div
               key={`${time}-${index}`}
-              className="flex items-center justify-between rounded-[14px] sm:rounded-[18px] border border-[#E5E7EB] bg-[#F8FAFF] px-3 py-2 sm:px-4 sm:py-3"
+              className="flex items-center justify-between rounded-[14px] border border-[#E5E7EB] bg-[#F8FAFF] px-3 py-2 sm:rounded-[18px] sm:px-4 sm:py-3"
             >
               <div>
                 <p className="text-[14px] font-semibold text-[#111827]">
@@ -245,7 +245,7 @@ export default function TimeOfDayChips({ selected, onToggle, error }: Props) {
         </p>
       )}
       {showCustomPicker && (
-        <div className="mt-3 sm:mt-4 rounded-[20px] sm:rounded-[28px] border border-[#E0E7FF] bg-white px-4 py-4 sm:px-6 sm:py-6 shadow-[0_24px_60px_rgba(15,23,42,0.08)]">
+        <div className="mt-3 rounded-[20px] border border-[#E0E7FF] bg-white px-4 py-4 shadow-[0_24px_60px_rgba(15,23,42,0.08)] sm:mt-4 sm:rounded-[28px] sm:px-6 sm:py-6">
           <div className="flex flex-col gap-3 sm:gap-4 md:flex-row md:items-center">
             <div className="flex-1">
               <p className={stepStyles.labelText}>Custom time</p>
@@ -259,22 +259,22 @@ export default function TimeOfDayChips({ selected, onToggle, error }: Props) {
                 step={900}
                 value={customTimeValue}
                 onChange={(event) => setCustomTimeValue(event.target.value)}
-                className={`${stepStyles.input} mt-2 sm:mt-3 h-[48px] sm:h-[56px] w-full rounded-[14px] sm:rounded-[18px] border border-[#E0E7FF] bg-[#F8FAFF] px-3 sm:px-4 focus:border-[#1479FF] focus:ring-2 focus:ring-[#1479FF]/30 focus:outline-none`}
+                className={`${stepStyles.input} mt-2 h-[48px] w-full rounded-[14px] border border-[#E0E7FF] bg-[#F8FAFF] px-3 focus:border-[#1479FF] focus:ring-2 focus:ring-[#1479FF]/30 focus:outline-none sm:mt-3 sm:h-[56px] sm:rounded-[18px] sm:px-4`}
               />
             </div>
           </div>
-          <div className="mt-4 sm:mt-6 flex flex-col gap-2.5 sm:gap-3 md:flex-row">
+          <div className="mt-4 flex flex-col gap-2.5 sm:mt-6 sm:gap-3 md:flex-row">
             <button
               type="button"
               onClick={handleCustomSave}
-              className="flex-1 rounded-[14px] sm:rounded-[18px] bg-gradient-to-r from-[#1479FF] to-[#2DD4BF] px-3.5 py-2.5 sm:px-4 sm:py-3 text-center text-[14px] sm:text-[15px] font-semibold text-white shadow-[0_18px_35px_rgba(20,121,255,0.3)] transition hover:brightness-105"
+              className="flex-1 rounded-[14px] bg-gradient-to-r from-[#1479FF] to-[#2DD4BF] px-3.5 py-2.5 text-center text-[14px] font-semibold text-white shadow-[0_18px_35px_rgba(20,121,255,0.3)] transition hover:brightness-105 sm:rounded-[18px] sm:px-4 sm:py-3 sm:text-[15px]"
             >
               Apply custom time
             </button>
             <button
               type="button"
               onClick={() => setShowCustomPicker(false)}
-              className="flex-1 rounded-[14px] sm:rounded-[18px] border border-[#D1D5DB] px-3.5 py-2.5 sm:px-4 sm:py-3 text-center text-[14px] sm:text-[15px] font-semibold text-[#111827] transition hover:bg-[#F3F4F6]"
+              className="flex-1 rounded-[14px] border border-[#D1D5DB] px-3.5 py-2.5 text-center text-[14px] font-semibold text-[#111827] transition hover:bg-[#F3F4F6] sm:rounded-[18px] sm:px-4 sm:py-3 sm:text-[15px]"
             >
               Cancel
             </button>

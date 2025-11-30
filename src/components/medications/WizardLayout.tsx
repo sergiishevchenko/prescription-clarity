@@ -57,7 +57,11 @@ export function WizardLayout({
         {/* Back Button and Title Row */}
         <div className={styles.titleRow}>
           {onBack && (
-            <button type="button" onClick={onBack} className={styles.backButton}>
+            <button
+              type="button"
+              onClick={onBack}
+              className={styles.backButton}
+            >
               <svg
                 className={styles.backIcon}
                 viewBox="0 0 24 24"
