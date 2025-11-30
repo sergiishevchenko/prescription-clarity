@@ -23,7 +23,7 @@ export function WeeklyFrequencyStep({
     <section className={stepStyles.step}>
       <div className={stepStyles.surface}>
         {medicationSummary}
-        <div className="flex flex-col gap-3">
+        <div className="flex flex-col gap-2.5 sm:gap-3 mt-0 sm:mt-0">
           <label className="flex items-center text-base font-medium text-gray-900">
             Select Days of the Week
             <span className="ml-1 text-red-500">*</span>

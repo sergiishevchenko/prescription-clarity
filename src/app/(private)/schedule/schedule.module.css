@@ -801,6 +801,20 @@
   color: #94a3b8;
 }
 
+.dateInputWrapper {
+  position: relative;
+}
+
+.dateInput {
+  padding-right: 2.5rem;
+}
+
+@media (min-width: 640px) {
+  .dateInput {
+    padding-right: 3rem;
+  }
+}
+
 .input {
   width: 100%;
   border: 1px solid #dfe3eb;
@@ -1320,6 +1334,10 @@
   .input {
     padding: 0.45rem 0.75rem;
     font-size: 0.85rem;
+  }
+
+  .dateInput {
+    padding-right: 2.5rem;
   }
 
   .formSection {

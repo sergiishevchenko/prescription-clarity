@@ -1,0 +1,14 @@
+.dateInputWrapper {
+  position: relative;
+}
+
+.dateInput {
+  padding-right: 2.5rem;
+}
+
+@media (min-width: 640px) {
+  .dateInput {
+    padding-right: 3rem;
+  }
+}
+
