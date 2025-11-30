@@ -42,3 +42,10 @@
   display: flex;
   flex-direction: column;
 }
+
+/* Mobile: allow content to be natural height */
+@media (max-width: 768px) {
+  .mainContent {
+    min-height: auto;
+  }
+}

@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { FilterToggleButton } from "./FilterToggleButton";
 import { useFilterToggle } from "./FilterToggleWrapper";
+import { useWeekFilters } from "./WeekFilterContext";
 import styles from "./week.module.css";
 
 type CalendarIconProps = {
@@ -35,6 +36,8 @@ type HeaderButtonsProps = {
 
 export function HeaderButtons({ children }: HeaderButtonsProps) {
   const { isOpen, setIsOpen } = useFilterToggle();
+  const { statusFilter, mealTimingFilter } = useWeekFilters();
+  const hasActiveFilters = statusFilter !== "all" || mealTimingFilter !== "all";
 
   return (
     <div className={styles.headerButtons}>
@@ -47,7 +50,11 @@ export function HeaderButtons({ children }: HeaderButtonsProps) {
         <CalendarIcon className={styles.calendarIcon} />
         <span>Today</span>
       </Link>
-      <FilterToggleButton isOpen={isOpen} onToggle={() => setIsOpen(!isOpen)} />
+      <FilterToggleButton
+        isOpen={isOpen}
+        hasActiveFilters={hasActiveFilters}
+        onToggle={() => setIsOpen(!isOpen)}
+      />
     </div>
   );
 }
