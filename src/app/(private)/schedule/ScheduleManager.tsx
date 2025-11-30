@@ -605,7 +605,9 @@ function ScheduleEditDialog({
                   "Saving..."
                 ) : (
                   <>
-                    <span className={styles.saveButtonTextFull}>Save changes</span>
+                    <span className={styles.saveButtonTextFull}>
+                      Save changes
+                    </span>
                     <span className={styles.saveButtonTextMobile}>Save</span>
                   </>
                 )}

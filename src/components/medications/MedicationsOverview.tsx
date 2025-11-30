@@ -76,7 +76,8 @@ export default function MedicationsOverview({
         if (window.innerWidth <= 768) {
           searchInputRef.current.placeholder = "Search medications...";
         } else {
-          searchInputRef.current.placeholder = "Search medications by name, dosage, or form...";
+          searchInputRef.current.placeholder =
+            "Search medications by name, dosage, or form...";
         }
       }
     };
@@ -104,7 +105,9 @@ export default function MedicationsOverview({
                       className={styles.heroButtonIcon}
                       aria-hidden="true"
                     />
-                    <span className={styles.heroButtonTextFull}>Add Medication</span>
+                    <span className={styles.heroButtonTextFull}>
+                      Add Medication
+                    </span>
                     <span className={styles.heroButtonTextMobile}>Add</span>
                   </Link>
                 </div>
@@ -152,7 +155,9 @@ export default function MedicationsOverview({
                 className={styles.heroButtonIcon}
                 aria-hidden="true"
               />
-              <span className={styles.filtersButtonTextFull}>{filtersOpen ? "Hide filters" : "Filters"}</span>
+              <span className={styles.filtersButtonTextFull}>
+                {filtersOpen ? "Hide filters" : "Filters"}
+              </span>
             </button>
           </div>
           {filtersOpen && (
@@ -195,7 +200,6 @@ function FiltersPanel({
   hasFilters,
   onToggleDose,
   onClear,
-  onClose,
 }: FiltersPanelProps) {
   return (
     <div className={styles.filtersPanelInner}>

@@ -50,7 +50,8 @@ export function ScheduleShell({ initialSchedules }: ScheduleShellProps) {
         if (window.innerWidth <= 768) {
           searchInputRef.current.placeholder = "Search schedules...";
         } else {
-          searchInputRef.current.placeholder = "Search schedules by medication, dosage, or timing...";
+          searchInputRef.current.placeholder =
+            "Search schedules by medication, dosage, or timing...";
         }
       }
     };
@@ -87,7 +88,9 @@ export function ScheduleShell({ initialSchedules }: ScheduleShellProps) {
                       className={styles.heroButtonIcon}
                       aria-hidden="true"
                     />
-                    <span className={styles.heroButtonTextFull}>Add&nbsp;Schedule</span>
+                    <span className={styles.heroButtonTextFull}>
+                      Add&nbsp;Schedule
+                    </span>
                     <span className={styles.heroButtonTextMobile}>Add</span>
                   </Link>
                 </div>
@@ -128,14 +131,18 @@ export function ScheduleShell({ initialSchedules }: ScheduleShellProps) {
                 styles.heroSecondary,
                 styles.filtersToggleButton,
                 advancedFiltersActive && styles.filtersToggleActive,
-                filtersOpen && !advancedFiltersActive && styles.filtersToggleOpen,
+                filtersOpen &&
+                  !advancedFiltersActive &&
+                  styles.filtersToggleOpen,
               )}
             >
               <FilterIcon
                 className={styles.heroButtonIcon}
                 aria-hidden="true"
               />
-              <span className={styles.filtersButtonTextFull}>{filtersOpen ? "Hide filters" : "Filters"}</span>
+              <span className={styles.filtersButtonTextFull}>
+                {filtersOpen ? "Hide filters" : "Filters"}
+              </span>
             </button>
           </div>
           {filtersOpen ? (
