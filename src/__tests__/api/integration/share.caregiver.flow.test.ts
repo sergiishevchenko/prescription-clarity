@@ -8,6 +8,7 @@ import * as MedicationIdRoute from "@/app/api/medications/[id]/route";
 import { prismaMock } from "../../../../tests-setup/prisma.mock";
 import * as SessionModule from "@/lib/auth/session";
 import { renderPdfBuffer } from "@/lib/pdf/render";
+import { NextRequest } from "next/server";
 
 jest.mock("@/lib/pdf/render", () => ({
   __esModule: true,
@@ -20,15 +21,21 @@ jest.mock("@/lib/pdf/render", () => ({
   },
 }));
 
-type RequestOf<T> = Parameters<T>[0];
-type RequestWithParams<T> = Parameters<T>[1];
+type AnyHandler = (...args: unknown[]) => unknown;
+type RequestOf<T extends AnyHandler> = Parameters<T>[0];
+type RequestWithParams<T extends AnyHandler> = Parameters<T>[1];
 
-const makeJsonRequest = (url: string, method: string, body: object) =>
-  new Request(url, {
+const makeNextJsonRequest = (url: string, method: string, body: object) =>
+  new NextRequest(url, {
     method,
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(body),
   });
+
+const makeNextGetRequest = (url: string) => new NextRequest(url);
+
+const makeNextRequest = (url: string, method: string) =>
+  new NextRequest(url, { method });
 
 const owner = { id: "owner-1", email: "owner@example.com", name: "Owner" };
 const viewer = { id: "viewer-1", email: "viewer@example.com", name: "Viewer" };
@@ -63,7 +70,11 @@ describe("Integration flow: share → caregiver view → PDF → revoke", () => 
       updatedAt: new Date("2025-01-05T10:00:00Z"),
     });
 
-    const createRes = await ShareRoute.POST(makeJsonRequest("http://localhost/api/share", "POST", {}));
+    process.env.NEXT_PUBLIC_APP_URL = "http://localhost:3000";
+
+    const createRes = await ShareRoute.POST(
+      makeNextJsonRequest("http://localhost/api/share", "POST", {}),
+    );
     expect(createRes.status).toBe(201);
 
     // 2) Viewer checks link validity
@@ -76,7 +87,9 @@ describe("Integration flow: share → caregiver view → PDF → revoke", () => 
       owner,
     });
     const validateRes = await ShareValidateRoute.GET(
-      new Request(`http://localhost/api/share/validate?token=${token}`) as unknown as RequestOf<typeof ShareValidateRoute.GET>,
+      makeNextGetRequest(
+        `http://localhost/api/share/validate?token=${token}`,
+      ) as unknown as RequestOf<typeof ShareValidateRoute.GET>,
     );
     const validateBody = await validateRes.json();
     expect(validateRes.status).toBe(200);
@@ -109,7 +122,9 @@ describe("Integration flow: share → caregiver view → PDF → revoke", () => 
     });
 
     const acceptRes = await ShareAcceptRoute.POST(
-      makeJsonRequest("http://localhost/api/share/accept", "POST", { token }),
+      makeNextJsonRequest("http://localhost/api/share/accept", "POST", {
+        token,
+      }),
     );
     const acceptBody = await acceptRes.json();
     expect(acceptRes.status).toBe(201);
@@ -131,7 +146,9 @@ describe("Integration flow: share → caregiver view → PDF → revoke", () => 
       },
     ]);
     const statusRes = await ShareStatusRoute.GET(
-      new Request("http://localhost/api/share/status") as unknown as RequestOf<typeof ShareStatusRoute.GET>,
+      makeNextGetRequest(
+        "http://localhost/api/share/status",
+      ) as unknown as RequestOf<typeof ShareStatusRoute.GET>,
     );
     const statusBody = await statusRes.json();
     expect(statusRes.status).toBe(200);
@@ -169,7 +186,7 @@ describe("Integration flow: share → caregiver view → PDF → revoke", () => 
     );
 
     const pdfRes = await ExportPdfRoute.POST(
-      makeJsonRequest("http://localhost/api/export/pdf", "POST", {
+      makeNextJsonRequest("http://localhost/api/export/pdf", "POST", {
         userId: owner.id,
         from: "2025-01-06",
         to: "2025-01-07",
@@ -195,7 +212,7 @@ describe("Integration flow: share → caregiver view → PDF → revoke", () => 
       updatedAt: new Date("2025-01-05T11:00:00Z"),
     });
     const revokeRes = await ShareRevokeRoute.POST(
-      makeJsonRequest("http://localhost/api/share/revoke", "POST", {
+      makeNextJsonRequest("http://localhost/api/share/revoke", "POST", {
         token,
       }),
     );
@@ -211,7 +228,9 @@ describe("Integration flow: share → caregiver view → PDF → revoke", () => 
       owner,
     });
     const validateAfterRevoke = await ShareValidateRoute.GET(
-      new Request(`http://localhost/api/share/validate?token=${token}`) as unknown as RequestOf<typeof ShareValidateRoute.GET>,
+      makeNextGetRequest(
+        `http://localhost/api/share/validate?token=${token}`,
+      ) as unknown as RequestOf<typeof ShareValidateRoute.GET>,
     );
     const validateAfterBody = await validateAfterRevoke.json();
     expect(validateAfterRevoke.status).toBe(200);
@@ -228,9 +247,10 @@ describe("Integration flow: share → caregiver view → PDF → revoke", () => 
     sessionSpy.mockResolvedValueOnce(viewer);
     prismaMock.medication.findFirst.mockResolvedValueOnce(null);
 
-    const deleteReq = new Request("http://localhost/api/medications/med-1", {
-      method: "DELETE",
-    });
+    const deleteReq = makeNextRequest(
+      "http://localhost/api/medications/med-1",
+      "DELETE",
+    );
     const deleteRes = await MedicationIdRoute.DELETE(deleteReq as unknown as RequestOf<typeof MedicationIdRoute.DELETE>, {
       params: Promise.resolve({ id: "med-1" }),
     } as unknown as RequestWithParams<typeof MedicationIdRoute.DELETE>);

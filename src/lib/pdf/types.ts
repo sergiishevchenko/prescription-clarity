@@ -31,8 +31,6 @@ export interface ScheduleEntryPrintable {
   form: string;
 }
 
-const DEFAULT_UNITS = "unit";
-
 export function toPrintableEntries(
   entries: ScheduleEntryWithRelations[],
 ): ScheduleEntryPrintable[] {

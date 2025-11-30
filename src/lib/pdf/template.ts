@@ -74,7 +74,7 @@ export function buildScheduleHtml(options: BuildScheduleHtmlOptions): string {
           ${buildQrPlaceholder()}
         </div>
       </div>
-      ${weeks.map((week, weekIndex) => buildWeekTable(week, weekIndex === 0)).join("")}
+      ${weeks.map((week) => buildWeekTable(week)).join("")}
       ${buildLegend()}
       <div class="print-footer">
         Generated ${escapeHtml(generatedLabel)} • Prescription Clarity
@@ -84,7 +84,7 @@ export function buildScheduleHtml(options: BuildScheduleHtmlOptions): string {
 </html>`;
 }
 
-function buildWeekTable(week: PrintableWeek, isFirst: boolean): string {
+function buildWeekTable(week: PrintableWeek): string {
   return `<div class="print-table-wrapper">
     <table class="print-table">
       <thead>
