@@ -31,8 +31,20 @@ const createConfig = async () => {
     collectCoverageFrom: ["src/lib/**/*.{ts,tsx}", "!src/lib/auth/cookies.ts"],
   })();
 
+  const component = await createJestConfig({
+    ...base,
+    displayName: "component",
+    testEnvironment: "jsdom",
+    setupFilesAfterEnv: ["<rootDir>/jest.setup.component.ts"],
+    testMatch: ["<rootDir>/src/__tests__/components/**/*.test.ts?(x)"],
+    collectCoverageFrom: [
+      "src/components/**/*.{ts,tsx}",
+      "!src/components/**/index.{ts,tsx}",
+    ],
+  })();
+
   return {
-    projects: [api, unit],
+    projects: [api, unit, component],
     coverageThreshold: {
       global: { branches: 70, functions: 70, lines: 70, statements: 70 },
     },

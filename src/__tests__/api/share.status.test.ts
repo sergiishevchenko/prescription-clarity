@@ -17,7 +17,12 @@ const mockUser = {
 };
 
 beforeEach(() => {
+  jest.useFakeTimers().setSystemTime(new Date("2025-11-26T12:00:00Z"));
   jest.clearAllMocks();
+});
+
+afterEach(() => {
+  jest.useRealTimers();
 });
 
 describe("GET /api/share/status", () => {
@@ -82,7 +87,6 @@ describe("GET /api/share/status", () => {
     expect(prismaMock.shareLink.findMany).toHaveBeenCalledWith({
       where: {
         ownerId: mockUser.id,
-        status: "active",
       },
       select: expect.any(Object),
       orderBy: {
@@ -121,7 +125,6 @@ describe("GET /api/share/status", () => {
     expect(prismaMock.shareLink.findMany).toHaveBeenCalledWith({
       where: {
         ownerId: mockUser.id,
-        status: "revoked",
       },
       select: expect.any(Object),
       orderBy: {
