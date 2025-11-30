@@ -36,11 +36,17 @@ function isVercelEnvironment(): boolean {
   );
 }
 
+interface ChromiumModule {
+  executablePath: () => Promise<string>;
+  args: string[];
+}
+
 async function getChromiumConfig() {
   if (isVercelEnvironment()) {
     try {
       const chromiumModule = await import("@sparticuz/chromium");
-      const chromium = (chromiumModule.default || chromiumModule) as any;
+      const chromium = (chromiumModule.default ||
+        chromiumModule) as unknown as ChromiumModule;
       const executablePath = await chromium.executablePath();
       const baseArgs = chromium.args || [];
       return {
