@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useMemo, useState, useEffect, useRef } from "react";
 import Link from "next/link";
 import clsx from "clsx";
 import {
@@ -42,39 +42,60 @@ export function ScheduleShell({ initialSchedules }: ScheduleShellProps) {
     setSortDirection("asc");
   };
 
+  const searchInputRef = useRef<HTMLInputElement>(null);
+
+  useEffect(() => {
+    const updatePlaceholder = () => {
+      if (searchInputRef.current) {
+        if (window.innerWidth <= 768) {
+          searchInputRef.current.placeholder = "Search schedules...";
+        } else {
+          searchInputRef.current.placeholder = "Search schedules by medication, dosage, or timing...";
+        }
+      }
+    };
+
+    updatePlaceholder();
+    window.addEventListener("resize", updatePlaceholder);
+    return () => window.removeEventListener("resize", updatePlaceholder);
+  }, []);
+
   return (
     <>
       <header className={styles.hero}>
         <div className={styles.heroInner}>
           <div className={styles.heroTop}>
-            <div>
-              <h1>Schedule</h1>
+            <div className={styles.heroTopLeft}>
+              <div className={styles.heroTopRow}>
+                <h1>Schedule</h1>
+                <div className={styles.heroActions}>
+                  {/* <button
+                    type="button"
+                    className={clsx(styles.heroButton, styles.heroSecondary)}
+                  >
+                    <DownloadIcon
+                      className={styles.heroButtonIcon}
+                      aria-hidden="true"
+                    />
+                    <span>Export</span>
+                  </button> */}
+                  <Link
+                    href="/medications/new"
+                    className={clsx(styles.heroButton, styles.heroPrimary)}
+                  >
+                    <PlusIcon
+                      className={styles.heroButtonIcon}
+                      aria-hidden="true"
+                    />
+                    <span className={styles.heroButtonTextFull}>Add&nbsp;Schedule</span>
+                    <span className={styles.heroButtonTextMobile}>Add</span>
+                  </Link>
+                </div>
+              </div>
               <p>
                 Manage recurring reminders, edit dose timing, and regenerate
                 plans.
               </p>
-            </div>
-            <div className={styles.heroActions}>
-              {/* <button
-                type="button"
-                className={clsx(styles.heroButton, styles.heroSecondary)}
-              >
-                <DownloadIcon
-                  className={styles.heroButtonIcon}
-                  aria-hidden="true"
-                />
-                <span>Export</span>
-              </button> */}
-              <Link
-                href="/medications/new"
-                className={clsx(styles.heroButton, styles.heroPrimary)}
-              >
-                <PlusIcon
-                  className={styles.heroButtonIcon}
-                  aria-hidden="true"
-                />
-                <span>Add&nbsp;Schedule</span>
-              </Link>
             </div>
           </div>
           <div className={styles.searchRow}>
@@ -87,6 +108,7 @@ export function ScheduleShell({ initialSchedules }: ScheduleShellProps) {
                   />
                 </span>
                 <input
+                  ref={searchInputRef}
                   type="search"
                   value={searchQuery}
                   onChange={(event) => setSearchQuery(event.target.value)}
@@ -105,35 +127,33 @@ export function ScheduleShell({ initialSchedules }: ScheduleShellProps) {
                 styles.heroButton,
                 styles.heroSecondary,
                 styles.filtersToggleButton,
-                filtersOpen && styles.filtersToggleActive,
+                advancedFiltersActive && styles.filtersToggleActive,
+                filtersOpen && !advancedFiltersActive && styles.filtersToggleOpen,
               )}
             >
               <FilterIcon
                 className={styles.heroButtonIcon}
                 aria-hidden="true"
               />
-              <span>{filtersOpen ? "Hide filters" : "Filters"}</span>
-              {advancedFiltersActive ? (
-                <span className={styles.filtersBadge}>Applied</span>
-              ) : null}
+              <span className={styles.filtersButtonTextFull}>{filtersOpen ? "Hide filters" : "Filters"}</span>
             </button>
           </div>
           {filtersOpen ? (
             <div className={styles.filtersPanel}>
               <div className={styles.filtersHeader}>
-                <div>
+                <div className={styles.filtersHeaderRow}>
                   <p className={styles.filtersTitle}>Advanced filters</p>
-                  <p className={styles.filtersSubtitle}>
-                    Narrow down by status, meal timing, and schedule order.
-                  </p>
+                  <button
+                    type="button"
+                    className={styles.filtersResetButton}
+                    onClick={resetFilters}
+                  >
+                    Reset
+                  </button>
                 </div>
-                <button
-                  type="button"
-                  className={styles.filtersResetButton}
-                  onClick={resetFilters}
-                >
-                  Reset
-                </button>
+                <p className={styles.filtersSubtitle}>
+                  Narrow down by status, meal timing, and schedule order.
+                </p>
               </div>
               <div className={styles.filtersGrid}>
                 <label className={styles.filtersLabel}>
@@ -292,14 +312,12 @@ function FilterIcon({ className }: IconProps) {
       viewBox="0 0 24 24"
       fill="none"
       stroke="currentColor"
-      strokeWidth={2.2}
+      strokeWidth={2}
       strokeLinecap="round"
       strokeLinejoin="round"
       aria-hidden="true"
     >
-      <path d="M4 4h16" />
-      <path d="M7 12h10" />
-      <path d="M10 20h4" />
+      <polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3" />
     </svg>
   );
 }

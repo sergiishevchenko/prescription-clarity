@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useMemo, useState, useEffect, useRef } from "react";
 import Link from "next/link";
 import clsx from "clsx";
 
@@ -68,31 +68,51 @@ export default function MedicationsOverview({
   };
 
   const [filtersOpen, setFiltersOpen] = useState(false);
+  const searchInputRef = useRef<HTMLInputElement>(null);
+
+  useEffect(() => {
+    const updatePlaceholder = () => {
+      if (searchInputRef.current) {
+        if (window.innerWidth <= 768) {
+          searchInputRef.current.placeholder = "Search medications...";
+        } else {
+          searchInputRef.current.placeholder = "Search medications by name, dosage, or form...";
+        }
+      }
+    };
+
+    updatePlaceholder();
+    window.addEventListener("resize", updatePlaceholder);
+    return () => window.removeEventListener("resize", updatePlaceholder);
+  }, []);
 
   return (
     <>
       <header className={styles.hero}>
         <div className={styles.heroInner}>
           <div className={styles.heroTop}>
-            <div>
-              <h1>Medications</h1>
+            <div className={styles.heroTopLeft}>
+              <div className={styles.heroTopRow}>
+                <h1>Medications</h1>
+                <div className={styles.heroActions}>
+                  {/* <ExportMenu medications={filteredMedications} /> */}
+                  <Link
+                    href="/medications/new"
+                    className={clsx(styles.heroButton, styles.heroPrimary)}
+                  >
+                    <PlusIcon
+                      className={styles.heroButtonIcon}
+                      aria-hidden="true"
+                    />
+                    <span className={styles.heroButtonTextFull}>Add Medication</span>
+                    <span className={styles.heroButtonTextMobile}>Add</span>
+                  </Link>
+                </div>
+              </div>
               <p>
                 View and manage all your medications. Add new ones or edit
                 existing entries.
               </p>
-            </div>
-            <div className={styles.heroActions}>
-              {/* <ExportMenu medications={filteredMedications} /> */}
-              <Link
-                href="/medications/new"
-                className={clsx(styles.heroButton, styles.heroPrimary)}
-              >
-                <PlusIcon
-                  className={styles.heroButtonIcon}
-                  aria-hidden="true"
-                />
-                <span>Add Medication</span>
-              </Link>
             </div>
           </div>
           <div className={styles.searchRow}>
@@ -105,6 +125,7 @@ export default function MedicationsOverview({
                   />
                 </span>
                 <input
+                  ref={searchInputRef}
                   type="search"
                   value={search}
                   onChange={(e) => setSearch(e.target.value)}
@@ -123,17 +144,15 @@ export default function MedicationsOverview({
                 styles.heroButton,
                 styles.heroSecondary,
                 styles.filtersToggleButton,
-                filtersOpen && styles.filtersToggleActive,
+                activeFilterCount > 0 && styles.filtersToggleActive,
+                filtersOpen && !activeFilterCount && styles.filtersToggleOpen,
               )}
             >
               <FilterIcon
                 className={styles.heroButtonIcon}
                 aria-hidden="true"
               />
-              <span>{filtersOpen ? "Hide filters" : "Filters"}</span>
-              {activeFilterCount > 0 && (
-                <span className={styles.filtersBadge}>{activeFilterCount}</span>
-              )}
+              <span className={styles.filtersButtonTextFull}>{filtersOpen ? "Hide filters" : "Filters"}</span>
             </button>
           </div>
           {filtersOpen && (
@@ -180,6 +199,21 @@ function FiltersPanel({
 }: FiltersPanelProps) {
   return (
     <div className={styles.filtersPanelInner}>
+      <div className={styles.filtersHeader}>
+        <div className={styles.filtersHeaderRow}>
+          <p className={styles.filtersTitle}>Filters</p>
+          <button
+            type="button"
+            className={styles.filtersResetButton}
+            onClick={onClear}
+          >
+            Reset
+          </button>
+        </div>
+        <p className={styles.filtersSubtitle}>
+          Filter medications by specific criteria.
+        </p>
+      </div>
       <label className={styles.filtersPanelLabel}>
         <input
           type="checkbox"
@@ -189,28 +223,6 @@ function FiltersPanel({
         />
         <span>Only medications with dosage</span>
       </label>
-      <div className={styles.filtersPanelActions}>
-        <button
-          type="button"
-          onClick={onClear}
-          className={clsx(
-            styles.filtersPanelActionButton,
-            styles.filtersPanelClearButton,
-          )}
-        >
-          Clear
-        </button>
-        <button
-          type="button"
-          onClick={onClose}
-          className={clsx(
-            styles.filtersPanelActionButton,
-            styles.filtersPanelCloseButton,
-          )}
-        >
-          Close
-        </button>
-      </div>
     </div>
   );
 }
@@ -486,14 +498,12 @@ function FilterIcon({ className }: IconProps) {
       viewBox="0 0 24 24"
       fill="none"
       stroke="currentColor"
-      strokeWidth={2.2}
+      strokeWidth={2}
       strokeLinecap="round"
       strokeLinejoin="round"
       aria-hidden="true"
     >
-      <path d="M4 4h16" />
-      <path d="M7 12h10" />
-      <path d="M10 20h4" />
+      <polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3" />
     </svg>
   );
 }

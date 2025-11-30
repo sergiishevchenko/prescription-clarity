@@ -601,7 +601,14 @@ function ScheduleEditDialog({
                 disabled={submitting || deleting || isPending}
                 className={styles.dialogSaveButton}
               >
-                {submitting || isPending ? "Saving..." : "Save changes"}
+                {submitting || isPending ? (
+                  "Saving..."
+                ) : (
+                  <>
+                    <span className={styles.saveButtonTextFull}>Save changes</span>
+                    <span className={styles.saveButtonTextMobile}>Save</span>
+                  </>
+                )}
               </button>
             </div>
           </div>
