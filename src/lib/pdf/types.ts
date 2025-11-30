@@ -25,7 +25,7 @@ export type ScheduleEntryWithRelations = {
 
 export interface ScheduleEntryPrintable {
   dateUtc: Date;
-  mealTiming: MealTiming;
+  mealTiming: MealTiming | null;
   medicationName: string;
   dose: string;
   form: string;
@@ -49,7 +49,14 @@ export function toPrintableEntries(
         ? `${entry.medication.dose}mg`
         : "";
 
-    const form = entry.medication?.form || entry.schedule?.units || "";
+    let form = "";
+    if (
+      entry.schedule?.quantity !== undefined &&
+      entry.schedule?.quantity !== null &&
+      entry.schedule?.units
+    ) {
+      form = `${entry.schedule.quantity} ${entry.schedule.units}`;
+    }
 
     const medicationName = entry.medication?.name
       ? entry.medication.name
@@ -67,9 +74,14 @@ export function toPrintableEntries(
   });
 }
 
-function normalizeMealTiming(value: string | null | undefined): MealTiming {
+function normalizeMealTiming(
+  value: string | null | undefined,
+): MealTiming | null {
   if (value === "before" || value === "with" || value === "after") {
     return value;
+  }
+  if (!value || value.trim() === "") {
+    return null;
   }
   return "anytime";
 }

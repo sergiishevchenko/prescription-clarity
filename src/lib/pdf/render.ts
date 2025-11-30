@@ -1,4 +1,5 @@
 import puppeteer from "puppeteer";
+import puppeteerCore from "puppeteer-core";
 
 const DEFAULT_TIMEOUT_MS = 20000;
 const DEFAULT_PDF_OPTIONS = {
@@ -27,22 +28,87 @@ export class PdfTimeoutError extends Error {
   }
 }
 
+function isVercelEnvironment(): boolean {
+  return !!(
+    process.env.VERCEL ||
+    process.env.AWS_LAMBDA_FUNCTION_NAME ||
+    process.env.VERCEL_ENV
+  );
+}
+
+async function getChromiumConfig() {
+  if (isVercelEnvironment()) {
+    try {
+      const chromium = await import("@sparticuz/chromium");
+      // @ts-expect-error - setGraphicsMode exists at runtime but not in types
+      chromium.setGraphicsMode(false);
+      // @ts-expect-error - executablePath exists at runtime but not in types
+      const executablePath = await chromium.executablePath();
+      // @ts-expect-error - args property exists at runtime but not in types
+      const args = chromium.args || [];
+      return {
+        executablePath,
+        args: [
+          ...args,
+          "--no-sandbox",
+          "--disable-setuid-sandbox",
+          "--disable-dev-shm-usage",
+          "--disable-accelerated-2d-canvas",
+          "--disable-gpu",
+          "--single-process",
+          "--disable-software-rasterizer",
+        ],
+      };
+    } catch (error) {
+      console.error("Failed to load @sparticuz/chromium:", error);
+      throw new Error(
+        "Failed to initialize Chromium for PDF generation on Vercel",
+      );
+    }
+  }
+  return {
+    executablePath: process.env.PUPPETEER_EXECUTABLE_PATH || undefined,
+    args:
+      process.env.CHROMIUM_ARGS?.split(" ").filter(Boolean) ??
+      DEFAULT_LAUNCH_ARGS,
+  };
+}
+
 export async function renderPdfBuffer(
   html: string,
   options?: { timeoutMs?: number },
 ): Promise<Buffer> {
   const timeoutMs = options?.timeoutMs ?? DEFAULT_TIMEOUT_MS;
-  const launchArgs =
-    process.env.CHROMIUM_ARGS?.split(" ").filter(Boolean) ??
-    DEFAULT_LAUNCH_ARGS;
+  const isVercel = isVercelEnvironment();
+  const chromiumConfig = await getChromiumConfig();
 
-  const executablePath = process.env.PUPPETEER_EXECUTABLE_PATH || undefined;
+  let browser;
+  if (isVercel) {
+    if (!chromiumConfig.executablePath) {
+      throw new Error(
+        "Chromium executable path is required on Vercel. @sparticuz/chromium may not be installed.",
+      );
+    }
+    browser = await puppeteerCore.launch({
+      headless: true,
+      executablePath: chromiumConfig.executablePath,
+      args: chromiumConfig.args,
+    });
+  } else {
+    const launchOptions: {
+      headless: boolean;
+      executablePath?: string;
+      args: string[];
+    } = {
+      headless: true,
+      args: chromiumConfig.args,
+    };
+    if (chromiumConfig.executablePath) {
+      launchOptions.executablePath = chromiumConfig.executablePath;
+    }
+    browser = await puppeteer.launch(launchOptions);
+  }
 
-  const browser = await puppeteer.launch({
-    headless: true,
-    executablePath,
-    args: launchArgs,
-  });
   const page = await browser.newPage();
 
   try {

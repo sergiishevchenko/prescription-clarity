@@ -158,15 +158,18 @@ body {
 }
 
 .meal-symbol.before {
-  background: #fff;
+  background: #fff !important;
+  border: 2px solid #000;
 }
 
 .meal-symbol.with {
-  background: linear-gradient(90deg, #000 0%, #000 50%, #fff 50%, #fff 100%);
+  background: linear-gradient(90deg, #000 0%, #000 50%, #fff 50%, #fff 100%) !important;
+  border: 2px solid #000;
 }
 
 .meal-symbol.after {
-  background: #000;
+  background: #000 !important;
+  border: 2px solid #000;
 }
 
 .meal-symbol.anytime {
@@ -193,7 +196,14 @@ body {
   display: block;
 }
 
-.med-details {
+.med-dose {
+  font-size: 9pt;
+  color: #333;
+  display: block;
+  margin-top: 0.5mm;
+}
+
+.med-quantity {
   font-size: 9pt;
   color: #333;
   display: block;
@@ -211,6 +221,7 @@ body {
   margin-top: 1mm;
   display: flex;
   align-items: center;
+  justify-content: flex-start;
   gap: 2mm;
 }
 
