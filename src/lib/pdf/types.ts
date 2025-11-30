@@ -76,7 +76,9 @@ export function toPrintableEntries(
   });
 }
 
-function normalizeMealTiming(value: string | null | undefined): MealTiming | null {
+function normalizeMealTiming(
+  value: string | null | undefined,
+): MealTiming | null {
   if (value === "before" || value === "with" || value === "after") {
     return value;
   }
