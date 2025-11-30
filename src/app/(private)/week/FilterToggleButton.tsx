@@ -1,10 +1,12 @@
 "use client";
 
 //import { useState } from "react";
+import clsx from "clsx";
 import styles from "./week.module.css";
 
 type FilterToggleButtonProps = {
   isOpen: boolean;
+  hasActiveFilters: boolean;
   onToggle: () => void;
 };
 
@@ -27,12 +29,17 @@ function FilterIcon({ className }: { className?: string }) {
 
 export function FilterToggleButton({
   isOpen,
+  hasActiveFilters,
   onToggle,
 }: FilterToggleButtonProps) {
   return (
     <button
       type="button"
-      className={styles.filterToggleButton}
+      className={clsx(
+        styles.filterToggleButton,
+        hasActiveFilters && styles.filterToggleActive,
+        isOpen && !hasActiveFilters && styles.filterToggleOpen,
+      )}
       aria-label={isOpen ? "Hide filters" : "Show filters"}
       aria-expanded={isOpen}
       onClick={onToggle}

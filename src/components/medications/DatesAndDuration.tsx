@@ -6,6 +6,7 @@ import { useFormContext, useWatch } from "react-hook-form";
 import { HelpTooltip } from "@/components/shared/HelpTooltip";
 import { Input } from "@/components/ui/Input";
 import type { FormValues } from "@/lib/medicationTypes";
+import styles from "./DatesAndDuration.module.css";
 
 const DURATION_UNITS = [
   { value: "days", label: "Days", multiplier: 1 },
@@ -184,7 +185,7 @@ export default function DatesAndDuration() {
   const durationError = errors.durationDays?.message as string | undefined;
 
   return (
-    <div className="space-y-6">
+    <div className="mt-0 space-y-4 sm:mt-0 sm:space-y-6">
       {/* durationDays у формі як hidden field */}
       <input
         type="number"
@@ -198,9 +199,9 @@ export default function DatesAndDuration() {
       {/* ongoing у формі як hidden checkbox */}
       <input type="checkbox" className="hidden" {...register("ongoing")} />
 
-      <div className="rounded-[28px] border border-[#E0E7FF] bg-white px-6 py-6 shadow-[0_24px_60px_rgba(15,23,42,0.08)]">
-        <div className="flex flex-col gap-1">
-          <div className="flex items-center gap-2 text-[18px] font-semibold text-[#111827]">
+      <div className="rounded-[20px] border border-[#E0E7FF] bg-white px-4 py-4 shadow-[0_24px_60px_rgba(15,23,42,0.08)] sm:rounded-[28px] sm:px-6 sm:py-6">
+        <div className="flex flex-col gap-0.5 sm:gap-1">
+          <div className="flex items-center gap-2 text-sm font-semibold text-[#111827] sm:text-[18px]">
             Treatment Duration
             <HelpTooltip placement="bottom">
               <div className="space-y-2">
@@ -215,7 +216,7 @@ export default function DatesAndDuration() {
               </div>
             </HelpTooltip>
           </div>
-          <p className="text-sm text-[#6B7280]">
+          <p className="text-xs text-[#6B7280] sm:text-sm">
             How long will you take this medication?
           </p>
         </div>
@@ -223,14 +224,14 @@ export default function DatesAndDuration() {
         <button
           type="button"
           onClick={toggleOngoing}
-          className={`mt-5 flex items-center gap-3 rounded-2xl border-2 px-4 py-3 text-left transition ${
+          className={`mt-3 flex w-full items-start gap-2.5 rounded-xl border-2 px-3.5 py-2.5 text-left transition sm:mt-5 sm:w-auto sm:gap-3 sm:rounded-2xl sm:px-4 sm:py-3 ${
             ongoing
               ? "border-[#111827] bg-[#111827] text-white"
               : "border-[#D1D5DB] bg-white text-[#111827] hover:border-[#93C5FD]"
           }`}
         >
           <span
-            className={`inline-flex h-5 w-5 items-center justify-center rounded-md border ${
+            className={`mt-0.5 inline-flex h-6 w-6 flex-shrink-0 items-center justify-center rounded border-2 sm:h-7 sm:w-7 ${
               ongoing ? "border-white bg-white/20" : "border-[#9CA3AF] bg-white"
             }`}
           >
@@ -239,21 +240,23 @@ export default function DatesAndDuration() {
                 viewBox="0 0 20 20"
                 fill="none"
                 stroke="currentColor"
-                strokeWidth="2"
-                className="h-3 w-3"
+                strokeWidth="2.5"
+                className="h-4 w-4 sm:h-5 sm:w-5"
               >
                 <path d="M5 10.5 8.5 14 15 6" strokeLinecap="round" />
               </svg>
             )}
           </span>
-          <span className="text-sm font-semibold">
-            Ongoing (lifetime medication)
+          <span className="text-xs font-semibold sm:text-sm">
+            Ongoing
+            <br />
+            (lifetime medication)
           </span>
         </button>
 
-        <div className="mt-5 grid gap-4 md:grid-cols-[2fr_1fr]">
+        <div className="mt-3 grid gap-3 sm:mt-5 sm:gap-4 md:grid-cols-[2fr_1fr]">
           <div className="flex flex-col">
-            <label className="text-sm font-semibold text-[#111827]">
+            <label className="text-xs font-semibold text-[#111827] sm:text-sm">
               Duration
             </label>
             <input
@@ -264,11 +267,11 @@ export default function DatesAndDuration() {
                 handleValueChange(Number(event.target.value))
               }
               disabled={ongoing}
-              className="mt-2 h-[56px] rounded-2xl border-2 border-[#E0E7FF] px-4 text-lg font-semibold text-[#0F172A] transition outline-none focus:border-[#2563EB] focus:ring-2 focus:ring-[#93C5FD] disabled:cursor-not-allowed disabled:opacity-50"
+              className="mt-2 h-[48px] rounded-xl border-2 border-[#E0E7FF] px-3 text-sm font-semibold text-[#0F172A] transition outline-none focus:border-[#2563EB] focus:ring-2 focus:ring-[#93C5FD] disabled:cursor-not-allowed disabled:opacity-50 sm:h-[56px] sm:rounded-2xl sm:px-4 sm:text-lg"
             />
           </div>
           <div className="flex flex-col">
-            <label className="text-sm font-semibold text-[#111827]">
+            <label className="text-xs font-semibold text-[#111827] sm:text-sm">
               Units
             </label>
             <select
@@ -277,7 +280,7 @@ export default function DatesAndDuration() {
                 handleUnitChange(event.target.value as DurationUnit)
               }
               disabled={ongoing}
-              className="mt-2 h-[56px] rounded-2xl border-2 border-[#E0E7FF] bg-white px-4 text-base font-medium text-[#0F172A] transition outline-none focus:border-[#2563EB] focus:ring-2 focus:ring-[#93C5FD] disabled:cursor-not-allowed disabled:opacity-50"
+              className="mt-2 h-[48px] rounded-xl border-2 border-[#E0E7FF] bg-white px-3 text-sm font-medium text-[#0F172A] transition outline-none focus:border-[#2563EB] focus:ring-2 focus:ring-[#93C5FD] disabled:cursor-not-allowed disabled:opacity-50 sm:h-[56px] sm:rounded-2xl sm:px-4 sm:text-base"
             >
               {DURATION_UNITS.map((option) => (
                 <option key={option.value} value={option.value}>
@@ -288,14 +291,16 @@ export default function DatesAndDuration() {
           </div>
         </div>
         {durationError && (
-          <p className="mt-2 text-sm text-[#DC2626]">{durationError}</p>
+          <p className="mt-2 text-xs text-[#DC2626] sm:text-sm">
+            {durationError}
+          </p>
         )}
 
-        <div className="mt-6">
-          <p className="text-sm font-semibold text-[#111827]">
+        <div className="mt-4 sm:mt-6">
+          <p className="text-xs font-semibold text-[#111827] sm:text-sm">
             Quick presets (optional)
           </p>
-          <div className="mt-3 grid grid-cols-2 gap-3 sm:grid-cols-3">
+          <div className="mt-2.5 grid grid-cols-2 gap-2.5 sm:mt-3 sm:grid-cols-3 sm:gap-3">
             {DURATION_PRESETS.map((preset) => {
               const isActive =
                 !ongoing && Number(durationDays) === preset.value;
@@ -305,7 +310,7 @@ export default function DatesAndDuration() {
                   type="button"
                   disabled={ongoing}
                   onClick={() => handlePreset(preset.value)}
-                  className={`rounded-2xl border px-4 py-2 text-sm font-semibold transition ${
+                  className={`rounded-xl border px-3 py-1.5 text-xs font-semibold transition sm:rounded-2xl sm:px-4 sm:py-2 sm:text-sm ${
                     isActive
                       ? "border-[#2563EB] bg-[#EFF6FF] text-[#1E3A8A]"
                       : "border-[#E2E8F0] text-[#1F2A44] hover:border-[#BFDBFE] hover:bg-[#F8FBFF] disabled:cursor-not-allowed disabled:opacity-50"
@@ -319,42 +324,52 @@ export default function DatesAndDuration() {
         </div>
       </div>
 
-      <div className="rounded-[24px] border border-[#E5E7EB] bg-white px-6 py-6 shadow-sm">
-        <p className="text-base font-semibold text-[#111827]">Schedule dates</p>
-        <p className="text-sm text-[#6B7280]">
+      <div className="rounded-[20px] border border-[#E5E7EB] bg-white px-4 py-4 shadow-sm sm:rounded-[24px] sm:px-6 sm:py-6">
+        <p className="text-sm font-semibold text-[#111827] sm:text-base">
+          Schedule dates
+        </p>
+        <p className="text-xs text-[#6B7280] sm:text-sm">
           Adjust start and end dates if your plan changes.
         </p>
-        <div className="mt-4 grid gap-4 md:grid-cols-2">
+        <div className="mt-3 grid gap-3 sm:mt-4 sm:gap-4 md:grid-cols-2">
           <div>
-            <label className="text-sm font-semibold text-[#111827]">
+            <label className="text-xs font-semibold text-[#111827] sm:text-sm">
               Start date
             </label>
-            <Input
-              type="date"
-              className="mt-2 h-[52px] rounded-2xl border-2 border-[#E0E7FF] px-4 text-base"
-              {...register("startDate", { required: "Start date is required" })}
-            />
+            <div className={`${styles.dateInputWrapper} relative mt-2`}>
+              <Input
+                type="date"
+                className={`${styles.dateInput} h-[48px] w-full rounded-xl border-2 border-[#E0E7FF] pl-3 text-sm sm:h-[52px] sm:rounded-2xl sm:pl-4 sm:text-base`}
+                {...register("startDate", {
+                  required: "Start date is required",
+                })}
+              />
+            </div>
             {startError && (
-              <p className="mt-1 text-sm text-[#DC2626]">{startError}</p>
+              <p className="mt-1 text-xs text-[#DC2626] sm:text-sm">
+                {startError}
+              </p>
             )}
           </div>
           <div>
-            <label className="text-sm font-semibold text-[#111827]">
+            <label className="text-xs font-semibold text-[#111827] sm:text-sm">
               End date
             </label>
-            <Input
-              type="date"
-              disabled={ongoing}
-              className="mt-2 h-[52px] rounded-2xl border-2 border-[#E0E7FF] px-4 text-base disabled:cursor-not-allowed disabled:opacity-50"
-              {...register("endDate", {
-                validate: (value) => {
-                  if (!ongoing && !value) {
-                    return "End date is required";
-                  }
-                  return true;
-                },
-              })}
-            />
+            <div className={`${styles.dateInputWrapper} relative mt-2`}>
+              <Input
+                type="date"
+                disabled={ongoing}
+                className={`${styles.dateInput} h-[48px] w-full rounded-xl border-2 border-[#E0E7FF] pl-3 text-sm disabled:cursor-not-allowed disabled:opacity-50 sm:h-[52px] sm:rounded-2xl sm:pl-4 sm:text-base`}
+                {...register("endDate", {
+                  validate: (value) => {
+                    if (!ongoing && !value) {
+                      return "End date is required";
+                    }
+                    return true;
+                  },
+                })}
+              />
+            </div>
             {!ongoing && (
               <p className="mt-1 text-xs text-[#6B7280]">
                 End date is calculated automatically from start date and
@@ -362,13 +377,17 @@ export default function DatesAndDuration() {
               </p>
             )}
             {!ongoing && endError && (
-              <p className="mt-1 text-sm text-[#DC2626]">{endError}</p>
+              <p className="mt-1 text-xs text-[#DC2626] sm:text-sm">
+                {endError}
+              </p>
             )}
           </div>
         </div>
         {!ongoing && startDate && endDate && (
-          <p className="mt-4 rounded-2xl bg-[#F9FAFB] px-4 py-3 text-sm text-[#1F2937]">
-            Schedule: <strong>{formatDateDisplay(String(startDate))}</strong> →{" "}
+          <p className="mt-3 rounded-xl bg-[#F9FAFB] px-3 py-2.5 text-xs text-[#1F2937] sm:mt-4 sm:rounded-2xl sm:px-4 sm:py-3 sm:text-sm">
+            Schedule:
+            <br />
+            <strong>{formatDateDisplay(String(startDate))}</strong> →{" "}
             <strong>{formatDateDisplay(String(endDate))}</strong>
           </p>
         )}

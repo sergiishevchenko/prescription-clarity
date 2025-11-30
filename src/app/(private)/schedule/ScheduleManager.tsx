@@ -460,12 +460,14 @@ function ScheduleEditDialog({
               </label>
               <label className={styles.formLabel}>
                 Start Date
-                <input
-                  type="date"
-                  value={dateStart}
-                  onChange={(event) => setDateStart(event.target.value)}
-                  className={styles.input}
-                />
+                <div className={styles.dateInputWrapper}>
+                  <input
+                    type="date"
+                    value={dateStart}
+                    onChange={(event) => setDateStart(event.target.value)}
+                    className={`${styles.input} ${styles.dateInput}`}
+                  />
+                </div>
               </label>
               <label className={styles.formLabel}>
                 Duration (days)
@@ -601,7 +603,16 @@ function ScheduleEditDialog({
                 disabled={submitting || deleting || isPending}
                 className={styles.dialogSaveButton}
               >
-                {submitting || isPending ? "Saving..." : "Save changes"}
+                {submitting || isPending ? (
+                  "Saving..."
+                ) : (
+                  <>
+                    <span className={styles.saveButtonTextFull}>
+                      Save changes
+                    </span>
+                    <span className={styles.saveButtonTextMobile}>Save</span>
+                  </>
+                )}
               </button>
             </div>
           </div>
