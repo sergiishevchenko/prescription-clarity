@@ -205,4 +205,95 @@ describe("POST /api/export/pdf", () => {
       expect.objectContaining({ error: "PDF rendering timeout" }),
     );
   });
+
+  it("returns 500 when PDF rendering fails with generic error", async () => {
+    prismaMock.scheduleEntry.count.mockResolvedValueOnce(1);
+    prismaMock.scheduleEntry.findMany.mockResolvedValueOnce([
+      {
+        id: "entry-3",
+        userId: mockUser.id,
+        dateTime: new Date("2025-01-01T08:00:00Z"),
+        status: "PLANNED",
+        scheduleId: "sched-1",
+        medicationId: "med-1",
+        createdAt: new Date(),
+        updatedAt: new Date(),
+        medication: {
+          id: "med-1",
+          name: "Ibuprofen",
+          dose: 200,
+          form: "tablets",
+          deletedAt: null,
+        },
+        schedule: {
+          quantity: 1,
+          units: "pill",
+          mealTiming: "before",
+        },
+      },
+    ]);
+
+    jest
+      .mocked(renderPdfBuffer)
+      .mockRejectedValueOnce(new Error("render-failed"));
+
+    const res = await POST(
+      makeRequest({
+        userId: mockUser.id,
+        from: "2025-01-01",
+        to: "2025-01-02",
+        tz: "UTC",
+      }),
+    );
+
+    expect(res.status).toBe(500);
+    await expect(res.json()).resolves.toEqual(
+      expect.objectContaining({ error: "Internal server error" }),
+    );
+  });
+
+  it("sets Content-Length header based on PDF size", async () => {
+    prismaMock.scheduleEntry.count.mockResolvedValueOnce(1);
+    prismaMock.scheduleEntry.findMany.mockResolvedValueOnce([
+      {
+        id: "entry-4",
+        userId: mockUser.id,
+        dateTime: new Date("2025-01-01T08:00:00Z"),
+        status: "PLANNED",
+        scheduleId: "sched-1",
+        medicationId: "med-1",
+        createdAt: new Date(),
+        updatedAt: new Date(),
+        medication: {
+          id: "med-1",
+          name: "Ibuprofen",
+          dose: 200,
+          form: "tablets",
+          deletedAt: null,
+        },
+        schedule: {
+          quantity: 1,
+          units: "pill",
+          mealTiming: "before",
+        },
+      },
+    ]);
+
+    const buffer = Buffer.from("pdf-binary-content");
+    jest.mocked(renderPdfBuffer).mockResolvedValueOnce(buffer);
+
+    const res = await POST(
+      makeRequest({
+        userId: mockUser.id,
+        from: "2025-01-01",
+        to: "2025-01-02",
+        tz: "UTC",
+      }),
+    );
+
+    expect(res.status).toBe(200);
+    expect(res.headers.get("Content-Length")).toBe(`${buffer.length}`);
+    const arrayBuffer = await res.arrayBuffer();
+    expect(Buffer.from(arrayBuffer)).toEqual(buffer);
+  });
 });

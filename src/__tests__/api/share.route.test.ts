@@ -98,6 +98,40 @@ describe("POST /api/share", () => {
     });
   });
 
+  it("uses default expiry helper when expiresAt is not provided", async () => {
+    jest
+      .spyOn(SessionModule, "getSessionUserFromRequest")
+      .mockResolvedValueOnce(mockUser);
+
+    const mockToken = "mock-secure-token-ttl";
+    const defaultExpiry = new Date("2025-12-31T12:00:00Z");
+
+    (TokenModule.generateShareToken as jest.Mock).mockReturnValueOnce(
+      mockToken,
+    );
+    (TokenModule.getDefaultExpiry as jest.Mock).mockReturnValueOnce(
+      defaultExpiry,
+    );
+
+    prismaMock.shareLink.create.mockResolvedValueOnce({
+      id: "share-ttl",
+      token: mockToken,
+      ownerId: mockUser.id,
+      viewerId: null,
+      expiresAt: defaultExpiry,
+      status: "active" as const,
+      createdAt: new Date(),
+      updatedAt: new Date(),
+    });
+
+    const res = await ShareRoute.POST(makePostReq({}));
+    const data = await res.json();
+
+    expect(res.status).toBe(201);
+    expect(data.shareLink.expiresAt).toBe(defaultExpiry.toISOString());
+    expect(TokenModule.getDefaultExpiry).toHaveBeenCalledTimes(1);
+  });
+
   it("should create share link with custom expiresAt", async () => {
     jest
       .spyOn(SessionModule, "getSessionUserFromRequest")
