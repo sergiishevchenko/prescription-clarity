@@ -169,6 +169,27 @@ describe("POST /api/share/revoke", () => {
     expect(data.error).toBe("Forbidden: You do not own this share link");
   });
 
+  it("should return 403 if revoking by shareId that belongs to another user", async () => {
+    jest
+      .spyOn(SessionModule, "getSessionUserFromRequest")
+      .mockResolvedValueOnce(mockOtherUser);
+
+    const mockShareLink = {
+      id: "shareX",
+      ownerId: mockOwner.id,
+      status: "active" as const,
+    };
+
+    prismaMock.shareLink.findFirst.mockResolvedValueOnce(mockShareLink);
+
+    const res = await ShareRevokeRoute.POST(makePostReq({ shareId: "shareX" }));
+    const data = await res.json();
+
+    expect(res.status).toBe(403);
+    expect(data.error).toBe("Forbidden: You do not own this share link");
+    expect(prismaMock.shareLink.update).not.toHaveBeenCalled();
+  });
+
   it("should return 400 if neither token nor shareId provided", async () => {
     jest
       .spyOn(SessionModule, "getSessionUserFromRequest")
