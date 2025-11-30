@@ -218,7 +218,7 @@ export function DosingScheduleStep({
               value={Number(frequencyValue) || 1}
               {...frequencyFieldRegister}
             />
-            <div className="mt-4 grid grid-cols-1 gap-4 sm:grid-cols-3">
+            <div className="mt-2 grid grid-cols-1 gap-2.5 sm:mt-4 sm:grid-cols-3 sm:gap-4">
               {FREQUENCY_OPTIONS.map(({ value, label, description }) => {
                 const isActive = Number(frequencyValue) === value;
                 const titleClass = `${stepStyles.cardTitle} ${
@@ -232,7 +232,7 @@ export function DosingScheduleStep({
                     key={value}
                     type="button"
                     onClick={() => onFrequencyChange(value)}
-                    className={`rounded-[20px] border-2 px-5 py-4 text-left transition focus-visible:ring-4 focus-visible:ring-[#1479FF]/20 focus-visible:outline-none ${
+                    className={`rounded-[14px] border-2 px-3.5 py-2.5 text-left transition focus-visible:ring-4 focus-visible:ring-[#1479FF]/20 focus-visible:outline-none sm:rounded-[20px] sm:px-5 sm:py-4 ${
                       isActive
                         ? "border-[#1479FF] bg-[#F0F7FF] shadow-[0_18px_35px_rgba(20,121,255,0.2)]"
                         : "border-[#E5E7EB] bg-white hover:border-[#BFD9FF] hover:bg-[#F8FAFF]"
@@ -273,7 +273,7 @@ export function DosingScheduleStep({
               value={mealTimingValue ?? "before"}
               {...mealTimingFieldRegister}
             />
-            <div className="mt-4 grid grid-cols-1 gap-4 md:grid-cols-2">
+            <div className="mt-2 grid grid-cols-1 gap-2.5 sm:mt-4 sm:gap-4 md:grid-cols-2">
               {MEAL_TIMING_OPTIONS.map(({ value, label, description }) => {
                 const isActive = mealTimingValue === value;
                 const titleClass = `${stepStyles.cardTitle} ${
@@ -287,7 +287,7 @@ export function DosingScheduleStep({
                     key={value}
                     type="button"
                     onClick={() => onMealTimingChange(value)}
-                    className={`rounded-[20px] border-2 px-5 py-4 text-left transition focus-visible:ring-4 focus-visible:ring-[#1479FF]/20 focus-visible:outline-none ${
+                    className={`rounded-[14px] border-2 px-3.5 py-2.5 text-left transition focus-visible:ring-4 focus-visible:ring-[#1479FF]/20 focus-visible:outline-none sm:rounded-[20px] sm:px-5 sm:py-4 ${
                       isActive
                         ? "border-[#1479FF] bg-[#F0F7FF] shadow-[0_18px_35px_rgba(20,121,255,0.2)]"
                         : "border-[#E5E7EB] bg-white hover:border-[#BFD9FF] hover:bg-[#F8FAFF]"

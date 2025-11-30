@@ -108,6 +108,7 @@ type FieldLabelProps = {
   optionalText?: string;
   tooltip?: ReactNode;
   tooltipPlacement?: "top" | "bottom";
+  tabletLineBreak?: boolean;
 };
 
 function FieldLabel({
@@ -117,9 +118,14 @@ function FieldLabel({
   optionalText,
   tooltip,
   tooltipPlacement = "top",
+  tabletLineBreak = false,
 }: FieldLabelProps) {
   return (
-    <div className={styles.labelRow}>
+    <div
+      className={`${styles.labelRow} ${
+        tabletLineBreak ? styles.labelRowTabletBreak : ""
+      }`}
+    >
       <label htmlFor={htmlFor} className={styles.labelText}>
         {label}
       </label>
@@ -379,6 +385,7 @@ export default function MedicationWizardStep1() {
                 optionalText="(Optional)"
                 tooltip={formTooltip}
                 tooltipPlacement="bottom"
+                tabletLineBreak
               />
               <div className={styles.selectWrapper}>
                 <select
@@ -424,6 +431,7 @@ export default function MedicationWizardStep1() {
                 optionalText="(Optional)"
                 tooltip={dosageTooltip}
                 tooltipPlacement="bottom"
+                tabletLineBreak
               />
               <input
                 id="medication-dosage"

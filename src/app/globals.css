@@ -51,3 +51,31 @@ html {
 .animate-fade-up {
   animation: fadeUp 1.2s ease-out;
 }
+
+/* Date input calendar icon positioning */
+input[type="date"]::-webkit-calendar-picker-indicator {
+  position: absolute;
+  right: 0.75rem;
+  top: 50%;
+  transform: translateY(-50%);
+  cursor: pointer;
+  opacity: 1;
+  width: 1.25rem;
+  height: 1.25rem;
+}
+
+@media (min-width: 640px) {
+  input[type="date"]::-webkit-calendar-picker-indicator {
+    right: 1rem;
+    width: 1.5rem;
+    height: 1.5rem;
+  }
+}
+
+/* Time of day cards: 2 columns on tablet (641px-1024px), 3 columns on desktop (1025px+) */
+@media (min-width: 641px) and (max-width: 1024px) {
+  /* Make Custom button span full width on tablet */
+  .time-of-day-grid > .custom-time-button {
+    grid-column: 1 / -1;
+  }
+}

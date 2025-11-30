@@ -54,28 +54,37 @@ export function WizardLayout({
   return (
     <div className={styles.wizard}>
       <div className={styles.container} ref={containerRef}>
-        {/* Back Button */}
-        {onBack && (
-          <button type="button" onClick={onBack} className={styles.backButton}>
-            <svg
-              className={styles.backIcon}
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="2"
+        {/* Back Button and Title Row */}
+        <div className={styles.titleRow}>
+          {onBack && (
+            <button
+              type="button"
+              onClick={onBack}
+              className={styles.backButton}
             >
-              <path
-                d="M15 18l-6-6 6-6"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-              />
-            </svg>
-            <span className={styles.backText}>Back</span>
-          </button>
-        )}
+              <svg
+                className={styles.backIcon}
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2"
+              >
+                <path
+                  d="M15 18l-6-6 6-6"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                />
+              </svg>
+              <span className={styles.backText}>Back</span>
+            </button>
+          )}
 
-        {/* Main Title */}
-        <h1 className={styles.title}>{title}</h1>
+          {/* Main Title */}
+          <h1 className={styles.title}>{title}</h1>
+
+          {/* Spacer for centering on tablet/desktop */}
+          <div className={styles.titleSpacer}></div>
+        </div>
 
         {showProgressBar && (
           <>
@@ -103,9 +112,13 @@ export function WizardLayout({
         {(stepIcon || stepTitle || stepSubtitle) && (
           <div className={styles.stepHeader}>
             {stepIcon && <div className={styles.iconContainer}>{stepIcon}</div>}
-            {stepTitle && <h2 className={styles.stepTitle}>{stepTitle}</h2>}
-            {stepSubtitle && (
-              <p className={styles.stepSubtitle}>{stepSubtitle}</p>
+            {(stepTitle || stepSubtitle) && (
+              <div className={styles.stepHeaderText}>
+                {stepTitle && <h2 className={styles.stepTitle}>{stepTitle}</h2>}
+                {stepSubtitle && (
+                  <p className={styles.stepSubtitle}>{stepSubtitle}</p>
+                )}
+              </div>
             )}
           </div>
         )}
