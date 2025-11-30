@@ -58,10 +58,7 @@ describe("Integration flow: share → caregiver view → PDF → revoke", () => 
 
   it("runs end-to-end share lifecycle and read-only/export/revoke expectations", async () => {
     const token = "share-token-123";
-    const sessionSpy = jest.spyOn(
-      SessionModule,
-      "getSessionUserFromRequest",
-    );
+    const sessionSpy = jest.spyOn(SessionModule, "getSessionUserFromRequest");
 
     // 1) Owner creates share link
     sessionSpy.mockResolvedValueOnce(owner);
@@ -187,9 +184,9 @@ describe("Integration flow: share → caregiver view → PDF → revoke", () => 
         },
       },
     ]);
-    jest.mocked(renderPdfBuffer).mockResolvedValueOnce(
-      Buffer.from("pdf-binary-content"),
-    );
+    jest
+      .mocked(renderPdfBuffer)
+      .mockResolvedValueOnce(Buffer.from("pdf-binary-content"));
 
     const pdfRes = await ExportPdfRoute.POST(
       makeNextJsonRequest("http://localhost/api/export/pdf", "POST", {
@@ -245,10 +242,7 @@ describe("Integration flow: share → caregiver view → PDF → revoke", () => 
   });
 
   it("blocks viewer mutations and keeps past entries after delete", async () => {
-    const sessionSpy = jest.spyOn(
-      SessionModule,
-      "getSessionUserFromRequest",
-    );
+    const sessionSpy = jest.spyOn(SessionModule, "getSessionUserFromRequest");
     // Viewer attempts to delete someone else's medication -> 404/Unauthorized path
     sessionSpy.mockResolvedValueOnce(viewer);
     prismaMock.medication.findFirst.mockResolvedValueOnce(null);
@@ -257,7 +251,10 @@ describe("Integration flow: share → caregiver view → PDF → revoke", () => 
       "http://localhost/api/medications/med-1",
       "DELETE",
     );
-    const deleteRes = await MedicationIdRoute.DELETE(deleteReq as DeleteRequest, makeDeleteParams("med-1"));
+    const deleteRes = await MedicationIdRoute.DELETE(
+      deleteReq as DeleteRequest,
+      makeDeleteParams("med-1"),
+    );
     expect(deleteRes.status).toBe(404); // viewer sees no access to owner's medication
 
     // Owner deletes medication; only future PLANNED entries are removed
@@ -287,7 +284,10 @@ describe("Integration flow: share → caregiver view → PDF → revoke", () => 
         }),
     );
 
-    const ownerDeleteRes = await MedicationIdRoute.DELETE(deleteReq as DeleteRequest, makeDeleteParams("med-1"));
+    const ownerDeleteRes = await MedicationIdRoute.DELETE(
+      deleteReq as DeleteRequest,
+      makeDeleteParams("med-1"),
+    );
     expect(ownerDeleteRes.status).toBe(200);
     expect(prismaMock.scheduleEntry.deleteMany).toHaveBeenCalledWith({
       where: {

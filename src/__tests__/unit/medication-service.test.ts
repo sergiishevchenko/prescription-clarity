@@ -65,10 +65,7 @@ describe("medication-service", () => {
     it("soft deletes active schedules linked to medication", async () => {
       prismaMock.schedule.updateMany.mockResolvedValueOnce({ count: 2 });
 
-      const deletedCount = await softDeleteRelatedSchedules(
-        "med-1",
-        "user-1",
-      );
+      const deletedCount = await softDeleteRelatedSchedules("med-1", "user-1");
 
       expect(deletedCount).toBe(2);
       expect(prismaMock.schedule.updateMany).toHaveBeenCalledWith({
@@ -106,12 +103,14 @@ describe("medication-service", () => {
         },
       });
       expect(result.count).toBe(2);
-      const expectedDates = ["2025-01-11T08:00:00Z", "2025-01-12T20:00:00Z"]
-        .map((iso) => {
-          const d = new Date(iso);
-          d.setHours(0, 0, 0, 0);
-          return d.toISOString();
-        });
+      const expectedDates = [
+        "2025-01-11T08:00:00Z",
+        "2025-01-12T20:00:00Z",
+      ].map((iso) => {
+        const d = new Date(iso);
+        d.setHours(0, 0, 0, 0);
+        return d.toISOString();
+      });
       const affectedIso = result.affectedDates.map((d) => d.toISOString());
       expect(affectedIso).toEqual(expect.arrayContaining(expectedDates));
     });
@@ -316,13 +315,14 @@ describe("medication-service", () => {
         where: { medicationId: "med-1", userId: "user-1", deletedAt: null },
         data: { deletedAt: expect.any(Date) },
       });
-      const expectedDates = ["2025-01-11T08:00:00Z", "2025-01-12T20:00:00Z"].map(
-        (iso) => {
-          const d = new Date(iso);
-          d.setHours(0, 0, 0, 0);
-          return d;
-        },
-      );
+      const expectedDates = [
+        "2025-01-11T08:00:00Z",
+        "2025-01-12T20:00:00Z",
+      ].map((iso) => {
+        const d = new Date(iso);
+        d.setHours(0, 0, 0, 0);
+        return d;
+      });
       expect(updateDayStatusesForDates).toHaveBeenCalledWith(
         "user-1",
         expectedDates,
