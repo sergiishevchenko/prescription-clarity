@@ -1,5 +1,7 @@
 import type { MealTiming, ScheduleEntryPrintable } from "@/lib/pdf/types";
 import { PRINT_SCHEDULE_CSS } from "@/lib/pdf/styles";
+import { readFileSync } from "fs";
+import { join } from "path";
 
 interface BuildScheduleHtmlOptions {
   entries: ScheduleEntryPrintable[];
@@ -114,11 +116,12 @@ function buildRow(row: PrintableRow): string {
     .filter((mt): mt is MealTiming => mt !== null);
 
   const rowMealTiming = resolveMealTiming(mealTimings);
+  const hasMealTiming = mealTimings.length > 0;
 
   return `<tr>
     <td class="time-col">${escapeHtml(row.timeLabel)}</td>
     <td class="meal-col">
-      <span class="meal-symbol ${rowMealTiming}"></span>
+      ${hasMealTiming ? `<span class="meal-symbol ${rowMealTiming}"></span>` : "—"}
     </td>
     ${row.cells.map((cell) => buildCell(cell)).join("")}
   </tr>`;
@@ -142,18 +145,10 @@ function buildCell(cell: PrintableCell): string {
   return `<td>
     ${cell.entries
       .map((entry) => {
-        const detailsParts: string[] = [];
-        if (entry.dose) {
-          detailsParts.push(entry.dose);
-        }
-        if (entry.form) {
-          detailsParts.push(entry.form);
-        }
-        const details = detailsParts.length > 0 ? detailsParts.join(" • ") : "";
-
         return `<div class="med-item">
             <span class="med-name">${escapeHtml(entry.medicationName)}</span>
-            ${details ? `<span class="med-details">${escapeHtml(details)}</span>` : ""}
+            ${entry.dose ? `<span class="med-dose">${escapeHtml(entry.dose)}</span>` : ""}
+            ${entry.form ? `<span class="med-quantity">${escapeHtml(entry.form)}</span>` : ""}
             <div class="med-checkbox-row">
               <input type="checkbox" />
               <span class="checkbox-label">DONE</span>
@@ -176,11 +171,26 @@ function buildLegend(): string {
   </div>`;
 }
 
+function getLogoBase64(): string {
+  try {
+    const logoPath = join(process.cwd(), "public", "logo.png");
+    const logoBuffer = readFileSync(logoPath);
+    return logoBuffer.toString("base64");
+  } catch (error) {
+    console.error("Failed to read logo file:", error);
+    return "";
+  }
+}
+
 function buildLogo(): string {
-  return `<svg width="52" height="52" viewBox="0 0 64 64" role="img" aria-label="Logo">
-    <rect width="64" height="64" rx="12" fill="#0f9afe" />
-    <text x="50%" y="55%" text-anchor="middle" font-family="Inter, Arial, sans-serif" font-size="26" font-weight="700" fill="#fff">Rx</text>
-  </svg>`;
+  const logoBase64 = getLogoBase64();
+  if (!logoBase64) {
+    return `<svg width="52" height="52" viewBox="0 0 64 64" role="img" aria-label="Logo">
+      <rect width="64" height="64" rx="12" fill="#0f9afe" />
+      <text x="50%" y="55%" text-anchor="middle" font-family="Inter, Arial, sans-serif" font-size="26" font-weight="700" fill="#fff">Rx</text>
+    </svg>`;
+  }
+  return `<img src="data:image/png;base64,${logoBase64}" alt="Prescription Clarity Logo" width="52" height="52" style="display: block;" role="img" aria-label="Logo" />`;
 }
 
 function buildQrPlaceholder(): string {
@@ -274,7 +284,7 @@ function buildRowsForWeek(
       Array<{
         entry: ScheduleEntryPrintable;
         printable: PrintableCellEntry;
-        mealTiming: MealTiming;
+        mealTiming: MealTiming | null;
       }>
     >
   >();
@@ -298,7 +308,7 @@ function buildRowsForWeek(
         Array<{
           entry: ScheduleEntryPrintable;
           printable: PrintableCellEntry;
-          mealTiming: MealTiming;
+          mealTiming: MealTiming | null;
         }>
       >();
     const cellEntries = timeGroup.get(dayKey) ?? [];
