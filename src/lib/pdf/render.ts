@@ -1,4 +1,5 @@
 import puppeteer from "puppeteer";
+import puppeteerCore from "puppeteer-core";
 
 const DEFAULT_TIMEOUT_MS = 20000;
 const DEFAULT_PDF_OPTIONS = {
@@ -27,22 +28,78 @@ export class PdfTimeoutError extends Error {
   }
 }
 
+function isVercelEnvironment(): boolean {
+  return !!(
+    process.env.VERCEL ||
+    process.env.AWS_LAMBDA_FUNCTION_NAME ||
+    process.env.VERCEL_ENV
+  );
+}
+
+async function getChromiumExecutablePath(): Promise<string | undefined> {
+  if (isVercelEnvironment()) {
+    try {
+      const chromium = await import("@sparticuz/chromium");
+      // @ts-expect-error - executablePath exists at runtime but not in types
+      return await chromium.executablePath();
+    } catch (error) {
+      console.warn("Failed to load @sparticuz/chromium:", error);
+    }
+  }
+  return process.env.PUPPETEER_EXECUTABLE_PATH || undefined;
+}
+
+async function getLaunchArgs(): Promise<string[]> {
+  if (isVercelEnvironment()) {
+    try {
+      const chromium = await import("@sparticuz/chromium");
+      // @ts-expect-error - args property exists at runtime but not in types
+      return chromium.args || DEFAULT_LAUNCH_ARGS;
+    } catch (error) {
+      console.warn("Failed to load @sparticuz/chromium args:", error);
+    }
+  }
+  return (
+    process.env.CHROMIUM_ARGS?.split(" ").filter(Boolean) ?? DEFAULT_LAUNCH_ARGS
+  );
+}
+
 export async function renderPdfBuffer(
   html: string,
   options?: { timeoutMs?: number },
 ): Promise<Buffer> {
   const timeoutMs = options?.timeoutMs ?? DEFAULT_TIMEOUT_MS;
-  const launchArgs =
-    process.env.CHROMIUM_ARGS?.split(" ").filter(Boolean) ??
-    DEFAULT_LAUNCH_ARGS;
+  const isVercel = isVercelEnvironment();
+  const launchArgs = await getLaunchArgs();
+  const executablePath = await getChromiumExecutablePath();
 
-  const executablePath = process.env.PUPPETEER_EXECUTABLE_PATH || undefined;
+  let browser;
+  if (isVercel) {
+    if (!executablePath) {
+      throw new Error(
+        "Chromium executable path is required on Vercel. @sparticuz/chromium may not be installed.",
+      );
+    }
+    browser = await puppeteerCore.launch({
+      headless: true,
+      executablePath,
+      args: launchArgs,
+    });
+  } else {
+    const launchOptions: {
+      headless: boolean;
+      executablePath?: string;
+      args: string[];
+    } = {
+      headless: true,
+      args: launchArgs,
+    };
+    if (process.env.PUPPETEER_EXECUTABLE_PATH) {
+      launchOptions.executablePath = process.env.PUPPETEER_EXECUTABLE_PATH;
+    }
+    browser = await puppeteer.launch(launchOptions);
+  }
 
-  const browser = await puppeteer.launch({
-    headless: true,
-    executablePath,
-    args: launchArgs,
-  });
   const page = await browser.newPage();
 
   try {
