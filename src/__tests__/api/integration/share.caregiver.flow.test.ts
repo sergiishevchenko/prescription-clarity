@@ -21,10 +21,11 @@ jest.mock("@/lib/pdf/render", () => ({
   },
 }));
 
-type RequestOf<T> = T extends (req: infer R, ...args: any[]) => any ? R : never;
-type RequestWithParams<T> = T extends (req: any, arg: infer P, ...rest: any[]) => any
-  ? P
-  : never;
+type ShareValidateRequest = Parameters<typeof ShareValidateRoute.GET>[0];
+type ShareStatusRequest = Parameters<typeof ShareStatusRoute.GET>[0];
+type ExportPdfRequest = Parameters<typeof ExportPdfRoute.POST>[0];
+type DeleteRequest = Parameters<typeof MedicationIdRoute.DELETE>[0];
+type DeleteParams = Parameters<typeof MedicationIdRoute.DELETE>[1];
 
 const makeNextJsonRequest = (url: string, method: string, body: object) =>
   new NextRequest(url, {
@@ -38,9 +39,7 @@ const makeNextGetRequest = (url: string) => new NextRequest(url);
 const makeNextRequest = (url: string, method: string) =>
   new NextRequest(url, { method });
 
-const makeDeleteParams = (
-  id: string,
-): RequestWithParams<typeof MedicationIdRoute.DELETE> => ({
+const makeDeleteParams = (id: string): DeleteParams => ({
   params: Promise.resolve({ id }),
 });
 
@@ -96,7 +95,7 @@ describe("Integration flow: share → caregiver view → PDF → revoke", () => 
     const validateRes = await ShareValidateRoute.GET(
       makeNextGetRequest(
         `http://localhost/api/share/validate?token=${token}`,
-      ) as unknown as RequestOf<typeof ShareValidateRoute.GET>,
+      ) as ShareValidateRequest,
     );
     const validateBody = await validateRes.json();
     expect(validateRes.status).toBe(200);
@@ -155,7 +154,7 @@ describe("Integration flow: share → caregiver view → PDF → revoke", () => 
     const statusRes = await ShareStatusRoute.GET(
       makeNextGetRequest(
         "http://localhost/api/share/status",
-      ) as unknown as RequestOf<typeof ShareStatusRoute.GET>,
+      ) as ShareStatusRequest,
     );
     const statusBody = await statusRes.json();
     expect(statusRes.status).toBe(200);
@@ -198,7 +197,7 @@ describe("Integration flow: share → caregiver view → PDF → revoke", () => 
         from: "2025-01-06",
         to: "2025-01-07",
         tz: "UTC",
-      }) as unknown as RequestOf<typeof ExportPdfRoute.POST>,
+      }) as ExportPdfRequest,
     );
     expect(pdfRes.status).toBe(200);
     expect(pdfRes.headers.get("Content-Type")).toBe("application/pdf");
@@ -237,7 +236,7 @@ describe("Integration flow: share → caregiver view → PDF → revoke", () => 
     const validateAfterRevoke = await ShareValidateRoute.GET(
       makeNextGetRequest(
         `http://localhost/api/share/validate?token=${token}`,
-      ) as unknown as RequestOf<typeof ShareValidateRoute.GET>,
+      ) as ShareValidateRequest,
     );
     const validateAfterBody = await validateAfterRevoke.json();
     expect(validateAfterRevoke.status).toBe(200);
@@ -258,10 +257,7 @@ describe("Integration flow: share → caregiver view → PDF → revoke", () => 
       "http://localhost/api/medications/med-1",
       "DELETE",
     );
-    const deleteRes = await MedicationIdRoute.DELETE(
-      deleteReq as RequestOf<typeof MedicationIdRoute.DELETE>,
-      makeDeleteParams("med-1"),
-    );
+    const deleteRes = await MedicationIdRoute.DELETE(deleteReq as DeleteRequest, makeDeleteParams("med-1"));
     expect(deleteRes.status).toBe(404); // viewer sees no access to owner's medication
 
     // Owner deletes medication; only future PLANNED entries are removed
@@ -291,10 +287,7 @@ describe("Integration flow: share → caregiver view → PDF → revoke", () => 
         }),
     );
 
-    const ownerDeleteRes = await MedicationIdRoute.DELETE(
-      deleteReq as RequestOf<typeof MedicationIdRoute.DELETE>,
-      makeDeleteParams("med-1"),
-    );
+    const ownerDeleteRes = await MedicationIdRoute.DELETE(deleteReq as DeleteRequest, makeDeleteParams("med-1"));
     expect(ownerDeleteRes.status).toBe(200);
     expect(prismaMock.scheduleEntry.deleteMany).toHaveBeenCalledWith({
       where: {
