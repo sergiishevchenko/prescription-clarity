@@ -39,9 +39,12 @@ function isVercelEnvironment(): boolean {
 async function getChromiumExecutablePath(): Promise<string | undefined> {
   if (isVercelEnvironment()) {
     try {
-      const chromium = await import("@sparticuz/chromium");
-      // @ts-expect-error - executablePath exists at runtime but not in types
-      return await chromium.executablePath();
+      const chromium = (await import("@sparticuz/chromium")) as {
+        executablePath?: () => Promise<string>;
+      };
+      if (chromium.executablePath) {
+        return await chromium.executablePath();
+      }
     } catch (error) {
       console.warn("Failed to load @sparticuz/chromium:", error);
     }
@@ -52,8 +55,9 @@ async function getChromiumExecutablePath(): Promise<string | undefined> {
 async function getLaunchArgs(): Promise<string[]> {
   if (isVercelEnvironment()) {
     try {
-      const chromium = await import("@sparticuz/chromium");
-      // @ts-expect-error - args property exists at runtime but not in types
+      const chromium = (await import("@sparticuz/chromium")) as {
+        args?: string[];
+      };
       return chromium.args || DEFAULT_LAUNCH_ARGS;
     } catch (error) {
       console.warn("Failed to load @sparticuz/chromium args:", error);

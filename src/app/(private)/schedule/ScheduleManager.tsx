@@ -186,9 +186,9 @@ export function ScheduleManager({
                   <ClockIcon className={styles.compactTimeIcon} />
                   <div className={styles.compactTimeList}>
                     {sortedTimes.length ? (
-                      sortedTimes.map((time) => (
+                      sortedTimes.map((time, index) => (
                         <span
-                          key={`${schedule.id}-${time}`}
+                          key={`${schedule.id}-${time}-${index}`}
                           className={styles.compactTimeChip}
                         >
                           {time}

@@ -27,25 +27,12 @@ export async function GET(request: NextRequest) {
       status: statusParam,
     });
 
-    // Build where clause
-    const whereClause: {
-      ownerId: string;
-      status?: "active" | "revoked" | "expired";
-    } = {
-      ownerId: user.id,
-    };
-
-    // Filter by status if not "all"
-    if (validatedQuery.status && validatedQuery.status !== "all") {
-      whereClause.status = validatedQuery.status as
-        | "active"
-        | "revoked"
-        | "expired";
-    }
-
-    // Fetch share links
+    // Fetch all share links for this owner.
+    // We filter by effective status (including computed expiry) in memory below.
     const shareLinks = await prisma.shareLink.findMany({
-      where: whereClause,
+      where: {
+        ownerId: user.id,
+      },
       select: {
         id: true,
         token: true,
@@ -67,15 +54,38 @@ export async function GET(request: NextRequest) {
       },
     });
 
+    const now = new Date();
+
+    function getEffectiveStatus(link: {
+      status: "active" | "revoked" | "expired";
+      expiresAt: Date;
+    }): "active" | "revoked" | "expired" {
+      if (link.status === "revoked") return "revoked";
+
+      const isExpired = link.expiresAt < now || link.status === "expired";
+      if (isExpired) return "expired";
+
+      return "active";
+    }
+
+    const targetStatus = validatedQuery.status ?? "active";
+
+    const filteredLinks =
+      targetStatus === "all"
+        ? shareLinks
+        : shareLinks.filter(
+            (link) => getEffectiveStatus(link) === targetStatus,
+          );
+
     return NextResponse.json(
       {
-        shareLinks: shareLinks.map((link) => ({
+        shareLinks: filteredLinks.map((link) => ({
           id: link.id,
           token: link.token,
           viewerId: link.viewerId,
           viewer: link.viewer,
           expiresAt: link.expiresAt,
-          status: link.status,
+          status: getEffectiveStatus(link),
           createdAt: link.createdAt,
           updatedAt: link.updatedAt,
         })),
