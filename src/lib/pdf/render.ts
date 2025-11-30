@@ -36,20 +36,23 @@ function isVercelEnvironment(): boolean {
   );
 }
 
+interface ChromiumModule {
+  executablePath: () => Promise<string>;
+  args: string[];
+}
+
 async function getChromiumConfig() {
   if (isVercelEnvironment()) {
     try {
-      const chromium = await import("@sparticuz/chromium");
-      // @ts-expect-error - setGraphicsMode exists at runtime but not in types
-      chromium.setGraphicsMode(false);
-      // @ts-expect-error - executablePath exists at runtime but not in types
+      const chromiumModule = await import("@sparticuz/chromium");
+      const chromium = (chromiumModule.default ||
+        chromiumModule) as unknown as ChromiumModule;
       const executablePath = await chromium.executablePath();
-      // @ts-expect-error - args property exists at runtime but not in types
-      const args = chromium.args || [];
+      const baseArgs = chromium.args || [];
       return {
         executablePath,
         args: [
-          ...args,
+          ...baseArgs,
           "--no-sandbox",
           "--disable-setuid-sandbox",
           "--disable-dev-shm-usage",
