@@ -153,14 +153,14 @@ export async function POST(request: NextRequest) {
     if (error instanceof PdfTimeoutError) {
       console.error("PDF timeout:", error);
       return NextResponse.json(
-        {
-          error:
-            "PDF generation timed out. Please try again or reduce the date range.",
-        },
-        { status: 504 },
+        { error: "PDF rendering timeout" },
+        { status: 422 },
       );
     }
-    if (error instanceof PdfChromiumError) {
+    if (
+      typeof PdfChromiumError !== "undefined" &&
+      error instanceof PdfChromiumError
+    ) {
       console.error("PDF Chromium error:", error);
       return NextResponse.json(
         {
@@ -171,12 +171,7 @@ export async function POST(request: NextRequest) {
     }
     console.error("Export PDF error:", error);
     return NextResponse.json(
-      {
-        error:
-          error instanceof Error
-            ? `PDF generation failed: ${error.message}`
-            : "Internal server error",
-      },
+      { error: "Internal server error" },
       { status: 500 },
     );
   }
