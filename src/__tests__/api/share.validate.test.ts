@@ -123,7 +123,7 @@ describe("GET /api/share/validate", () => {
   });
 
   it("should return valid=true for active non-expired token", async () => {
-    const futureDate = new Date("2025-12-01T12:00:00Z");
+    const futureDate = new Date(Date.now() + 24 * 60 * 60 * 1000);
     const mockShareLink = {
       id: "share4",
       ownerId: mockOwner.id,
@@ -151,7 +151,7 @@ describe("GET /api/share/validate", () => {
   });
 
   it("should include owner details in valid token response", async () => {
-    const futureDate = new Date("2025-12-01T12:00:00Z");
+    const futureDate = new Date(Date.now() + 24 * 60 * 60 * 1000);
     const mockShareLink = {
       id: "share5",
       ownerId: mockOwner.id,
@@ -176,7 +176,7 @@ describe("GET /api/share/validate", () => {
 
   it("should handle token with special characters", async () => {
     const token = "token-with-special_chars.123";
-    const futureDate = new Date("2025-12-01T12:00:00Z");
+    const futureDate = new Date(Date.now() + 24 * 60 * 60 * 1000);
     const mockShareLink = {
       id: "share6",
       ownerId: mockOwner.id,
