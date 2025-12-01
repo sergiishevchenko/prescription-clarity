@@ -45,19 +45,27 @@ async function getChromiumConfig() {
   if (isVercelEnvironment()) {
     try {
       const chromium = await import("@sparticuz/chromium");
-      const chromiumModule = (chromium.default || chromium) as unknown as ChromiumModule;
-      
-      if (!chromiumModule || typeof chromiumModule.executablePath !== "function") {
-        throw new Error("Invalid chromium module: executablePath is not a function");
+      const chromiumModule = (chromium.default ||
+        chromium) as unknown as ChromiumModule;
+
+      if (
+        !chromiumModule ||
+        typeof chromiumModule.executablePath !== "function"
+      ) {
+        throw new Error(
+          "Invalid chromium module: executablePath is not a function",
+        );
       }
-      
+
       const executablePath = await chromiumModule.executablePath();
-      const baseArgs = Array.isArray(chromiumModule.args) ? chromiumModule.args : [];
-      
+      const baseArgs = Array.isArray(chromiumModule.args)
+        ? chromiumModule.args
+        : [];
+
       if (!executablePath) {
         throw new Error("Chromium executablePath returned empty value");
       }
-      
+
       return {
         executablePath,
         args: [
