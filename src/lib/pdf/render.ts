@@ -1,6 +1,8 @@
 import puppeteer from "puppeteer-core";
 
+const VERCEL_TIMEOUT_MS = 8000;
 const DEFAULT_TIMEOUT_MS = 20000;
+
 const DEFAULT_PDF_OPTIONS = {
   format: "A4" as const,
   printBackground: true,
@@ -27,6 +29,13 @@ export class PdfTimeoutError extends Error {
   }
 }
 
+export class PdfChromiumError extends Error {
+  constructor(message = "Chromium failed to launch") {
+    super(message);
+    this.name = "PdfChromiumError";
+  }
+}
+
 function isVercelEnvironment(): boolean {
   return !!(
     process.env.VERCEL ||
@@ -45,9 +54,14 @@ async function launchBrowser() {
       );
       const chromiumModule = chromium.default || chromium;
 
+      const executablePath = await chromiumModule.executablePath();
+      if (!executablePath) {
+        throw new PdfChromiumError("Chromium executable path not available");
+      }
+
       return await puppeteer.launch({
         args: chromiumModule.args || [],
-        executablePath: await chromiumModule.executablePath(),
+        executablePath,
         headless: chromiumModule.headless ?? true,
         defaultViewport: chromiumModule.defaultViewport ?? {
           width: 1920,
@@ -55,8 +69,13 @@ async function launchBrowser() {
         },
       });
     } catch (error) {
+      if (error instanceof PdfChromiumError) {
+        throw error;
+      }
       console.error("Failed to load @sparticuz/chromium:", error);
-      throw new Error("Chromium module not available in Vercel environment");
+      throw new PdfChromiumError(
+        `Chromium module not available: ${error instanceof Error ? error.message : "Unknown error"}`,
+      );
     }
   }
 
@@ -73,24 +92,52 @@ export async function renderPdfBuffer(
   html: string,
   options?: { timeoutMs?: number },
 ): Promise<Buffer> {
-  const timeoutMs = options?.timeoutMs ?? DEFAULT_TIMEOUT_MS;
-  const browser = await launchBrowser();
+  const isVercel = isVercelEnvironment();
+  const timeoutMs =
+    options?.timeoutMs ?? (isVercel ? VERCEL_TIMEOUT_MS : DEFAULT_TIMEOUT_MS);
 
-  const page = await browser.newPage();
+  if (html.length > 5 * 1024 * 1024) {
+    throw new Error("HTML content too large for PDF generation");
+  }
+
+  let browser;
+  let page;
 
   try {
+    browser = await launchBrowser();
+    page = await browser.newPage();
+
+    const waitUntil = isVercel ? "domcontentloaded" : "networkidle0";
+
     await page.setContent(html, {
-      waitUntil: "networkidle0",
-      timeout: timeoutMs,
+      waitUntil,
+      timeout: Math.min(timeoutMs, 5000),
     });
+
+    if (isVercel) {
+      await new Promise((resolve) => setTimeout(resolve, 500));
+    }
+
     const pdfBuffer = await withTimeout(
       page.pdf(DEFAULT_PDF_OPTIONS),
-      timeoutMs,
+      timeoutMs - 2000,
     );
     return Buffer.from(pdfBuffer);
+  } catch (error) {
+    if (error instanceof PdfTimeoutError || error instanceof PdfChromiumError) {
+      throw error;
+    }
+    console.error("PDF rendering error:", error);
+    throw new Error(
+      `PDF generation failed: ${error instanceof Error ? error.message : "Unknown error"}`,
+    );
   } finally {
-    await page.close().catch(() => {});
-    await browser.close().catch(() => {});
+    if (page) {
+      await page.close().catch(() => {});
+    }
+    if (browser) {
+      await browser.close().catch(() => {});
+    }
   }
 }
 

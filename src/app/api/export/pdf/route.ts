@@ -3,7 +3,11 @@ import { NextRequest, NextResponse } from "next/server";
 import { getSessionUserFromRequest } from "@/lib/auth/session";
 import { prisma } from "@/lib/db";
 import { buildScheduleHtml } from "@/lib/pdf/template";
-import { PdfTimeoutError, renderPdfBuffer } from "@/lib/pdf/render";
+import {
+  PdfTimeoutError,
+  PdfChromiumError,
+  renderPdfBuffer,
+} from "@/lib/pdf/render";
 import {
   toPrintableEntries,
   type ScheduleEntryWithRelations,
@@ -12,7 +16,7 @@ import { exportPdfSchema, type ExportPdfInput } from "@/lib/validators/pdf";
 
 export const runtime = "nodejs";
 
-const PDF_TIMEOUT_MS = 20000;
+const PDF_TIMEOUT_MS = 8000;
 
 export async function POST(request: NextRequest) {
   const user = await getSessionUserFromRequest(request);
@@ -147,9 +151,22 @@ export async function POST(request: NextRequest) {
     });
   } catch (error) {
     if (error instanceof PdfTimeoutError) {
+      console.error("PDF timeout:", error);
       return NextResponse.json(
         { error: "PDF rendering timeout" },
         { status: 422 },
+      );
+    }
+    if (
+      typeof PdfChromiumError !== "undefined" &&
+      error instanceof PdfChromiumError
+    ) {
+      console.error("PDF Chromium error:", error);
+      return NextResponse.json(
+        {
+          error: "PDF generation service unavailable. Please try again later.",
+        },
+        { status: 503 },
       );
     }
     console.error("Export PDF error:", error);
