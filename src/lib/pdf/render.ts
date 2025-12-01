@@ -44,11 +44,28 @@ interface ChromiumModule {
 async function getChromiumConfig() {
   if (isVercelEnvironment()) {
     try {
-      const chromiumModule = await import("@sparticuz/chromium");
-      const chromium = (chromiumModule.default ||
-        chromiumModule) as unknown as ChromiumModule;
-      const executablePath = await chromium.executablePath();
-      const baseArgs = chromium.args || [];
+      const chromium = await import("@sparticuz/chromium");
+      const chromiumModule = (chromium.default ||
+        chromium) as unknown as ChromiumModule;
+
+      if (
+        !chromiumModule ||
+        typeof chromiumModule.executablePath !== "function"
+      ) {
+        throw new Error(
+          "Invalid chromium module: executablePath is not a function",
+        );
+      }
+
+      const executablePath = await chromiumModule.executablePath();
+      const baseArgs = Array.isArray(chromiumModule.args)
+        ? chromiumModule.args
+        : [];
+
+      if (!executablePath) {
+        throw new Error("Chromium executablePath returned empty value");
+      }
+
       return {
         executablePath,
         args: [
@@ -64,8 +81,11 @@ async function getChromiumConfig() {
       };
     } catch (error) {
       console.error("Failed to load @sparticuz/chromium:", error);
+      if (error instanceof Error) {
+        console.error("Error details:", error.message, error.stack);
+      }
       throw new Error(
-        "Failed to initialize Chromium for PDF generation on Vercel",
+        `Failed to initialize Chromium for PDF generation on Vercel: ${error instanceof Error ? error.message : String(error)}`,
       );
     }
   }
