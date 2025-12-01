@@ -53,7 +53,7 @@ function formatDate(
 }
 
 type WeekPageProps = {
-  searchParams: Promise<{ week?: string }>;
+  searchParams: Promise<{ week?: string; userId?: string; name?: string }>;
 };
 
 export default async function WeekPage({ searchParams }: WeekPageProps) {
@@ -64,6 +64,9 @@ export default async function WeekPage({ searchParams }: WeekPageProps) {
 
   const today = new Date();
   const params = await searchParams;
+  const targetUserId = params.userId || user.id;
+  const targetNameFromQuery = params.name;
+  const isOwnSchedule = targetUserId === user.id;
 
   let referenceDate: Date;
   if (params.week) {
@@ -112,6 +115,7 @@ export default async function WeekPage({ searchParams }: WeekPageProps) {
       startOfWeek,
       endOfWeek,
       timezone,
+      targetUserId,
     );
   } catch (error) {
     console.error("Failed to load schedule entries:", error);
@@ -125,13 +129,25 @@ export default async function WeekPage({ searchParams }: WeekPageProps) {
           <header className={styles.stickyHeader}>
             <div className={styles.headerInner}>
               <div className={styles.headerTop}>
-                <h1 className={styles.title}>Week View</h1>
+                <div>
+                  <h1 className={styles.title}>Week View</h1>
+                  {!isOwnSchedule && (
+                    <p className="mt-1 text-xs text-slate-500">
+                      Viewing schedule for{" "}
+                      <span className="font-semibold text-slate-900">
+                        {targetNameFromQuery || user.name || user.email}
+                      </span>
+                    </p>
+                  )}
+                </div>
                 <HeaderButtons>
-                  <PrintButton
-                    weekStart={weekStart}
-                    weekEnd={weekEnd}
-                    timezone={timezone}
-                  />
+                  {isOwnSchedule && (
+                    <PrintButton
+                      weekStart={weekStart}
+                      weekEnd={weekEnd}
+                      timezone={timezone}
+                    />
+                  )}
                 </HeaderButtons>
               </div>
               <div className={styles.weekNavigation}>

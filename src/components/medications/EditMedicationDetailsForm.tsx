@@ -242,7 +242,21 @@ export default function EditMedicationDetailsForm({
         className={`${wizardStyles.button} ${wizardStyles.buttonPrimary} ${wizardStyles.buttonFullWidth}`}
         disabled={saving}
       >
-        {saving ? "Saving..." : "Save changes"}
+        {saving ? (
+          "Saving..."
+        ) : (
+          <>
+            <span className={wizardStyles.buttonTextFull}>Save changes</span>
+            <span className={wizardStyles.buttonTextMobile}>Save</span>
+          </>
+        )}
+      </button>
+      <button
+        type="button"
+        onClick={handleBack}
+        className={`${wizardStyles.button} ${wizardStyles.buttonCancel} ${wizardStyles.buttonFullWidth} ${wizardStyles.buttonMobileOnly}`}
+      >
+        Cancel
       </button>
     </div>
   );

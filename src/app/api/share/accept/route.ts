@@ -9,6 +9,18 @@ import {
 export const runtime = "nodejs";
 
 /**
+ * GET /api/share/accept?token=xxx
+ * Redirects browser requests to the UI page /share/accept
+ * so users opening the raw share link see a friendly screen.
+ * This does not change the POST behavior used by the API.
+ */
+export async function GET(request: NextRequest) {
+  const url = new URL(request.url);
+  url.pathname = "/share/accept";
+  return NextResponse.redirect(url);
+}
+
+/**
  * POST /api/share/accept
  * Accept a share link and create permanent CareAccess
  * Requires authentication (viewer must be logged in)

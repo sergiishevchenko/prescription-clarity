@@ -47,6 +47,7 @@ export async function getScheduleEntries(
   from: Date,
   to: Date,
   timezone: string = "UTC",
+  userId?: string,
 ): Promise<ScheduleEntryItem[]> {
   const store = await cookies();
   const cookieHeader = store
@@ -61,6 +62,9 @@ export async function getScheduleEntries(
   url.searchParams.set("from", fromISO);
   url.searchParams.set("to", toISO);
   url.searchParams.set("tz", timezone);
+  if (userId) {
+    url.searchParams.set("userId", userId);
+  }
 
   const res = await fetch(url.toString(), {
     headers: cookieHeader ? { cookie: cookieHeader } : undefined,

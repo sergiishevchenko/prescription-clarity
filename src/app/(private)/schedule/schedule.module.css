@@ -46,6 +46,25 @@
   gap: 1rem;
 }
 
+.heroTopLeft {
+  flex: 1;
+  min-width: 0;
+}
+
+.heroTopRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  width: 100%;
+}
+
+@media (min-width: 769px) {
+  .heroTopRow {
+    width: auto;
+  }
+}
+
 .heroTop h1 {
   margin: 0.15rem 0 0.25rem;
   font-size: 1.75rem;
@@ -99,6 +118,18 @@
   line-height: 1;
 }
 
+.heroButtonTextFull {
+  display: inline;
+}
+
+.heroButtonTextMobile {
+  display: none;
+}
+
+.filtersButtonTextFull {
+  display: inline;
+}
+
 .heroSecondary {
   border: 2px solid #e5e7eb;
   background-color: #ffffff;
@@ -131,9 +162,29 @@
   padding-inline: 1.2rem;
 }
 
+.filtersToggleOpen {
+  border-color: #d1d5db;
+  border-width: 2px;
+  background-color: #f0f0f0;
+  color: #374151;
+}
+
+.filtersToggleOpen:hover {
+  border-color: #d1d5db;
+  background-color: #f0f0f0;
+  color: #1f2937;
+}
+
 .filtersToggleActive {
   border-color: #2196f3;
+  border-width: 2px;
   background-color: #e0f2fe;
+  color: #0f172a;
+}
+
+.filtersToggleActive:hover {
+  border-color: #1976d2;
+  background-color: #b3e5fc;
   color: #0f172a;
 }
 
@@ -213,10 +264,17 @@
 
 .filtersHeader {
   display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  margin-bottom: 1rem;
+}
+
+.filtersHeaderRow {
+  display: flex;
   align-items: center;
   justify-content: space-between;
   gap: 1rem;
-  margin-bottom: 1rem;
+  width: 100%;
 }
 
 .filtersTitle {
@@ -225,26 +283,33 @@
   font-weight: 600;
   text-transform: uppercase;
   letter-spacing: 0.2em;
-  color: #94a3b8;
+  color: #475569;
 }
 
 .filtersSubtitle {
-  margin: 0.15rem 0 0;
+  margin: 0;
   font-size: 0.85rem;
   color: #64748b;
+  width: 100%;
 }
 
 .filtersResetButton {
-  font-size: 0.75rem;
+  font-size: 0.85rem;
   font-weight: 600;
-  letter-spacing: 0.18em;
-  text-transform: uppercase;
-  color: #94a3b8;
-  transition: color 0.2s ease;
+  padding: 0.5rem 1rem;
+  border-radius: 0.5rem;
+  border: 1px solid #e5e7eb;
+  background-color: #ffffff;
+  color: #475569;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  flex-shrink: 0;
 }
 
 .filtersResetButton:hover {
-  color: #475569;
+  background-color: #f9fafb;
+  border-color: #d1d5db;
+  color: #1f2937;
 }
 
 .filtersGrid {
@@ -606,7 +671,7 @@
   border-bottom: 1px solid #e4e7ec;
   display: flex;
   justify-content: space-between;
-  align-items: center;
+  align-items: flex-start;
 }
 
 .dialogTitleLabel {
@@ -643,6 +708,7 @@
   transition:
     background-color 0.2s ease,
     color 0.2s ease;
+  align-self: flex-start;
 }
 
 .dialogCloseButton:hover {
@@ -733,6 +799,20 @@
   font-size: 0.75rem;
   font-weight: 500;
   color: #94a3b8;
+}
+
+.dateInputWrapper {
+  position: relative;
+}
+
+.dateInput {
+  padding-right: 2.5rem;
+}
+
+@media (min-width: 640px) {
+  .dateInput {
+    padding-right: 3rem;
+  }
 }
 
 .input {
@@ -861,6 +941,14 @@
   box-shadow: 0 10px 15px rgba(37, 99, 235, 0.25);
 }
 
+.saveButtonTextFull {
+  display: inline;
+}
+
+.saveButtonTextMobile {
+  display: none;
+}
+
 .dialogSaveButton:hover {
   background: #1d4ed8;
 }
@@ -935,4 +1023,356 @@
 .confirmDeleteButton:disabled {
   opacity: 0.6;
   cursor: not-allowed;
+}
+
+/* Mobile-specific styles */
+@media (max-width: 768px) {
+  .heroTopLeft {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    width: 100%;
+  }
+
+  .heroTopRow {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.75rem;
+    width: 100%;
+  }
+
+  .heroTop h1 {
+    margin: 0;
+    font-size: 1.25rem;
+    font-weight: 700;
+    flex: 1;
+    min-width: 0;
+  }
+
+  .heroTop p {
+    margin: 0;
+    font-size: 0.8rem;
+    line-height: 1.3;
+    width: 100%;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+
+  .heroActions {
+    flex-shrink: 0;
+  }
+
+  .heroButton {
+    padding: 0.4rem 0.6rem;
+    min-height: 2rem;
+    font-size: 0.8rem;
+  }
+
+  .heroButtonTextFull {
+    display: none;
+  }
+
+  .heroButtonTextMobile {
+    display: inline;
+  }
+
+  .searchRow {
+    margin-top: 0;
+    gap: 0.5rem;
+    flex-wrap: nowrap;
+  }
+
+  .searchMeta {
+    font-size: 0.7rem;
+    margin-top: 0.2rem;
+  }
+
+  .searchInputWrapper {
+    flex: 1;
+    min-width: 0;
+  }
+
+  .searchInput {
+    height: 2.5rem;
+    font-size: 0.85rem;
+    padding: 0 0.9rem 0 2.4rem;
+  }
+
+  .searchIcon {
+    left: 0.75rem;
+  }
+
+  .searchIconIcon {
+    width: 0.9rem;
+    height: 0.9rem;
+  }
+
+  .filtersToggleButton {
+    min-width: auto;
+    width: 2.5rem;
+    height: 2.5rem;
+    padding-inline: 0;
+    flex-shrink: 0;
+  }
+
+  .heroButtonIcon {
+    width: 0.9rem;
+    height: 0.9rem;
+  }
+
+  .filtersButtonTextFull {
+    display: none;
+  }
+
+  .heroInner {
+    gap: 0.75rem;
+  }
+
+  .hero {
+    padding: 0.5rem 1rem;
+  }
+
+  .scheduleCompactGrid {
+    gap: 0.75rem;
+  }
+
+  .scheduleCompactCard {
+    padding: 0.75rem 0.75rem 0.5rem;
+    gap: 0.5rem;
+    border-radius: 0.5rem;
+  }
+
+  .compactHeader {
+    gap: 0.5rem;
+  }
+
+  .compactHeaderLeft {
+    gap: 0.5rem;
+  }
+
+  .compactIcon {
+    width: 48px;
+    height: 48px;
+    border-radius: 0.375rem;
+  }
+
+  .compactIconGlyph {
+    width: 1.1rem;
+    height: 1.1rem;
+  }
+
+  .compactTitle {
+    font-size: 0.9rem;
+  }
+
+  .compactDose {
+    margin-top: 0.1rem;
+    font-size: 0.85rem;
+  }
+
+  .compactTimeRow {
+    gap: 0.375rem;
+  }
+
+  .compactTimeIcon {
+    width: 0.875rem;
+    height: 0.875rem;
+  }
+
+  .compactTimeList {
+    gap: 0.25rem;
+  }
+
+  .compactTimeChip {
+    font-size: 0.75rem;
+    padding: 0.1rem 0.45rem;
+  }
+
+  .compactBadges {
+    gap: 0.375rem;
+  }
+
+  .badge {
+    padding: 0.15rem 0.6rem;
+    font-size: 0.75rem;
+  }
+
+  .compactDivider {
+    margin-top: 0.375rem;
+  }
+
+  .compactFooter {
+    padding-top: 0.375rem;
+  }
+
+  .compactEditButton {
+    font-size: 0.8rem !important;
+    padding: 0.4rem 0.75rem !important;
+    height: 36px !important;
+    min-height: 36px !important;
+  }
+
+  .compactCalendarButton {
+    font-size: 0.8rem !important;
+    padding: 0.4rem 0.75rem !important;
+    height: 36px !important;
+    min-height: 36px !important;
+  }
+
+  .content {
+    padding: 0.5rem 1rem 0;
+  }
+
+  .filtersPanel {
+    padding: 1rem;
+    border-radius: 0.375rem;
+  }
+
+  .filtersHeader {
+    gap: 0.5rem;
+    margin-bottom: 0.75rem;
+  }
+
+  .filtersHeaderRow {
+    gap: 0.75rem;
+  }
+
+  .filtersTitle {
+    font-size: 0.75rem;
+  }
+
+  .filtersSubtitle {
+    font-size: 0.75rem;
+    line-height: 1.3;
+  }
+
+  .filtersResetButton {
+    font-size: 0.75rem;
+    padding: 0.35rem 0.6rem;
+  }
+
+  .filtersGrid {
+    gap: 0.75rem;
+  }
+
+  .filtersLabel {
+    font-size: 0.8rem;
+    margin-bottom: 0.3rem;
+  }
+
+  .filtersSelect,
+  .sortButton {
+    height: 36px;
+    padding: 0 0.75rem;
+    font-size: 0.85rem;
+  }
+
+  .sortIcon {
+    width: 0.875rem;
+    height: 0.875rem;
+  }
+
+  .dialogOverlay {
+    padding: 0.5rem;
+    align-items: flex-start;
+    padding-top: 3.5rem;
+  }
+
+  .dialogPanel {
+    border-radius: 0.5rem;
+    max-height: calc(100vh - 5rem);
+    width: 100%;
+  }
+
+  .dialogHeader {
+    padding: 0.75rem 1rem;
+    align-items: flex-start;
+  }
+
+  .dialogTitleLabel {
+    font-size: 0.7rem;
+    margin: 0;
+  }
+
+  .dialogTitle {
+    margin-top: 0.1rem;
+    font-size: 1.1rem;
+  }
+
+  .dialogTitleMeta {
+    margin-top: 0.15rem;
+    font-size: 0.85rem;
+  }
+
+  .dialogCloseButton {
+    padding: 0;
+    font-size: 1.25rem;
+    margin: 0;
+    align-self: flex-start;
+    line-height: 1;
+    height: auto;
+    margin-top: -0.25rem;
+  }
+
+  .dialogBody {
+    padding: 1rem;
+    max-height: calc(100vh - 18rem);
+    overflow-y: auto;
+  }
+
+  .formGrid {
+    gap: 0.75rem;
+  }
+
+  .formLabel {
+    font-size: 0.85rem;
+  }
+
+  .input {
+    padding: 0.45rem 0.75rem;
+    font-size: 0.85rem;
+  }
+
+  .dateInput {
+    padding-right: 2.5rem;
+  }
+
+  .formSection {
+    margin-top: 1rem;
+  }
+
+  .formSectionTitle {
+    font-size: 0.85rem;
+  }
+
+  .dialogFooter {
+    padding: 0.75rem 1rem 1rem;
+    gap: 0.5rem;
+  }
+
+  .dialogDeleteButton {
+    font-size: 0.8rem;
+    padding: 0.4rem 0.75rem;
+  }
+
+  .dialogCancelButton {
+    font-size: 0.8rem;
+    padding: 0.4rem 0.75rem;
+  }
+
+  .dialogSaveButton {
+    font-size: 0.8rem;
+    padding: 0.4rem 0.75rem;
+  }
+
+  .saveButtonTextFull {
+    display: none;
+  }
+
+  .saveButtonTextMobile {
+    display: inline;
+  }
 }
