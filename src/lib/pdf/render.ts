@@ -1,5 +1,4 @@
-import puppeteer from "puppeteer";
-import puppeteerCore from "puppeteer-core";
+import puppeteer from "puppeteer-core";
 
 const DEFAULT_TIMEOUT_MS = 20000;
 const DEFAULT_PDF_OPTIONS = {
@@ -36,65 +35,38 @@ function isVercelEnvironment(): boolean {
   );
 }
 
-interface ChromiumModule {
-  executablePath: () => Promise<string>;
-  args: string[];
-}
+async function launchBrowser() {
+  const isVercel = isVercelEnvironment();
 
-async function getChromiumConfig() {
-  if (isVercelEnvironment()) {
+  if (isVercel) {
     try {
-      const chromium = await import("@sparticuz/chromium");
-      const chromiumModule = (chromium.default ||
-        chromium) as unknown as ChromiumModule;
+      const chromium = await import(
+        /* webpackIgnore: true */ "@sparticuz/chromium"
+      );
+      const chromiumModule = chromium.default || chromium;
 
-      if (
-        !chromiumModule ||
-        typeof chromiumModule.executablePath !== "function"
-      ) {
-        throw new Error(
-          "Invalid chromium module: executablePath is not a function",
-        );
-      }
-
-      const executablePath = await chromiumModule.executablePath();
-      const baseArgs = Array.isArray(chromiumModule.args)
-        ? chromiumModule.args
-        : [];
-
-      if (!executablePath) {
-        throw new Error("Chromium executablePath returned empty value");
-      }
-
-      return {
-        executablePath,
-        args: [
-          ...baseArgs,
-          "--no-sandbox",
-          "--disable-setuid-sandbox",
-          "--disable-dev-shm-usage",
-          "--disable-accelerated-2d-canvas",
-          "--disable-gpu",
-          "--single-process",
-          "--disable-software-rasterizer",
-        ],
-      };
+      return await puppeteer.launch({
+        args: chromiumModule.args || [],
+        executablePath: await chromiumModule.executablePath(),
+        headless: chromiumModule.headless ?? true,
+        defaultViewport: chromiumModule.defaultViewport ?? {
+          width: 1920,
+          height: 1080,
+        },
+      });
     } catch (error) {
       console.error("Failed to load @sparticuz/chromium:", error);
-      if (error instanceof Error) {
-        console.error("Error details:", error.message, error.stack);
-      }
-      throw new Error(
-        `Failed to initialize Chromium for PDF generation on Vercel: ${error instanceof Error ? error.message : String(error)}`,
-      );
+      throw new Error("Chromium module not available in Vercel environment");
     }
   }
-  return {
-    executablePath: process.env.PUPPETEER_EXECUTABLE_PATH || undefined,
+
+  return await puppeteer.launch({
+    headless: true,
+    executablePath: process.env.PUPPETEER_EXECUTABLE_PATH,
     args:
       process.env.CHROMIUM_ARGS?.split(" ").filter(Boolean) ??
       DEFAULT_LAUNCH_ARGS,
-  };
+  });
 }
 
 export async function renderPdfBuffer(
@@ -102,35 +74,7 @@ export async function renderPdfBuffer(
   options?: { timeoutMs?: number },
 ): Promise<Buffer> {
   const timeoutMs = options?.timeoutMs ?? DEFAULT_TIMEOUT_MS;
-  const isVercel = isVercelEnvironment();
-  const chromiumConfig = await getChromiumConfig();
-
-  let browser;
-  if (isVercel) {
-    if (!chromiumConfig.executablePath) {
-      throw new Error(
-        "Chromium executable path is required on Vercel. @sparticuz/chromium may not be installed.",
-      );
-    }
-    browser = await puppeteerCore.launch({
-      headless: true,
-      executablePath: chromiumConfig.executablePath,
-      args: chromiumConfig.args,
-    });
-  } else {
-    const launchOptions: {
-      headless: boolean;
-      executablePath?: string;
-      args: string[];
-    } = {
-      headless: true,
-      args: chromiumConfig.args,
-    };
-    if (chromiumConfig.executablePath) {
-      launchOptions.executablePath = chromiumConfig.executablePath;
-    }
-    browser = await puppeteer.launch(launchOptions);
-  }
+  const browser = await launchBrowser();
 
   const page = await browser.newPage();
 
