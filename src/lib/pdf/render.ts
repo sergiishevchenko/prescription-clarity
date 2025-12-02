@@ -50,7 +50,7 @@ async function launchBrowser() {
   if (isVercel) {
     try {
       const chromium = await import(
-        /* webpackIgnore: true */ "@sparticuz/chromium"
+        /* webpackIgnore: true */ "@sparticuz/chromium-min"
       );
       const chromiumModule = chromium.default || chromium;
 
@@ -59,10 +59,27 @@ async function launchBrowser() {
         throw new PdfChromiumError("Chromium executable path not available");
       }
 
+      const chromiumArgs = [
+        ...(chromiumModule.args || []),
+        "--disable-dev-shm-usage",
+        "--disable-software-rasterizer",
+        "--disable-gpu",
+        "--no-sandbox",
+        "--disable-setuid-sandbox",
+        "--disable-web-security",
+        "--disable-features=IsolateOrigins,site-per-process",
+        "--disable-site-isolation-trials",
+      ];
+
+      const headlessValue =
+        typeof chromiumModule.headless === "boolean"
+          ? chromiumModule.headless
+          : true;
+
       return await puppeteer.launch({
-        args: chromiumModule.args || [],
+        args: chromiumArgs,
         executablePath,
-        headless: chromiumModule.headless ?? true,
+        headless: headlessValue,
         defaultViewport: chromiumModule.defaultViewport ?? {
           width: 1920,
           height: 1080,
