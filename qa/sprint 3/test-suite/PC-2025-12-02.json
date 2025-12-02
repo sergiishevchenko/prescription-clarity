@@ -1,0 +1,537 @@
+{
+  "suites": [
+    {
+      "id": 3,
+      "title": "Sprint 3 - Profile Sharing & PDF Export",
+      "description": null,
+      "preconditions": null,
+      "suites": [],
+      "cases": [
+        {
+          "id": 21,
+          "title": "Data Sharing page loads and empty state is displayed",
+          "description": "**Objective:**\nVerify that the Data Sharing page loads correctly, UI elements render properly, and no-access state is shown when there are no share links.",
+          "preconditions": "User is logged in as patient.\n\nNo share links exist.",
+          "postconditions": null,
+          "priority": "medium",
+          "severity": "minor",
+          "type": "functional",
+          "behavior": "positive",
+          "automation": "is-not-automated",
+          "status": "actual",
+          "is_flaky": "no",
+          "layer": "e2e",
+          "milestone": null,
+          "custom_fields": [],
+          "steps_type": "classic",
+          "steps": [
+            {
+              "position": 1,
+              "action": "Navigate to `Personal → Data Sharing.`",
+              "expected_result": "Data Sharing page opens successfully.",
+              "data": "",
+              "steps": []
+            },
+            {
+              "position": 2,
+              "action": "Observe the “Who Has Access (0)” block.",
+              "expected_result": "Zero-access state is displayed.",
+              "data": "",
+              "steps": []
+            },
+            {
+              "position": 3,
+              "action": "Check the content inside the main panel.",
+              "expected_result": "Message *“No share links yet. Create a link to share your profile…”* is visible.",
+              "data": "",
+              "steps": []
+            },
+            {
+              "position": 4,
+              "action": "Verify the dropdown filter state.",
+              "expected_result": "\"Active\" filter is selected by default.",
+              "data": "",
+              "steps": []
+            }
+          ],
+          "tags": [],
+          "params": [],
+          "is_muted": "no"
+        },
+        {
+          "id": 22,
+          "title": "Create a share link and validate Active state",
+          "description": null,
+          "preconditions": "* User is authenticated.\n* No existing active share links.",
+          "postconditions": null,
+          "priority": "high",
+          "severity": "normal",
+          "type": "functional",
+          "behavior": "positive",
+          "automation": "is-not-automated",
+          "status": "actual",
+          "is_flaky": "no",
+          "layer": "e2e",
+          "milestone": null,
+          "custom_fields": [],
+          "steps_type": "classic",
+          "steps": [
+            {
+              "position": 1,
+              "action": "Navigate to Data Sharing page.",
+              "expected_result": "Screen loads, empty state is visible.",
+              "data": "",
+              "steps": []
+            },
+            {
+              "position": 2,
+              "action": "Click **“Share profile”**.",
+              "expected_result": "Modal “Share your profile” appears.",
+              "data": "",
+              "steps": []
+            },
+            {
+              "position": 3,
+              "action": "Observe generated link inside the text field.",
+              "expected_result": "A unique URL with `/api/share/accept?token=` is displayed.",
+              "data": "",
+              "steps": []
+            },
+            {
+              "position": 4,
+              "action": "Click **“Copy”**.",
+              "expected_result": "Success toast appears *“Shared Link copied to clickboard”*.",
+              "data": "",
+              "steps": []
+            },
+            {
+              "position": 5,
+              "action": "Close the modal.",
+              "expected_result": "* Modal disappears,\n* User returns to the Data Sharing list.",
+              "data": "",
+              "steps": []
+            },
+            {
+              "position": 6,
+              "action": "Verify new entry is displayed",
+              "expected_result": "A new row appears with the following details:\n\n* **Status:** “Active” (green badge)\n* **Label:** “Pending viewer”\n* **State:** “Awaiting acceptance”\n* **Created on:** Current date\n* Revoke button is visible.",
+              "data": "",
+              "steps": []
+            },
+            {
+              "position": 7,
+              "action": "Change filter to “Active”",
+              "expected_result": "Only the newly created *Active* link is displayed.\n\nNo revoked/expired links appear.",
+              "data": "",
+              "steps": []
+            },
+            {
+              "position": 8,
+              "action": "Change filter to “Revoked”",
+              "expected_result": "Only revoked links are displayed.\n\nActive link disappears from the list.",
+              "data": "",
+              "steps": []
+            },
+            {
+              "position": 9,
+              "action": "Change filter to “Expired”",
+              "expected_result": "* If there are no expired links → empty state is shown.\n* If expired links exist → only expired items are displayed.",
+              "data": "",
+              "steps": []
+            },
+            {
+              "position": 10,
+              "action": "Change filter to “All”",
+              "expected_result": "* All categories appear (Active + Revoked + Expired).\n* Order matches backend sorting rules.\n* The newly created *Active* entry is still visible.",
+              "data": "",
+              "steps": []
+            }
+          ],
+          "tags": [],
+          "params": [],
+          "is_muted": "no"
+        },
+        {
+          "id": 23,
+          "title": "Revoke an existing share link and verify Revoked state",
+          "description": null,
+          "preconditions": "* User is authenticated.\n* At least one active share link exists.",
+          "postconditions": null,
+          "priority": "high",
+          "severity": "major",
+          "type": "functional",
+          "behavior": "positive",
+          "automation": "is-not-automated",
+          "status": "actual",
+          "is_flaky": "no",
+          "layer": "unknown",
+          "milestone": null,
+          "custom_fields": [],
+          "steps_type": "classic",
+          "steps": [
+            {
+              "position": 1,
+              "action": "Navigate to Data Sharing page.",
+              "expected_result": "Active share link is displayed with “Active” badge.",
+              "data": "",
+              "steps": []
+            },
+            {
+              "position": 2,
+              "action": "Click **“Revoke”** button on the link entry.",
+              "expected_result": "Confirmation modal “Revoke access?” appears.",
+              "data": "",
+              "steps": []
+            },
+            {
+              "position": 3,
+              "action": "Click **“Revoke”** in the modal.",
+              "expected_result": "* Link status changes to **“Revoked”**\n* Badge becomes red\n* **Row disappears** under filter = Active.",
+              "data": "",
+              "steps": []
+            },
+            {
+              "position": 4,
+              "action": "Switch filter to *All*.",
+              "expected_result": "Both Active and Revoked items (if any) appear.",
+              "data": "",
+              "steps": []
+            }
+          ],
+          "tags": [],
+          "params": [],
+          "is_muted": "no"
+        },
+        {
+          "id": 24,
+          "title": "Full end-to-end profile sharing flow",
+          "description": "**Objective**\n\n\nVerify the complete sharing workflow between two registered users:\nOwner shares profile → Viewer accepts → Viewer sees schedule → Owner updates schedule → Viewer sees updates → Owner revokes access → Viewer loses access.",
+          "preconditions": "* **Owner User** is registered and logged in (Browser A).\n* **Viewer User** is registered and logged in (Browser B).\n* Owner has at least one medication with active schedule entries.\n* No previously active sharing links between these two users.",
+          "postconditions": null,
+          "priority": "high",
+          "severity": "major",
+          "type": "functional",
+          "behavior": "positive",
+          "automation": "is-not-automated",
+          "status": "actual",
+          "is_flaky": "no",
+          "layer": "e2e",
+          "milestone": null,
+          "custom_fields": [],
+          "steps_type": "classic",
+          "steps": [
+            {
+              "position": 1,
+              "action": "Owner navigates to “Data Sharing” page",
+              "expected_result": "Data Sharing page loads successfully with “Share profile” button visible.",
+              "data": "",
+              "steps": []
+            },
+            {
+              "position": 2,
+              "action": "Click **Share profile** and press **Copy** in the modal to generate a share link.",
+              "expected_result": "A unique share link is generated and copied; a new “Pending viewer — Active” entry appears in the list.",
+              "data": "",
+              "steps": []
+            },
+            {
+              "position": 3,
+              "action": "Navigate as Owner to **Dashboard** and review **Access Roles → People who can view my data**.",
+              "expected_result": "The pending viewer entry (email) is displayed under “People who can view my data.”",
+              "data": "",
+              "steps": []
+            },
+            {
+              "position": 4,
+              "action": "Open the generated share link in a new browser as Viewer.",
+              "expected_result": "“Accept shared profile” page is displayed showing Owner’s name and email.",
+              "data": "",
+              "steps": []
+            },
+            {
+              "position": 5,
+              "action": "Click **Accept access** as Viewer.",
+              "expected_result": "Green notification “Access granted” appears with a **Go to dashboard** button.",
+              "data": "",
+              "steps": []
+            },
+            {
+              "position": 6,
+              "action": "Click **Go to dashboard** as Viewer.",
+              "expected_result": "Viewer dashboard opens and shows Owner under **Profiles I can view**, with **Open week view** button.",
+              "data": "",
+              "steps": []
+            },
+            {
+              "position": 7,
+              "action": "Click **Open week view** as Viewer.",
+              "expected_result": "Viewer sees Owner’s **Week View** schedule in read-only mode.",
+              "data": "",
+              "steps": []
+            },
+            {
+              "position": 8,
+              "action": "As Owner, open **Week View** and mark several medications as **Taken**.",
+              "expected_result": "Selected medication entries update to “Taken” and appear checked in Owner’s schedule.",
+              "data": "",
+              "steps": []
+            },
+            {
+              "position": 9,
+              "action": "Refresh the Week View page as Viewer.",
+              "expected_result": "Viewer sees updated “Taken” states in Owner’s schedule.",
+              "data": "",
+              "steps": []
+            },
+            {
+              "position": 10,
+              "action": "As Owner, go to **Data Sharing** and click **Revoke** for this viewer.",
+              "expected_result": "The shared entry changes to **Revoked**, and is hidden when filter = Active.",
+              "data": "",
+              "steps": []
+            },
+            {
+              "position": 11,
+              "action": "Refresh Viewer’s dashboard.",
+              "expected_result": "**Profiles I can view** section no longer contains Owner’s profile.",
+              "data": "",
+              "steps": []
+            },
+            {
+              "position": 12,
+              "action": "Attempt to open the same shared link again as Viewer.",
+              "expected_result": "* The viewer sees a denied state\n* Фccess to Owner’s data is no longer available.",
+              "data": "",
+              "steps": []
+            }
+          ],
+          "tags": [],
+          "params": [],
+          "is_muted": "no"
+        },
+        {
+          "id": 25,
+          "title": "Display of dependents list and medication details",
+          "description": null,
+          "preconditions": "User is logged in and has at least 1 dependent (viewer access previously accepted).",
+          "postconditions": null,
+          "priority": "medium",
+          "severity": "major",
+          "type": "functional",
+          "behavior": "positive",
+          "automation": "is-not-automated",
+          "status": "actual",
+          "is_flaky": "no",
+          "layer": "unknown",
+          "milestone": null,
+          "custom_fields": [],
+          "steps_type": "classic",
+          "steps": [
+            {
+              "position": 1,
+              "action": "Open the “Dependents” page and review the dependent card and its medication list.",
+              "expected_result": "The dependent card appears with correct avatar, name, age, adherence %, medication count, and all medications are listed with correct names, dosage and form.",
+              "data": "",
+              "steps": []
+            }
+          ],
+          "tags": [],
+          "params": [],
+          "is_muted": "no"
+        },
+        {
+          "id": 26,
+          "title": "Validation of adherence and medication information consistency",
+          "description": "Dependent has adherence data and at least one active medication.",
+          "preconditions": "Dependent has adherence data and at least one active medication.",
+          "postconditions": null,
+          "priority": "high",
+          "severity": "major",
+          "type": "functional",
+          "behavior": "positive",
+          "automation": "is-not-automated",
+          "status": "actual",
+          "is_flaky": "no",
+          "layer": "e2e",
+          "milestone": null,
+          "custom_fields": [],
+          "steps_type": "classic",
+          "steps": [
+            {
+              "position": 1,
+              "action": "On the “Dependents” page, verify adherence %, medication count, and compare them with backend test data.",
+              "expected_result": "Displayed adherence value and medication count match backend records; no incorrect or outdated values appear.",
+              "data": "",
+              "steps": []
+            }
+          ],
+          "tags": [],
+          "params": [],
+          "is_muted": "no"
+        },
+        {
+          "id": 27,
+          "title": "Opening and interaction with the Print Schedule modal",
+          "description": null,
+          "preconditions": "User has at least one dependent.",
+          "postconditions": null,
+          "priority": "medium",
+          "severity": "normal",
+          "type": "functional",
+          "behavior": "positive",
+          "automation": "is-not-automated",
+          "status": "actual",
+          "is_flaky": "no",
+          "layer": "e2e",
+          "milestone": null,
+          "custom_fields": [],
+          "steps_type": "classic",
+          "steps": [
+            {
+              "position": 1,
+              "action": "Click the Print icon on the Dependent card to open the modal, navigate between weeks, and verify week selection.",
+              "expected_result": "The “Print schedule” modal opens correctly, shows proper week range, supports navigation (Previous/Next), and updates displayed calendar accurately.",
+              "data": "",
+              "steps": []
+            }
+          ],
+          "tags": [],
+          "params": [],
+          "is_muted": "no"
+        },
+        {
+          "id": 28,
+          "title": "PDF export behavior and error handling",
+          "description": null,
+          "preconditions": "Print modal is open for a dependent.",
+          "postconditions": null,
+          "priority": "high",
+          "severity": "major",
+          "type": "functional",
+          "behavior": "undefined",
+          "automation": "is-not-automated",
+          "status": "actual",
+          "is_flaky": "no",
+          "layer": "e2e",
+          "milestone": null,
+          "custom_fields": [],
+          "steps_type": "classic",
+          "steps": [
+            {
+              "position": 1,
+              "action": "Click “Export PDF” and observe the system response.",
+              "expected_result": "PDF export starts. If PDF service is unavailable, user sees a friendly error message (“PDF generation service unavailable”) without console errors or broken UI elements.",
+              "data": "",
+              "steps": []
+            }
+          ],
+          "tags": [],
+          "params": [],
+          "is_muted": "no"
+        },
+        {
+          "id": 29,
+          "title": "Verify PDF export from Week View",
+          "description": null,
+          "preconditions": "* User is logged in.\n* User has at least one medication scheduled for the current week.\n* Week View page is accessible.",
+          "postconditions": null,
+          "priority": "high",
+          "severity": "major",
+          "type": "functional",
+          "behavior": "positive",
+          "automation": "is-not-automated",
+          "status": "actual",
+          "is_flaky": "no",
+          "layer": "e2e",
+          "milestone": null,
+          "custom_fields": [],
+          "steps_type": "classic",
+          "steps": [
+            {
+              "position": 1,
+              "action": "Open the **Week View** page from the sidebar.",
+              "expected_result": "Week View is displayed with the current week shown, and medication schedule entries are visible.",
+              "data": "",
+              "steps": []
+            },
+            {
+              "position": 2,
+              "action": "Click the **Print** button in the top-right corner of the Week View page.",
+              "expected_result": "A modal window **“Print schedule”** opens, displaying the selected week (e.g., *Dec 1 – Dec 7*) and a calendar for choosing the week.",
+              "data": "",
+              "steps": []
+            },
+            {
+              "position": 3,
+              "action": "Use **Previous** or **Next** buttons in the modal to change the week range.",
+              "expected_result": "The displayed week range updates correctly, and the calendar highlights update accordingly.",
+              "data": "",
+              "steps": []
+            },
+            {
+              "position": 4,
+              "action": "Click **Export PDF**.",
+              "expected_result": "The system attempts to generate a PDF file for the selected week.\n\nIf successful → the PDF begins downloading.\nIf the PDF service is unavailable → a friendly error appears: *“PDF generation service unavailable. Please try again later.”*",
+              "data": "",
+              "steps": []
+            }
+          ],
+          "tags": [],
+          "params": [],
+          "is_muted": "no"
+        },
+        {
+          "id": 30,
+          "title": "Verify that exported PDF content matches Week View schedule",
+          "description": null,
+          "preconditions": "* User is logged in.\n* Week View contains at least one medication entry for the selected week.\n* PDF generation service is operational.\n* User has a PDF viewer installed.",
+          "postconditions": null,
+          "priority": "high",
+          "severity": "major",
+          "type": "functional",
+          "behavior": "undefined",
+          "automation": "is-not-automated",
+          "status": "actual",
+          "is_flaky": "no",
+          "layer": "e2e",
+          "milestone": null,
+          "custom_fields": [],
+          "steps_type": "classic",
+          "steps": [
+            {
+              "position": 1,
+              "action": "Open **Week View** page.",
+              "expected_result": "Week View displays the current week’s medication schedule.",
+              "data": "",
+              "steps": []
+            },
+            {
+              "position": 2,
+              "action": "Click the **Print** button on the Week View page.",
+              "expected_result": "The PDF file for the selected week automatically downloads without errors.",
+              "data": "",
+              "steps": []
+            },
+            {
+              "position": 3,
+              "action": "Open the downloaded PDF file.",
+              "expected_result": "PDF displays the medication schedule for the same week.",
+              "data": "",
+              "steps": []
+            },
+            {
+              "position": 4,
+              "action": "Visually compare the PDF content with the schedule displayed on Week View (entries, times, dosage, meal timing, days).",
+              "expected_result": "PDF content fully matches what is displayed on Week View.",
+              "data": "",
+              "steps": []
+            }
+          ],
+          "tags": [],
+          "params": [],
+          "is_muted": "no"
+        }
+      ]
+    }
+  ]
+}
