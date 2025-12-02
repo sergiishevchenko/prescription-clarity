@@ -308,6 +308,7 @@ NEXT_PUBLIC_APP_URL="https://your-app.vercel.app"
    - `SESSION_COOKIE_NAME` - Session cookie name
    - `SESSION_SECRET` - Strong secret key
    - `NEXT_PUBLIC_APP_URL` - Your Vercel app URL
+   - `AWS_LAMBDA_JS_RUNTIME` - Set to `nodejs22.x` (required for PDF export functionality)
 
 3. **Deploy**
    - Automatic deployments on push to main branch
@@ -500,6 +501,18 @@ npm run build
 # Error: TypeScript errors
 # Solution: Check types and run typecheck
 npm run typecheck
+```
+
+#### PDF Export Issues on Vercel
+
+```bash
+# Error: libnss3.so: cannot open shared object file
+# Solution: 
+# 1. Ensure you're using @sparticuz/chromium version 141.0.0 or later
+# 2. Add environment variable in Vercel project settings:
+#    - Key: AWS_LAMBDA_JS_RUNTIME
+#    - Value: nodejs22.x
+# 3. Redeploy your application
 ```
 
 #### Authentication Issues
