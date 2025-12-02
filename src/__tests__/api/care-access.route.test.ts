@@ -40,24 +40,28 @@ const mockViewer1 = {
   id: "viewer1",
   email: "viewer1@example.com",
   name: "Viewer One",
+  dateOfBirth: null,
 };
 
 const mockViewer2 = {
   id: "viewer2",
   email: "viewer2@example.com",
   name: "Viewer Two",
+  dateOfBirth: null,
 };
 
 const mockPatient1 = {
   id: "patient1",
   email: "patient1@example.com",
   name: "Patient One",
+  dateOfBirth: null,
 };
 
 const mockPatient2 = {
   id: "patient2",
   email: "patient2@example.com",
   name: "Patient Two",
+  dateOfBirth: null,
 };
 
 beforeEach(() => {
@@ -168,6 +172,11 @@ describe("GET /api/care-access", () => {
 
     prismaMock.careAccess.findMany.mockResolvedValueOnce([]); // viewers
     prismaMock.careAccess.findMany.mockResolvedValueOnce(caringForData); // caringFor
+    // Mock adherence calculations for both patients
+    prismaMock.dayStatus.findMany.mockResolvedValueOnce([]); // patient1 - 7 days
+    prismaMock.dayStatus.findMany.mockResolvedValueOnce([]); // patient1 - 30 days
+    prismaMock.dayStatus.findMany.mockResolvedValueOnce([]); // patient2 - 7 days
+    prismaMock.dayStatus.findMany.mockResolvedValueOnce([]); // patient2 - 30 days
 
     const res = await CareAccessRoute.GET(makeGetReq());
     const data = await res.json();
@@ -222,6 +231,9 @@ describe("GET /api/care-access", () => {
 
     prismaMock.careAccess.findMany.mockResolvedValueOnce(myViewersData);
     prismaMock.careAccess.findMany.mockResolvedValueOnce(caringForData);
+    // Mock adherence calculations for patient1
+    prismaMock.dayStatus.findMany.mockResolvedValueOnce([]); // patient1 - 7 days
+    prismaMock.dayStatus.findMany.mockResolvedValueOnce([]); // patient1 - 30 days
 
     const res = await CareAccessRoute.GET(makeGetReq());
     const data = await res.json();
