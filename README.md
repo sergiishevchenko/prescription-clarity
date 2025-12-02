@@ -507,7 +507,7 @@ npm run typecheck
 
 ```bash
 # Error: libnss3.so: cannot open shared object file
-# Solution: 
+# Solution:
 # 1. Ensure you're using @sparticuz/chromium version 141.0.0 or later
 # 2. Add environment variable in Vercel project settings:
 #    - Key: AWS_LAMBDA_JS_RUNTIME
