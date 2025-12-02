@@ -11,7 +11,9 @@ export const runtime = "nodejs";
 
 /**
  * GET /api/medications
- * Get all medications for the authenticated user
+ * Get medications for:
+ * - the authenticated user (default), or
+ * - a specific userId, if the authenticated user has care-access to that user
  */
 export async function GET(request: NextRequest) {
   try {
@@ -21,9 +23,35 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
+    const { searchParams } = new URL(request.url);
+    const requestedUserId = searchParams.get("userId");
+
+    // Determine which user's medications to load:
+    // - If no userId is provided, use the authenticated user's ID (existing behavior)
+    // - If userId is provided and differs from the current user, ensure we have care-access
+    let targetUserId = user.id;
+
+    if (requestedUserId && requestedUserId !== user.id) {
+      const careAccess = await prisma.careAccess.findFirst({
+        where: {
+          ownerId: requestedUserId,
+          viewerId: user.id,
+        },
+      });
+
+      if (!careAccess) {
+        return NextResponse.json(
+          { error: "Forbidden: No access to this user's medications" },
+          { status: 403 },
+        );
+      }
+
+      targetUserId = requestedUserId;
+    }
+
     // Build where clause - only return non-deleted medications
     const where = {
-      userId: user.id,
+      userId: targetUserId,
       deletedAt: null,
     };
 

@@ -31,8 +31,25 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: "Invalid input data" }, { status: 400 });
   }
 
-  if (payload.userId !== user.id) {
-    return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+  // Determine which user's schedule to export:
+  // - If payload.userId is the authenticated user, allow.
+  // - If it's a different user, require an existing care-access record
+  //   where the current user is the viewer and the target is the owner.
+  const targetUserId = payload.userId;
+  if (targetUserId !== user.id) {
+    const careAccess = await prisma.careAccess.findFirst({
+      where: {
+        ownerId: targetUserId,
+        viewerId: user.id,
+      },
+    });
+
+    if (!careAccess) {
+      return NextResponse.json(
+        { error: "Forbidden: No access to this user's schedule" },
+        { status: 403 },
+      );
+    }
   }
 
   let fromDate: Date;
@@ -49,9 +66,25 @@ export async function POST(request: NextRequest) {
   }
 
   try {
+    const targetUser = await prisma.user.findUnique({
+      where: { id: targetUserId },
+      select: {
+        id: true,
+        name: true,
+        email: true,
+      },
+    });
+
+    if (!targetUser) {
+      return NextResponse.json(
+        { error: "User not found" },
+        { status: 404 },
+      );
+    }
+
     const totalCount = await prisma.scheduleEntry.count({
       where: {
-        userId: user.id,
+        userId: targetUserId,
         dateTime: {
           gte: fromDate,
           lte: toDate,
@@ -61,7 +94,7 @@ export async function POST(request: NextRequest) {
 
     const entries = (await prisma.scheduleEntry.findMany({
       where: {
-        userId: user.id,
+        userId: targetUserId,
         dateTime: {
           gte: fromDate,
           lte: toDate,
@@ -106,7 +139,7 @@ export async function POST(request: NextRequest) {
       ).length;
 
       console.log("No valid entries found", {
-        userId: user.id,
+        userId: targetUserId,
         fromDate: fromDate.toISOString(),
         toDate: toDate.toISOString(),
         totalEntriesInRange: totalCount,
@@ -130,7 +163,7 @@ export async function POST(request: NextRequest) {
       tz: payload.tz,
       from: fromDate,
       to: toDate,
-      userName: user.name ?? user.email,
+      userName: targetUser.name ?? targetUser.email,
       rangeLabel,
       generatedAt: new Date(),
     });

@@ -15,12 +15,13 @@ datasource db {
 }
 
 model User {
-  id           String   @id @default(cuid()) @db.VarChar(32)
-  email        String   @unique @db.VarChar(255)
-  passwordHash String   @db.VarChar(60)
-  name         String?  @db.VarChar(255)
-  createdAt    DateTime @default(now())
-  updatedAt    DateTime @updatedAt
+  id           String    @id @default(cuid()) @db.VarChar(32)
+  email        String    @unique @db.VarChar(255)
+  passwordHash String    @db.VarChar(60)
+  name         String?   @db.VarChar(255)
+  dateOfBirth  DateTime? // Optional, used to derive age for dependents/care access
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
 
   sessions           Session[]
   medications        Medication[]

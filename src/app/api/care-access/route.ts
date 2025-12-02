@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
 import { getSessionUserFromRequest } from "@/lib/auth/session";
+import { getAdherenceSummariesForUser } from "@/lib/adherence";
 
 export const runtime = "nodejs";
 
@@ -19,6 +20,18 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
+    // Helper to calculate age in full years from a Date
+    const calculateAge = (dateOfBirth: Date | null | undefined): number | null => {
+      if (!dateOfBirth) return null;
+      const today = new Date();
+      let age = today.getFullYear() - dateOfBirth.getFullYear();
+      const monthDiff = today.getMonth() - dateOfBirth.getMonth();
+      if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < dateOfBirth.getDate())) {
+        age -= 1;
+      }
+      return age >= 0 ? age : null;
+    };
+
     // Get people who can view my data (I am the owner)
     const myViewers = await prisma.careAccess.findMany({
       where: {
@@ -34,6 +47,7 @@ export async function GET(request: NextRequest) {
             id: true,
             email: true,
             name: true,
+            dateOfBirth: true,
           },
         },
       },
@@ -57,6 +71,7 @@ export async function GET(request: NextRequest) {
             id: true,
             email: true,
             name: true,
+            dateOfBirth: true,
           },
         },
       },
@@ -65,22 +80,58 @@ export async function GET(request: NextRequest) {
       },
     });
 
+    // Pre-compute adherence summaries for people I'm caring for (owner side)
+    const caringForWithAdherence = await Promise.all(
+      caringFor.map(async (access) => {
+        const summaries = await getAdherenceSummariesForUser(access.ownerId);
+        const last7 = summaries.find((s) => s.windowDays === 7)?.adherence ?? null;
+        const last30 =
+          summaries.find((s) => s.windowDays === 30)?.adherence ?? null;
+
+        return {
+          access,
+          adherence7Days: last7,
+          adherence30Days: last30,
+        };
+      }),
+    );
+
     return NextResponse.json(
       {
-        viewers: myViewers.map((access) => ({
-          accessId: access.id,
-          userId: access.viewerId,
-          user: access.viewer,
-          grantedAt: access.createdAt,
-          updatedAt: access.updatedAt,
-        })),
-        caringFor: caringFor.map((access) => ({
-          accessId: access.id,
-          userId: access.ownerId,
-          user: access.owner,
-          grantedAt: access.createdAt,
-          updatedAt: access.updatedAt,
-        })),
+        viewers: myViewers.map((access) => {
+          const age = calculateAge(access.viewer.dateOfBirth);
+          return {
+            accessId: access.id,
+            userId: access.viewerId,
+            user: {
+              id: access.viewer.id,
+              email: access.viewer.email,
+              name: access.viewer.name,
+              dateOfBirth: access.viewer.dateOfBirth,
+              age,
+            },
+            grantedAt: access.createdAt,
+            updatedAt: access.updatedAt,
+          };
+        }),
+        caringFor: caringForWithAdherence.map(({ access, adherence7Days, adherence30Days }) => {
+          const age = calculateAge(access.owner.dateOfBirth);
+          return {
+            accessId: access.id,
+            userId: access.ownerId,
+            user: {
+              id: access.owner.id,
+              email: access.owner.email,
+              name: access.owner.name,
+              dateOfBirth: access.owner.dateOfBirth,
+              age,
+              adherence7Days,
+              adherence30Days,
+            },
+            grantedAt: access.createdAt,
+            updatedAt: access.updatedAt,
+          };
+        }),
       },
       { status: 200 },
     );

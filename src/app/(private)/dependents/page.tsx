@@ -1,95 +1,50 @@
+/* eslint-disable react/jsx-no-comment-textnodes */
+"use client";
+
 import Link from "next/link";
+import { useEffect, useState } from "react";
+import { getWeekDays, formatWeekRange } from "@/lib/week";
 import styles from "./dependents.module.css";
+
+// --- Types for API data ---
+type CareAccessUser = {
+  id: string;
+  email: string;
+  name: string | null;
+  dateOfBirth: string | null;
+  age: number | null;
+  adherence7Days?: number | null;
+  adherence30Days?: number | null;
+};
+
+type CareAccessItem = {
+  accessId: string;
+  userId: string;
+  user: CareAccessUser;
+  grantedAt: string;
+  updatedAt: string;
+};
+
+type CareAccessResponse = {
+  viewers: CareAccessItem[];
+  caringFor: CareAccessItem[];
+};
 
 type Medication = {
   id: string;
   name: string;
-  dosage: string;
-  time: string;
-  taken: boolean;
+  dose: number | null;
+  form: string | null;
 };
 
 type Dependent = {
   id: string;
+  userId: string;
   name: string;
-  age: number;
-  adherence: number;
-  medicationCount: number;
-  avatar: string;
-  isActive: boolean;
+  age: number | null;
+  adherence30: number | null;
   medications: Medication[];
 };
-
-const DEPENDENTS: Dependent[] = [
-  {
-    id: "1",
-    name: "Anna Williams",
-    age: 10,
-    adherence: 95,
-    medicationCount: 1,
-    avatar: "/avatars/anna.jpg",
-    isActive: true,
-    medications: [
-      {
-        id: "m1",
-        name: "Vitamin D3",
-        dosage: "400 IU",
-        time: "8:00 AM",
-        taken: true,
-      },
-    ],
-  },
-  {
-    id: "2",
-    name: "Hans Müller",
-    age: 75,
-    adherence: 91,
-    medicationCount: 2,
-    avatar: "/avatars/hans.jpg",
-    isActive: true,
-    medications: [
-      {
-        id: "m2",
-        name: "Metformin",
-        dosage: "500 mg",
-        time: "8:00 AM",
-        taken: true,
-      },
-      {
-        id: "m3",
-        name: "Lisinopril",
-        dosage: "10 mg",
-        time: "9:00 AM",
-        taken: false,
-      },
-    ],
-  },
-  {
-    id: "3",
-    name: "Maria Garcia",
-    age: 68,
-    adherence: 96,
-    medicationCount: 2,
-    avatar: "/avatars/maria.jpg",
-    isActive: false,
-    medications: [
-      {
-        id: "m4",
-        name: "Omeprazole",
-        dosage: "20 mg",
-        time: "7:00 AM",
-        taken: true,
-      },
-      {
-        id: "m5",
-        name: "Aspirin",
-        dosage: "81 mg",
-        time: "8:00 AM",
-        taken: true,
-      },
-    ],
-  },
-];
 
 function HeartIcon({ className }: { className?: string }) {
   return (
@@ -308,8 +263,42 @@ function UsersIcon({ className }: { className?: string }) {
   );
 }
 
-function DependentCard({ dependent }: { dependent: Dependent }) {
-  const initials = dependent.name
+function Spinner({ className }: { className?: string }) {
+  return (
+    <svg
+      className={className}
+      viewBox="0 0 24 24"
+      fill="none"
+      aria-hidden="true"
+    >
+      <circle
+        cx="12"
+        cy="12"
+        r="10"
+        stroke="currentColor"
+        strokeWidth="4"
+        style={{ opacity: 0.25 }}
+      />
+      <path
+        fill="currentColor"
+        style={{ opacity: 0.75 }}
+        d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+      />
+    </svg>
+  );
+}
+
+function DependentCard({
+  dependent,
+  onPrint,
+  isPrinting,
+}: {
+  dependent: Dependent;
+  onPrint: () => void;
+  isPrinting: boolean;
+}) {
+  const name = dependent.name;
+  const initials = name
     .split(" ")
     .map((n) => n[0])
     .join("")
@@ -321,27 +310,37 @@ function DependentCard({ dependent }: { dependent: Dependent }) {
         <div className={styles.avatarSection}>
           <div className={styles.avatarWrapper}>
             <div className={styles.avatarFallback}>{initials}</div>
-            {dependent.isActive && (
               <span className={styles.statusIndicator} aria-label="Active" />
-            )}
           </div>
         </div>
         <div className={styles.cardInfo}>
-          <h3 className={styles.dependentName}>{dependent.name}</h3>
+          <h3 className={styles.dependentName}>{name}</h3>
           <p className={styles.dependentMeta}>
-            {dependent.age} years • {dependent.adherence}% adherence •{" "}
-            {dependent.medicationCount} medication
-            {dependent.medicationCount !== 1 ? "s" : ""}
+            {typeof dependent.age === "number" ? `${dependent.age} years` : "Age —"} •{" "}
+            {typeof dependent.adherence30 === "number"
+              ? `${dependent.adherence30}% adherence (30 days)`
+              : "Adherence —"}{" "}
+            • {dependent.medications.length} medication
+            {dependent.medications.length !== 1 ? "s" : ""}
           </p>
         </div>
         <div className={styles.cardActions}>
+          {isPrinting && (
+            <div className={styles.loaderContainer}>
+              <Spinner className={styles.spinner} />
+            </div>
+          )}
           <button
             type="button"
             className={styles.printButton}
-            aria-label="Print Schedule"
+            aria-label="Print schedule as PDF"
+            onClick={onPrint}
+            disabled={isPrinting}
           >
             <PrinterIcon className={styles.actionIcon} />
           </button>
+          {/* Future actions for dependents */}
+          {/*
           <button type="button" className={styles.editButton}>
             <EditIcon className={styles.editButtonIcon} />
             Edit
@@ -353,24 +352,28 @@ function DependentCard({ dependent }: { dependent: Dependent }) {
           >
             <ChevronDownIcon className={styles.expandIcon} />
           </button>
+          */}
         </div>
       </div>
 
+      {/* Placeholder for future medications list sourced from real data */}
       <div className={styles.medicationsList}>
         {dependent.medications.map((med) => (
           <div key={med.id} className={styles.medicationItem}>
             <div className={styles.medicationStatus}>
               <CheckCircleIcon
-                className={`${styles.checkIcon} ${med.taken ? styles.checkIconTaken : styles.checkIconPending}`}
+                className={`${styles.checkIcon} ${styles.checkIconPending}`}
               />
             </div>
             <div className={styles.medicationInfo}>
               <span className={styles.medicationName}>{med.name}</span>
               <span className={styles.medicationDetails}>
-                {med.dosage} •{" "}
-                <span className={styles.medTime}>{med.time}</span>
+                {med.dose !== null ? `${med.dose} mg` : "Dose —"}
+                {med.form ? ` • ${med.form}` : ""}
               </span>
             </div>
+            {/* Future per-medication actions */}
+            {/*
             <div className={styles.medicationActions}>
               <button
                 type="button"
@@ -387,6 +390,7 @@ function DependentCard({ dependent }: { dependent: Dependent }) {
                 <TrashIcon className={styles.medActionIcon} />
               </button>
             </div>
+            */}
           </div>
         ))}
       </div>
@@ -395,14 +399,255 @@ function DependentCard({ dependent }: { dependent: Dependent }) {
 }
 
 export default function DependentsPage() {
-  const totalDependents = DEPENDENTS.length;
-  const averageAdherence = Math.round(
-    DEPENDENTS.reduce((sum, d) => sum + d.adherence, 0) / totalDependents,
+  const [data, setData] = useState<CareAccessResponse | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const [medicationsByUserId, setMedicationsByUserId] = useState<
+    Record<string, Medication[]>
+  >({});
+  const [medicationsLoading, setMedicationsLoading] = useState(false);
+  const [printingUserId, setPrintingUserId] = useState<string | null>(null);
+  const [printDialogUserId, setPrintDialogUserId] = useState<string | null>(
+    null,
   );
-  const totalMedications = DEPENDENTS.reduce(
-    (sum, d) => sum + d.medicationCount,
-    0,
-  );
+  const [printWeekStart, setPrintWeekStart] = useState<Date | null>(null);
+  const [printWeekEnd, setPrintWeekEnd] = useState<Date | null>(null);
+
+  useEffect(() => {
+    let isMounted = true;
+
+    async function loadCareAccess() {
+      try {
+        const res = await fetch("/api/care-access", {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+          },
+        });
+
+        if (!res.ok) {
+          if (res.status === 401) {
+            throw new Error("Please sign in to view your care relationships.");
+          }
+          throw new Error("Unable to load care relationships. Please try again.");
+        }
+
+        const json = (await res.json()) as CareAccessResponse;
+        if (!isMounted) return;
+        setData(json);
+        setError(null);
+      } catch (err) {
+        if (!isMounted) return;
+        setError(
+          err instanceof Error
+            ? err.message
+            : "Something went wrong loading care relationships.",
+        );
+      } finally {
+        if (isMounted) {
+          setLoading(false);
+        }
+      }
+    }
+
+    loadCareAccess();
+
+    return () => {
+      isMounted = false;
+    };
+  }, []);
+
+  const caringFor = data?.caringFor ?? [];
+
+  // Load medications for each dependent (caringFor user)
+  useEffect(() => {
+    if (!caringFor.length) {
+      setMedicationsByUserId({});
+      return;
+    }
+
+    let isMounted = true;
+    const loadMedications = async () => {
+      setMedicationsLoading(true);
+      try {
+        const uniqueUserIds = Array.from(
+          new Set(caringFor.map((access) => access.user.id)),
+        );
+
+        const results = await Promise.all(
+          uniqueUserIds.map(async (userId) => {
+            const res = await fetch(`/api/medications?userId=${encodeURIComponent(userId)}`, {
+              method: "GET",
+              headers: { "Content-Type": "application/json" },
+            });
+
+            if (!res.ok) {
+              return { userId, medications: [] as Medication[] };
+            }
+
+            const json = (await res.json()) as {
+              medications: {
+                id: string;
+                name: string;
+                dose: number | null;
+                form: string | null;
+              }[];
+            };
+
+            return { userId, medications: json.medications };
+          }),
+        );
+
+        if (!isMounted) return;
+
+        const nextMap: Record<string, Medication[]> = {};
+        results.forEach(({ userId, medications }) => {
+          nextMap[userId] = medications;
+        });
+        setMedicationsByUserId(nextMap);
+      } finally {
+        if (isMounted) {
+          setMedicationsLoading(false);
+        }
+      }
+    };
+
+    void loadMedications();
+
+    return () => {
+      isMounted = false;
+    };
+  }, [caringFor]);
+
+  const dependentsToRender: Dependent[] = caringFor.map((access) => {
+    const meds = medicationsByUserId[access.user.id] ?? [];
+    const realAge =
+      typeof access.user.age === "number" ? access.user.age : null;
+    const realAdherence30 =
+      typeof access.user.adherence30Days === "number"
+        ? access.user.adherence30Days
+        : null;
+
+    return {
+      id: access.accessId,
+      userId: access.user.id,
+      name: access.user.name || "Unknown person",
+      age: realAge,
+      adherence30: realAdherence30,
+      medications: meds,
+    };
+  });
+
+  const totalDependents = caringFor.length;
+
+  // Precompute weeks for the mini calendar in the print dialog
+  const currentWeekDays = printWeekStart ? getWeekDays(printWeekStart) : [];
+  let previousWeekDays: Date[] = [];
+  let nextWeekDays: Date[] = [];
+  if (printWeekStart) {
+    const prevStart = new Date(printWeekStart);
+    prevStart.setDate(prevStart.getDate() - 7);
+    previousWeekDays = getWeekDays(prevStart);
+
+    const nextStart = new Date(printWeekStart);
+    nextStart.setDate(nextStart.getDate() + 7);
+    nextWeekDays = getWeekDays(nextStart);
+  }
+
+  const openPrintDialog = (userId: string) => {
+    const days = getWeekDays(new Date());
+    const start = days[0];
+    const end = days[days.length - 1];
+    setPrintWeekStart(start);
+    setPrintWeekEnd(end);
+    setPrintDialogUserId(userId);
+  };
+
+  const shiftWeek = (direction: -1 | 1) => {
+    if (!printWeekStart || !printWeekEnd) return;
+    const newStart = new Date(printWeekStart);
+    newStart.setDate(newStart.getDate() + direction * 7);
+    const newEnd = new Date(printWeekEnd);
+    newEnd.setDate(newEnd.getDate() + direction * 7);
+    setPrintWeekStart(newStart);
+    setPrintWeekEnd(newEnd);
+  };
+
+  const handlePrint = async (userId: string, weekStart: Date, weekEnd: Date) => {
+    if (!userId) return;
+
+    setPrintingUserId(userId);
+
+    try {
+      const startDate = new Date(
+        Date.UTC(
+          weekStart.getFullYear(),
+          weekStart.getMonth(),
+          weekStart.getDate(),
+          0,
+          0,
+          0,
+          0,
+        ),
+      );
+      const endDate = new Date(
+        Date.UTC(
+          weekEnd.getFullYear(),
+          weekEnd.getMonth(),
+          weekEnd.getDate(),
+          23,
+          59,
+          59,
+          999,
+        ),
+      );
+
+      const fromISO = startDate.toISOString();
+      const toISO = endDate.toISOString();
+      const timezone =
+        Intl.DateTimeFormat().resolvedOptions().timeZone || "UTC";
+
+      const response = await fetch("/api/export/pdf", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          userId,
+          from: fromISO,
+          to: toISO,
+          tz: timezone,
+        }),
+      });
+
+      if (!response.ok) {
+        const errorData = (await response.json().catch(() => ({
+          error: "Unknown error",
+        }))) as { error?: string };
+        // eslint-disable-next-line no-console
+        console.error("Failed to export PDF:", errorData.error);
+        return;
+      }
+
+      const blob = await response.blob();
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = "schedule.pdf";
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      window.URL.revokeObjectURL(url);
+    } catch (err) {
+      // eslint-disable-next-line no-console
+      console.error("PDF export error:", err);
+    } finally {
+      // Keep the loader visible for a brief moment so the user can see it
+      setTimeout(() => {
+        setPrintingUserId(null);
+      }, 400);
+    }
+  };
 
   return (
     <div className={styles.container}>
@@ -414,13 +659,17 @@ export default function DependentsPage() {
           <div className={styles.headerText}>
             <h1 className={styles.title}>My Dependents</h1>
             <p className={styles.subtitle}>
-              {totalDependents} Dependents • {averageAdherence}% Adherence •{" "}
-              {totalMedications} Rx
+              {totalDependents}{" "}
+              {totalDependents === 1
+                ? "dependent in your care"
+                : "dependents in your care"}
             </p>
           </div>
         </div>
 
         <div className={styles.headerActions}>
+          {/* Filter buttons reserved for future use */}
+          {/*
           <button type="button" className={styles.filterButton}>
             <TrendingUpIcon className={styles.filterIcon} />
             All
@@ -443,17 +692,196 @@ export default function DependentsPage() {
             <BarChartIcon className={styles.filterIcon} />
             Analytics
           </button>
+          */}
         </div>
       </header>
 
       <main className={styles.main}>
+        {loading && (
+          <div className={styles.dependentsList}>
+            <p className={styles.subtitle}>Loading your care relationships…</p>
+          </div>
+        )}
+
+        {!loading && error && (
+          <div className={styles.dependentsList}>
+            <p className={styles.subtitle}>{error}</p>
+          </div>
+        )}
+
+        {!loading && !error && (
+          <section aria-label="Dependents list">
+            {caringFor.length === 0 ? (
+              <p className={styles.subtitle}>You do not have any dependents</p>
+            ) : (
         <div className={styles.dependentsList}>
-          {DEPENDENTS.map((dependent) => (
-            <DependentCard key={dependent.id} dependent={dependent} />
-          ))}
+                {dependentsToRender.map((dependent) => (
+                  <DependentCard
+                    key={dependent.id}
+                    dependent={dependent}
+                    onPrint={() => openPrintDialog(dependent.userId)}
+                    isPrinting={printingUserId === dependent.userId}
+                  />
+                ))}
+                {medicationsLoading && (
+                  <p className={styles.subtitle}>
+                    Loading medications for your dependents…
+                  </p>
+                )}
+              </div>
+            )}
+          </section>
+        )}
+
+        {printDialogUserId && printWeekStart && printWeekEnd && (
+          <div className={styles.printDialogOverlay}>
+            <div className={styles.printDialog}>
+              <div className={styles.printDialogHeader}>
+                <h2 className={styles.printDialogTitle}>Print schedule</h2>
+                <button
+                  type="button"
+                  className={styles.printDialogClose}
+                  onClick={() => setPrintDialogUserId(null)}
+                  aria-label="Close"
+                >
+                  ×
+                </button>
+              </div>
+              <div className={styles.printDialogBody}>
+                <p className={styles.printDialogDescription}>
+                  Choose the week you want to export. The PDF will include all
+                  schedule entries for the selected week.
+                </p>
+                <div className={styles.printDialogWeekPicker}>
+                  <button
+                    type="button"
+                    className={styles.printDialogWeekButton}
+                    onClick={() => shiftWeek(-1)}
+                  >
+                    Previous
+                  </button>
+                  <div className={styles.printDialogWeekLabel}>
+                    {formatWeekRange(printWeekStart, printWeekEnd)}
+                  </div>
+                  <button
+                    type="button"
+                    className={styles.printDialogWeekButton}
+                    onClick={() => shiftWeek(1)}
+                  >
+                    Next
+                  </button>
+                </div>
+
+                <div className={styles.printDialogWeekDays}>
+                  <div className={styles.printDialogWeekDaysGrid}>
+                    {["M", "T", "W", "T", "F", "S", "S"].map((label, idx) => (
+                      <div
+                        key={`${label}-${idx}`}
+                        className={styles.printDialogWeekdayLabel}
+                      >
+                        {label}
+                      </div>
+                    ))}
+
+                    {previousWeekDays.map((day) => {
+                      const isToday = (() => {
+                        const now = new Date();
+                        return (
+                          now.getFullYear() === day.getFullYear() &&
+                          now.getMonth() === day.getMonth() &&
+                          now.getDate() === day.getDate()
+                        );
+                      })();
+                      return (
+                        <div
+                          key={`prev-${day.toISOString()}`}
+                          className={`${styles.printDialogDay} ${
+                            isToday ? styles.printDialogDayToday : ""
+                          }`}
+                        >
+                          {day.getDate()}
+                        </div>
+                      );
+                    })}
+
+                    {currentWeekDays.map((day) => {
+                      const isToday = (() => {
+                        const now = new Date();
+                        return (
+                          now.getFullYear() === day.getFullYear() &&
+                          now.getMonth() === day.getMonth() &&
+                          now.getDate() === day.getDate()
+                        );
+                      })();
+                      return (
+                        <div
+                          key={`current-${day.toISOString()}`}
+                          className={`${styles.printDialogDay} ${styles.printDialogDayCurrent} ${
+                            isToday ? styles.printDialogDayToday : ""
+                          }`}
+                        >
+                          {day.getDate()}
+                        </div>
+                      );
+                    })}
+
+                    {nextWeekDays.map((day) => {
+                      const isToday = (() => {
+                        const now = new Date();
+                        return (
+                          now.getFullYear() === day.getFullYear() &&
+                          now.getMonth() === day.getMonth() &&
+                          now.getDate() === day.getDate()
+                        );
+                      })();
+                      return (
+                        <div
+                          key={`next-${day.toISOString()}`}
+                          className={`${styles.printDialogDay} ${
+                            isToday ? styles.printDialogDayToday : ""
+                          }`}
+                        >
+                          {day.getDate()}
+                        </div>
+                      );
+                    })}
+                  </div>
+                </div>
+              </div>
+              <div className={styles.printDialogFooter}>
+                <button
+                  type="button"
+                  className={styles.printDialogCancel}
+                  onClick={() => setPrintDialogUserId(null)}
+                >
+                  Cancel
+                </button>
+                <button
+                  type="button"
+                  className={styles.printDialogConfirm}
+                  onClick={() => {
+                    void (async () => {
+                      if (!printDialogUserId || !printWeekStart || !printWeekEnd)
+                        return;
+                      await handlePrint(
+                        printDialogUserId,
+                        printWeekStart,
+                        printWeekEnd,
+                      );
+                      setPrintDialogUserId(null);
+                    })();
+                  }}
+                  disabled={printingUserId !== null}
+                >
+                  Export PDF
+                </button>
+              </div>
+            </div>
         </div>
+        )}
       </main>
 
+      {/*
       <Link
         href="/dependents/new"
         className={styles.fab}
@@ -461,6 +889,7 @@ export default function DependentsPage() {
       >
         <UsersIcon className={styles.fabIcon} />
       </Link>
+      */}
     </div>
   );
 }

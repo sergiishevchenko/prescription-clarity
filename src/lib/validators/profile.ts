@@ -11,6 +11,11 @@ export const updateProfileSchema = z.object({
     .email("Invalid email address")
     .max(255, "Email must not exceed 255 characters")
     .optional(),
+  dateOfBirth: z
+    .string()
+    .datetime({ message: "Invalid date of birth" })
+    .optional()
+    .or(z.literal("").transform(() => undefined)),
 });
 
 export type UpdateProfileInput = z.infer<typeof updateProfileSchema>;
