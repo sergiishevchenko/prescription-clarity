@@ -1,0 +1,168 @@
+case_id,title,suite,suite_id,assignee,time_spent_ms,status,finish_time,steps,steps_input_data,steps_expected_result,steps_status,steps_comments,comment,stacktrace,priority,severity,automation,type,tags,is_muted,case_parameter
+21,"Data Sharing page loads and empty state is displayed","Sprint 3 - Profile Sharing & PDF Export",3,"Vladyslav Mazur",1923,Passed,"2025-12-01 19:45:14","1. Navigate to `Personal → Data Sharing.`
+2. Observe the “Who Has Access (0)” block.
+3. Check the content inside the main panel.
+4. Verify the dropdown filter state.
+","1. 
+2. 
+3. 
+4. 
+","1. Data Sharing page opens successfully.
+2. Zero-access state is displayed.
+3. Message *“No share links yet. Create a link to share your profile…”* is visible.
+4. ""Active"" filter is selected by default.
+","1. Untested
+2. Untested
+3. Untested
+4. Untested
+","1. 
+2. 
+3. 
+4. ",,,Medium,Minor,Manual,Functional,,false,
+22,"Create a share link and validate Active state","Sprint 3 - Profile Sharing & PDF Export",3,"Vladyslav Mazur",4037,Passed,"2025-12-01 19:45:19","1. Navigate to Data Sharing page.
+2. Click **“Share profile”**.
+3. Observe generated link inside the text field.
+4. Click **“Copy”**.
+5. Close the modal.
+6. Verify new entry is displayed
+7. Change filter to “Active”
+8. Change filter to “Revoked”
+9. Change filter to “Expired”
+10. Change filter to “All”
+","1. 
+2. 
+3. 
+4. 
+5. 
+6. 
+7. 
+8. 
+9. 
+10. 
+","1. Screen loads, empty state is visible.
+2. Modal “Share your profile” appears.
+3. A unique URL with `/api/share/accept?token=` is displayed.
+4. Success toast appears *“Shared Link copied to clickboard”*.
+5. * Modal disappears,
+* User returns to the Data Sharing list.
+6. A new row appears with the following details:
+
+* **Status:** “Active” (green badge)
+* **Label:** “Pending viewer”
+* **State:** “Awaiting acceptance”
+* **Created on:** Current date
+* Revoke button is visible.
+7. Only the newly created *Active* link is displayed.
+
+No revoked/expired links appear.
+8. Only revoked links are displayed.
+
+Active link disappears from the list.
+9. * If there are no expired links → empty state is shown.
+* If expired links exist → only expired items are displayed.
+10. * All categories appear (Active + Revoked + Expired).
+* Order matches backend sorting rules.
+* The newly created *Active* entry is still visible.
+","1. Untested
+2. Untested
+3. Untested
+4. Untested
+5. Untested
+6. Untested
+7. Untested
+8. Untested
+9. Untested
+10. Untested
+","1. 
+2. 
+3. 
+4. 
+5. 
+6. 
+7. 
+8. 
+9. 
+10. ",,,High,Normal,Manual,Functional,,false,
+23,"Revoke an existing share link and verify Revoked state","Sprint 3 - Profile Sharing & PDF Export",3,"Vladyslav Mazur",15906,Passed,"2025-12-01 19:45:36","1. Navigate to Data Sharing page.
+2. Click **“Revoke”** button on the link entry.
+3. Click **“Revoke”** in the modal.
+4. Switch filter to *All*.
+","1. 
+2. 
+3. 
+4. 
+","1. Active share link is displayed with “Active” badge.
+2. Confirmation modal “Revoke access?” appears.
+3. * Link status changes to **“Revoked”**
+* Badge becomes red
+* **Row disappears** under filter = Active.
+4. Both Active and Revoked items (if any) appear.
+","1. Untested
+2. Untested
+3. Untested
+4. Untested
+","1. 
+2. 
+3. 
+4. ",,,High,Major,Manual,Functional,,false,
+24,"Full end-to-end profile sharing flow","Sprint 3 - Profile Sharing & PDF Export",3,"Vladyslav Mazur",29000,Failed,"2025-12-01 19:46:54","1. Owner navigates to “Data Sharing” page
+2. Click **Share profile** and press **Copy** in the modal to generate a share link.
+3. Navigate as Owner to **Dashboard** and review **Access Roles → People who can view my data**.
+4. Open the generated share link in a new browser as Viewer.
+5. Click **Accept access** as Viewer.
+6. Click **Go to dashboard** as Viewer.
+7. Click **Open week view** as Viewer.
+8. As Owner, open **Week View** and mark several medications as **Taken**.
+9. Refresh the Week View page as Viewer.
+10. As Owner, go to **Data Sharing** and click **Revoke** for this viewer.
+11. Refresh Viewer’s dashboard.
+12. Attempt to open the same shared link again as Viewer.
+","1. 
+2. 
+3. 
+4. 
+5. 
+6. 
+7. 
+8. 
+9. 
+10. 
+11. 
+12. 
+","1. Data Sharing page loads successfully with “Share profile” button visible.
+2. A unique share link is generated and copied; a new “Pending viewer — Active” entry appears in the list.
+3. The pending viewer entry (email) is displayed under “People who can view my data.”
+4. “Accept shared profile” page is displayed showing Owner’s name and email.
+5. Green notification “Access granted” appears with a **Go to dashboard** button.
+6. Viewer dashboard opens and shows Owner under **Profiles I can view**, with **Open week view** button.
+7. Viewer sees Owner’s **Week View** schedule in read-only mode.
+8. Selected medication entries update to “Taken” and appear checked in Owner’s schedule.
+9. Viewer sees updated “Taken” states in Owner’s schedule.
+10. The shared entry changes to **Revoked**, and is hidden when filter = Active.
+11. **Profiles I can view** section no longer contains Owner’s profile.
+12. * The viewer sees a denied state
+* Фccess to Owner’s data is no longer available.
+","1. Passed
+2. Passed
+3. Passed
+4. Passed
+5. Passed
+6. Passed
+7. Passed
+8. Passed
+9. Passed
+10. Passed
+11. Failed
+12. Untested
+","1. 
+2. 
+3. 
+4. 
+5. 
+6. 
+7. 
+8. 
+9. 
+10. 
+11. 
+12. ","The user can still see the shared profile",,High,Major,Manual,Functional,,false,
