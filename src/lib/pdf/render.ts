@@ -50,7 +50,7 @@ async function launchBrowser() {
   if (isVercel) {
     try {
       const chromium = await import(
-        /* webpackIgnore: true */ "@sparticuz/chromium-min"
+        /* webpackIgnore: true */ "@sparticuz/chromium"
       );
       const chromiumModule = chromium.default || chromium;
 

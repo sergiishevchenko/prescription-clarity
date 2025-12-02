@@ -8,7 +8,7 @@ const nextConfig: NextConfig = {
     "/**/*": [
       "./node_modules/.prisma/client/**",
       "./node_modules/@prisma/client/**",
-      "./node_modules/@sparticuz/chromium-min/**",
+      "./node_modules/@sparticuz/chromium/**",
       "./node_modules/puppeteer-core/**",
       "./node_modules/follow-redirects/**",
     ],
