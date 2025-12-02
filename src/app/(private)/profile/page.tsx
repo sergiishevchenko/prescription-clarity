@@ -80,27 +80,31 @@ export default function ProfilePage() {
 
   return (
     <div className="min-h-[calc(100vh-4rem)] bg-gray-50">
-      <div className="mx-auto max-w-3xl px-4 py-6 sm:px-6 lg:px-8">
-        <h1 className="text-3xl font-bold text-gray-900">Profile</h1>
-        <p className="mt-2 text-gray-600">
+      <div className="mx-auto max-w-3xl px-4 py-4 sm:px-6 sm:py-6 lg:px-8">
+        <h1 className="text-2xl font-bold text-gray-900 sm:text-3xl">
+          Profile
+        </h1>
+        <p className="mt-1.5 text-sm text-gray-600 sm:mt-2 sm:text-base">
           Manage your account settings and personal information.
         </p>
 
-        <div className="mt-8 rounded-lg bg-white shadow">
-          <div className="px-4 py-5 sm:p-6">
-            <h3 className="text-lg leading-6 font-medium text-gray-900">
+        <div className="mt-6 rounded-lg bg-white shadow sm:mt-8">
+          <div className="px-4 py-4 sm:px-6 sm:py-5">
+            <h3 className="text-base font-medium text-gray-900 sm:text-lg sm:leading-6">
               Personal Information
             </h3>
 
             {loading ? (
-              <p className="mt-6 text-gray-600">Loading...</p>
+              <p className="mt-4 text-sm text-gray-600 sm:mt-6 sm:text-base">
+                Loading...
+              </p>
             ) : (
-              <form className="mt-6" onSubmit={onSubmit} noValidate>
-                <div className="grid grid-cols-1 gap-x-4 gap-y-6 sm:grid-cols-6">
+              <form className="mt-4 sm:mt-6" onSubmit={onSubmit} noValidate>
+                <div className="grid grid-cols-1 gap-x-4 gap-y-4 sm:grid-cols-6 sm:gap-y-6">
                   <div className="sm:col-span-3">
                     <label
                       htmlFor="name"
-                      className="block text-base font-medium text-gray-900"
+                      className="block text-sm font-medium text-gray-900 sm:text-base"
                     >
                       Full Name
                     </label>
@@ -108,7 +112,7 @@ export default function ProfilePage() {
                       <input
                         type="text"
                         id="name"
-                        className="block w-full rounded-lg border border-gray-300 bg-white px-3.5 py-2.5 text-base text-gray-900 shadow-sm placeholder:text-gray-400 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/50 focus:outline-none sm:text-base"
+                        className="block w-full rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm text-gray-900 shadow-sm placeholder:text-gray-400 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/50 focus:outline-none sm:px-3.5 sm:py-2.5 sm:text-base"
                         value={name}
                         onChange={(e) => setName(e.target.value)}
                         disabled={saving}
@@ -119,7 +123,7 @@ export default function ProfilePage() {
                   <div className="sm:col-span-3">
                     <label
                       htmlFor="email"
-                      className="block text-base font-medium text-gray-900"
+                      className="block text-sm font-medium text-gray-900 sm:text-base"
                     >
                       Email Address
                     </label>
@@ -127,7 +131,7 @@ export default function ProfilePage() {
                       <input
                         type="email"
                         id="email"
-                        className="block w-full rounded-lg border border-gray-300 bg-white px-3.5 py-2.5 text-base text-gray-900 shadow-sm placeholder:text-gray-400 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/50 focus:outline-none sm:text-base"
+                        className="block w-full rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm text-gray-900 shadow-sm placeholder:text-gray-400 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/50 focus:outline-none sm:px-3.5 sm:py-2.5 sm:text-base"
                         value={email}
                         onChange={(e) => setEmail(e.target.value)}
                         disabled={saving}
@@ -138,15 +142,15 @@ export default function ProfilePage() {
                   <div className="sm:col-span-3">
                     <label
                       htmlFor="dateOfBirth"
-                      className="block text-base font-medium text-gray-900"
+                      className="block text-sm font-medium text-gray-900 sm:text-base"
                     >
                       Date of Birth
                     </label>
-                    <div className="mt-1">
+                    <div className="relative mt-1">
                       <input
                         type="date"
                         id="dateOfBirth"
-                        className="block w-full rounded-lg border border-gray-300 bg-white px-3.5 py-2.5 text-base text-gray-900 shadow-sm placeholder:text-gray-400 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/50 focus:outline-none sm:text-base"
+                        className="block w-full rounded-lg border border-gray-300 bg-white py-2 pr-9 pl-3 text-sm text-gray-900 shadow-sm placeholder:text-gray-400 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/50 focus:outline-none sm:py-2.5 sm:pr-12 sm:pl-3.5 sm:text-base"
                         value={dateOfBirth}
                         onChange={(e) => setDateOfBirth(e.target.value)}
                         disabled={saving}
@@ -155,7 +159,7 @@ export default function ProfilePage() {
                   </div>
                 </div>
 
-                <div className="mt-6 flex items-center gap-4">
+                <div className="mt-4 flex flex-col gap-3 sm:mt-6 sm:flex-row sm:items-center sm:gap-4">
                   <button
                     type="submit"
                     className="inline-flex cursor-pointer justify-center rounded-md border border-transparent bg-indigo-600 px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-indigo-700 focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 focus:outline-none disabled:cursor-not-allowed disabled:opacity-50"
@@ -164,10 +168,14 @@ export default function ProfilePage() {
                     {saving ? "Saving..." : "Save changes"}
                   </button>
                   {message && (
-                    <span className="text-sm text-green-700">{message}</span>
+                    <span className="text-xs text-green-700 sm:text-sm">
+                      {message}
+                    </span>
                   )}
                   {error && (
-                    <span className="text-sm text-red-600">{error}</span>
+                    <span className="text-xs text-red-600 sm:text-sm">
+                      {error}
+                    </span>
                   )}
                 </div>
               </form>

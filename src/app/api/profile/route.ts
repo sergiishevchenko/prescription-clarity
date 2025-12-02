@@ -14,10 +14,25 @@ export async function GET() {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    const user = await verifySession(sessionToken);
+    const sessionUser = await verifySession(sessionToken);
+
+    if (!sessionUser) {
+      return NextResponse.json({ error: "Invalid session" }, { status: 401 });
+    }
+
+    // Fetch user with dateOfBirth from database
+    const user = await prisma.user.findUnique({
+      where: { id: sessionUser.id },
+      select: {
+        id: true,
+        email: true,
+        name: true,
+        dateOfBirth: true,
+      },
+    });
 
     if (!user) {
-      return NextResponse.json({ error: "Invalid session" }, { status: 401 });
+      return NextResponse.json({ error: "User not found" }, { status: 404 });
     }
 
     return NextResponse.json({ user });

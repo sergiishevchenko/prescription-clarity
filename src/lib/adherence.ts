@@ -28,6 +28,9 @@ export async function computeAdherenceForUser(
   const startDate = getWindowStart(windowDays);
 
   // Use DayStatus aggregates to avoid scanning all schedule entries
+  // For adherence, we need:
+  // - totalCount: all scheduled doses (regardless of status)
+  // - takenCount: doses that were actually taken
   const statuses = await prisma.dayStatus.findMany({
     where: {
       userId,
@@ -37,12 +40,12 @@ export async function computeAdherenceForUser(
       },
     },
     select: {
-      plannedCount: true,
+      totalCount: true,
       takenCount: true,
     },
   });
 
-  const totalPlanned = statuses.reduce((sum, s) => sum + s.plannedCount, 0);
+  const totalPlanned = statuses.reduce((sum, s) => sum + s.totalCount, 0);
   const totalTaken = statuses.reduce((sum, s) => sum + s.takenCount, 0);
 
   if (totalPlanned === 0) {
