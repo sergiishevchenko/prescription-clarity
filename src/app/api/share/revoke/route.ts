@@ -36,6 +36,7 @@ export async function POST(request: NextRequest) {
       select: {
         id: true,
         ownerId: true,
+        viewerId: true,
         status: true,
       },
     });
@@ -56,16 +57,30 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Update status to revoked
-    const updatedShareLink = await prisma.shareLink.update({
-      where: { id: shareLink.id },
-      data: { status: "revoked" },
-      select: {
-        id: true,
-        token: true,
-        status: true,
-        updatedAt: true,
-      },
+    // Update status to revoked and remove any permanent care access
+    const updatedShareLink = await prisma.$transaction(async (tx) => {
+      const link = await tx.shareLink.update({
+        where: { id: shareLink.id },
+        data: { status: "revoked" },
+        select: {
+          id: true,
+          token: true,
+          status: true,
+          updatedAt: true,
+        },
+      });
+
+      // If this link has an associated viewer, remove their permanent access
+      if (shareLink.viewerId) {
+        await tx.careAccess.deleteMany({
+          where: {
+            ownerId: user.id,
+            viewerId: shareLink.viewerId,
+          },
+        });
+      }
+
+      return link;
     });
 
     return NextResponse.json(

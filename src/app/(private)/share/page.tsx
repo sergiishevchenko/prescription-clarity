@@ -12,6 +12,12 @@ import {
 import { useConfirm, useToast } from "@/components/shared/ToastProvider";
 import { type ShareListItem, ShareList } from "@/components/share/ShareList";
 import { CreateLinkModal } from "@/components/share/CreateLinkModal";
+import {
+  getCareAccessOverviewClient,
+  revokeCareAccess,
+  type CareAccessEntry,
+} from "@/lib/careAccessApi";
+import { RevokeButton } from "@/components/share/RevokeButton";
 
 /* LEGACY MOCK IMPLEMENTATION (kept for reference)
 
@@ -176,6 +182,13 @@ export default function DataSharingPage() {
 
   const [revokingId, setRevokingId] = useState<string | null>(null);
 
+  const [viewerAccessList, setViewerAccessList] = useState<CareAccessEntry[]>(
+    [],
+  );
+  const [isLoadingViewers, setIsLoadingViewers] = useState<boolean>(true);
+  const [viewersError, setViewersError] = useState<string | null>(null);
+  const [revokingAccessId, setRevokingAccessId] = useState<string | null>(null);
+
   useEffect(() => {
     let cancelled = false;
 
@@ -205,6 +218,36 @@ export default function DataSharingPage() {
       cancelled = true;
     };
   }, [statusFilter]);
+
+  useEffect(() => {
+    let cancelled = false;
+
+    async function loadViewers() {
+      setIsLoadingViewers(true);
+      setViewersError(null);
+      try {
+        const overview = await getCareAccessOverviewClient();
+        if (cancelled) return;
+        setViewerAccessList(overview.viewers);
+      } catch (err) {
+        if (cancelled) return;
+        const message =
+          err instanceof Error ? err.message : "Failed to load current viewers";
+        setViewersError(message);
+        setViewerAccessList([]);
+      } finally {
+        if (!cancelled) {
+          setIsLoadingViewers(false);
+        }
+      }
+    }
+
+    void loadViewers();
+
+    return () => {
+      cancelled = true;
+    };
+  }, []);
 
   const activeCount = accessList.filter(
     (item) => item.status === "active",
@@ -265,6 +308,37 @@ export default function DataSharingPage() {
     }
   }
 
+  async function handleRevokeViewer(accessId: string) {
+    const target = viewerAccessList.find((item) => item.accessId === accessId);
+    if (!target) return;
+
+    const viewerName = target.user?.name || target.user?.email || "this viewer";
+
+    const confirmed = await confirm({
+      title: "Revoke access?",
+      description: `This will immediately remove access for ${viewerName}. You can always share your profile again later.`,
+      confirmText: "Revoke",
+      cancelText: "Cancel",
+    });
+
+    if (!confirmed) return;
+
+    setRevokingAccessId(accessId);
+    try {
+      await revokeCareAccess(accessId);
+      setViewerAccessList((prev) =>
+        prev.filter((item) => item.accessId !== accessId),
+      );
+      toast("Access revoked", { variant: "success" });
+    } catch (err) {
+      const message =
+        err instanceof Error ? err.message : "Failed to revoke access";
+      toast(message, { variant: "error" });
+    } finally {
+      setRevokingAccessId(null);
+    }
+  }
+
   return (
     <div className="min-h-[calc(100vh-4rem)] bg-gray-50">
       <div className="mx-auto max-w-5xl px-4 py-6 sm:px-6 lg:px-8">
@@ -322,13 +396,11 @@ export default function DataSharingPage() {
               Loading access list...
             </div>
           )}
-
           {!isLoading && error && (
             <div className="rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
               {error}
             </div>
           )}
-
           {!isLoading && !error && accessList.length === 0 && (
             <div className="py-10 text-center text-sm text-gray-500">
               No share links yet. Create a link to share your profile with
@@ -343,6 +415,83 @@ export default function DataSharingPage() {
               onRevoke={(id) => void handleRevoke(id)}
             />
           )}
+        </section>
+
+        <section className="mt-6 rounded-2xl border border-gray-200 bg-white p-6 shadow-sm">
+          <div className="mb-4 flex flex-col gap-1 text-gray-700">
+            <h2 className="text-sm font-medium">People who can view my data</h2>
+            <p className="text-xs text-gray-500">
+              These users accepted a share link from you and can view your
+              schedule as viewers.
+            </p>
+          </div>
+
+          {isLoadingViewers && (
+            <div className="py-6 text-center text-sm text-gray-500">
+              Loading viewers...
+            </div>
+          )}
+
+          {!isLoadingViewers && viewersError && (
+            <div className="rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
+              {viewersError}
+            </div>
+          )}
+
+          {!isLoadingViewers &&
+            !viewersError &&
+            viewerAccessList.length === 0 && (
+              <div className="py-6 text-center text-sm text-gray-500">
+                No active viewers yet. When someone accepts your share link,
+                they will appear here.
+              </div>
+            )}
+
+          {!isLoadingViewers &&
+            !viewersError &&
+            viewerAccessList.length > 0 && (
+              <div className="space-y-3">
+                {viewerAccessList.map((access) => {
+                  const displayName =
+                    access.user?.name || access.user?.email || "Viewer";
+                  const email = access.user?.email ?? "Unknown email";
+                  const created = new Date(
+                    access.grantedAt,
+                  ).toLocaleDateString();
+
+                  return (
+                    <article
+                      key={access.accessId}
+                      className="flex items-center justify-between rounded-2xl border border-gray-200 bg-gray-50 px-5 py-4"
+                    >
+                      <div>
+                        <div className="flex items-center gap-2">
+                          <h3 className="text-base font-semibold text-gray-900">
+                            {displayName}
+                          </h3>
+                          <span className="rounded-full bg-indigo-50 px-2.5 py-0.5 text-xs font-semibold text-indigo-700">
+                            Viewer
+                          </span>
+                        </div>
+                        <p className="mt-1 text-sm text-gray-700">{email}</p>
+                        <p className="mt-1 text-xs text-gray-500">
+                          Access granted on {created}
+                        </p>
+                      </div>
+                      <div className="flex items-center gap-3">
+                        <RevokeButton
+                          onClick={() =>
+                            void handleRevokeViewer(access.accessId)
+                          }
+                          loading={revokingAccessId === access.accessId}
+                          disabled={revokingAccessId === access.accessId}
+                        />
+                      </div>
+                    </article>
+                  );
+                })}
+              </div>
+            )}
         </section>
       </div>
 
