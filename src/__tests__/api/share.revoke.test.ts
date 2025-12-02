@@ -82,6 +82,7 @@ describe("POST /api/share/revoke", () => {
       select: {
         id: true,
         ownerId: true,
+        viewerId: true,
         status: true,
       },
     });
@@ -126,6 +127,7 @@ describe("POST /api/share/revoke", () => {
       select: {
         id: true,
         ownerId: true,
+        viewerId: true,
         status: true,
       },
     });
