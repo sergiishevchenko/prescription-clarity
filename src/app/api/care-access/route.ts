@@ -21,12 +21,17 @@ export async function GET(request: NextRequest) {
     }
 
     // Helper to calculate age in full years from a Date
-    const calculateAge = (dateOfBirth: Date | null | undefined): number | null => {
+    const calculateAge = (
+      dateOfBirth: Date | null | undefined,
+    ): number | null => {
       if (!dateOfBirth) return null;
       const today = new Date();
       let age = today.getFullYear() - dateOfBirth.getFullYear();
       const monthDiff = today.getMonth() - dateOfBirth.getMonth();
-      if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < dateOfBirth.getDate())) {
+      if (
+        monthDiff < 0 ||
+        (monthDiff === 0 && today.getDate() < dateOfBirth.getDate())
+      ) {
         age -= 1;
       }
       return age >= 0 ? age : null;
@@ -84,7 +89,8 @@ export async function GET(request: NextRequest) {
     const caringForWithAdherence = await Promise.all(
       caringFor.map(async (access) => {
         const summaries = await getAdherenceSummariesForUser(access.ownerId);
-        const last7 = summaries.find((s) => s.windowDays === 7)?.adherence ?? null;
+        const last7 =
+          summaries.find((s) => s.windowDays === 7)?.adherence ?? null;
         const last30 =
           summaries.find((s) => s.windowDays === 30)?.adherence ?? null;
 
@@ -114,24 +120,26 @@ export async function GET(request: NextRequest) {
             updatedAt: access.updatedAt,
           };
         }),
-        caringFor: caringForWithAdherence.map(({ access, adherence7Days, adherence30Days }) => {
-          const age = calculateAge(access.owner.dateOfBirth);
-          return {
-            accessId: access.id,
-            userId: access.ownerId,
-            user: {
-              id: access.owner.id,
-              email: access.owner.email,
-              name: access.owner.name,
-              dateOfBirth: access.owner.dateOfBirth,
-              age,
-              adherence7Days,
-              adherence30Days,
-            },
-            grantedAt: access.createdAt,
-            updatedAt: access.updatedAt,
-          };
-        }),
+        caringFor: caringForWithAdherence.map(
+          ({ access, adherence7Days, adherence30Days }) => {
+            const age = calculateAge(access.owner.dateOfBirth);
+            return {
+              accessId: access.id,
+              userId: access.ownerId,
+              user: {
+                id: access.owner.id,
+                email: access.owner.email,
+                name: access.owner.name,
+                dateOfBirth: access.owner.dateOfBirth,
+                age,
+                adherence7Days,
+                adherence30Days,
+              },
+              grantedAt: access.createdAt,
+              updatedAt: access.updatedAt,
+            };
+          },
+        ),
       },
       { status: 200 },
     );

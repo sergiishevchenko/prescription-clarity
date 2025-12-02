@@ -1,8 +1,7 @@
-/* eslint-disable react/jsx-no-comment-textnodes */
 "use client";
 
-import Link from "next/link";
-import { useEffect, useState } from "react";
+//import Link from "next/link";
+import { useEffect, useMemo, useState } from "react";
 import { getWeekDays, formatWeekRange } from "@/lib/week";
 import styles from "./dependents.module.css";
 
@@ -63,7 +62,7 @@ function HeartIcon({ className }: { className?: string }) {
   );
 }
 
-function TrendingUpIcon({ className }: { className?: string }) {
+/*function TrendingUpIcon({ className }: { className?: string }) {
   return (
     <svg
       className={className}
@@ -79,9 +78,9 @@ function TrendingUpIcon({ className }: { className?: string }) {
       <polyline points="17 6 23 6 23 12" />
     </svg>
   );
-}
+}*/
 
-function AlertCircleIcon({ className }: { className?: string }) {
+/*function AlertCircleIcon({ className }: { className?: string }) {
   return (
     <svg
       className={className}
@@ -98,9 +97,9 @@ function AlertCircleIcon({ className }: { className?: string }) {
       <line x1="12" y1="16" x2="12.01" y2="16" />
     </svg>
   );
-}
+}*/
 
-function PlusIcon({ className }: { className?: string }) {
+/*function PlusIcon({ className }: { className?: string }) {
   return (
     <svg
       className={className}
@@ -116,9 +115,9 @@ function PlusIcon({ className }: { className?: string }) {
       <line x1="5" y1="12" x2="19" y2="12" />
     </svg>
   );
-}
+}*/
 
-function BarChartIcon({ className }: { className?: string }) {
+/*function BarChartIcon({ className }: { className?: string }) {
   return (
     <svg
       className={className}
@@ -135,7 +134,7 @@ function BarChartIcon({ className }: { className?: string }) {
       <line x1="6" y1="20" x2="6" y2="14" />
     </svg>
   );
-}
+}*/
 
 function PrinterIcon({ className }: { className?: string }) {
   return (
@@ -156,7 +155,7 @@ function PrinterIcon({ className }: { className?: string }) {
   );
 }
 
-function EditIcon({ className }: { className?: string }) {
+/*function EditIcon({ className }: { className?: string }) {
   return (
     <svg
       className={className}
@@ -172,9 +171,9 @@ function EditIcon({ className }: { className?: string }) {
       <path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z" />
     </svg>
   );
-}
+}*/
 
-function ChevronDownIcon({ className }: { className?: string }) {
+/*function ChevronDownIcon({ className }: { className?: string }) {
   return (
     <svg
       className={className}
@@ -189,7 +188,7 @@ function ChevronDownIcon({ className }: { className?: string }) {
       <polyline points="6 9 12 15 18 9" />
     </svg>
   );
-}
+}*/
 
 function CheckCircleIcon({ className }: { className?: string }) {
   return (
@@ -208,7 +207,7 @@ function CheckCircleIcon({ className }: { className?: string }) {
   );
 }
 
-function PencilIcon({ className }: { className?: string }) {
+/*function PencilIcon({ className }: { className?: string }) {
   return (
     <svg
       className={className}
@@ -223,9 +222,9 @@ function PencilIcon({ className }: { className?: string }) {
       <path d="M17 3a2.828 2.828 0 114 4L7.5 20.5 2 22l1.5-5.5L17 3z" />
     </svg>
   );
-}
+}*/
 
-function TrashIcon({ className }: { className?: string }) {
+/*function TrashIcon({ className }: { className?: string }) {
   return (
     <svg
       className={className}
@@ -241,9 +240,9 @@ function TrashIcon({ className }: { className?: string }) {
       <path d="M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a2 2 0 012-2h4a2 2 0 012 2v2" />
     </svg>
   );
-}
+}*/
 
-function UsersIcon({ className }: { className?: string }) {
+/*function UsersIcon({ className }: { className?: string }) {
   return (
     <svg
       className={className}
@@ -261,7 +260,7 @@ function UsersIcon({ className }: { className?: string }) {
       <path d="M16 3.13a4 4 0 010 7.75" />
     </svg>
   );
-}
+}*/
 
 function Spinner({ className }: { className?: string }) {
   return (
@@ -310,13 +309,16 @@ function DependentCard({
         <div className={styles.avatarSection}>
           <div className={styles.avatarWrapper}>
             <div className={styles.avatarFallback}>{initials}</div>
-              <span className={styles.statusIndicator} aria-label="Active" />
+            <span className={styles.statusIndicator} aria-label="Active" />
           </div>
         </div>
         <div className={styles.cardInfo}>
           <h3 className={styles.dependentName}>{name}</h3>
           <p className={styles.dependentMeta}>
-            {typeof dependent.age === "number" ? `${dependent.age} years` : "Age —"} •{" "}
+            {typeof dependent.age === "number"
+              ? `${dependent.age} years`
+              : "Age —"}{" "}
+            •{" "}
             {typeof dependent.adherence30 === "number"
               ? `${dependent.adherence30}% adherence (30 days)`
               : "Adherence —"}{" "}
@@ -429,7 +431,9 @@ export default function DependentsPage() {
           if (res.status === 401) {
             throw new Error("Please sign in to view your care relationships.");
           }
-          throw new Error("Unable to load care relationships. Please try again.");
+          throw new Error(
+            "Unable to load care relationships. Please try again.",
+          );
         }
 
         const json = (await res.json()) as CareAccessResponse;
@@ -457,7 +461,7 @@ export default function DependentsPage() {
     };
   }, []);
 
-  const caringFor = data?.caringFor ?? [];
+  const caringFor = useMemo(() => data?.caringFor ?? [], [data]);
 
   // Load medications for each dependent (caringFor user)
   useEffect(() => {
@@ -476,10 +480,13 @@ export default function DependentsPage() {
 
         const results = await Promise.all(
           uniqueUserIds.map(async (userId) => {
-            const res = await fetch(`/api/medications?userId=${encodeURIComponent(userId)}`, {
-              method: "GET",
-              headers: { "Content-Type": "application/json" },
-            });
+            const res = await fetch(
+              `/api/medications?userId=${encodeURIComponent(userId)}`,
+              {
+                method: "GET",
+                headers: { "Content-Type": "application/json" },
+              },
+            );
 
             if (!res.ok) {
               return { userId, medications: [] as Medication[] };
@@ -573,7 +580,11 @@ export default function DependentsPage() {
     setPrintWeekEnd(newEnd);
   };
 
-  const handlePrint = async (userId: string, weekStart: Date, weekEnd: Date) => {
+  const handlePrint = async (
+    userId: string,
+    weekStart: Date,
+    weekEnd: Date,
+  ) => {
     if (!userId) return;
 
     setPrintingUserId(userId);
@@ -624,7 +635,7 @@ export default function DependentsPage() {
         const errorData = (await response.json().catch(() => ({
           error: "Unknown error",
         }))) as { error?: string };
-        // eslint-disable-next-line no-console
+
         console.error("Failed to export PDF:", errorData.error);
         return;
       }
@@ -639,7 +650,6 @@ export default function DependentsPage() {
       document.body.removeChild(a);
       window.URL.revokeObjectURL(url);
     } catch (err) {
-      // eslint-disable-next-line no-console
       console.error("PDF export error:", err);
     } finally {
       // Keep the loader visible for a brief moment so the user can see it
@@ -714,7 +724,7 @@ export default function DependentsPage() {
             {caringFor.length === 0 ? (
               <p className={styles.subtitle}>You do not have any dependents</p>
             ) : (
-        <div className={styles.dependentsList}>
+              <div className={styles.dependentsList}>
                 {dependentsToRender.map((dependent) => (
                   <DependentCard
                     key={dependent.id}
@@ -861,7 +871,11 @@ export default function DependentsPage() {
                   className={styles.printDialogConfirm}
                   onClick={() => {
                     void (async () => {
-                      if (!printDialogUserId || !printWeekStart || !printWeekEnd)
+                      if (
+                        !printDialogUserId ||
+                        !printWeekStart ||
+                        !printWeekEnd
+                      )
                         return;
                       await handlePrint(
                         printDialogUserId,
@@ -877,7 +891,7 @@ export default function DependentsPage() {
                 </button>
               </div>
             </div>
-        </div>
+          </div>
         )}
       </main>
 

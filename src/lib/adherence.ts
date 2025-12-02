@@ -42,14 +42,8 @@ export async function computeAdherenceForUser(
     },
   });
 
-  const totalPlanned = statuses.reduce(
-    (sum, s) => sum + s.plannedCount,
-    0,
-  );
-  const totalTaken = statuses.reduce(
-    (sum, s) => sum + s.takenCount,
-    0,
-  );
+  const totalPlanned = statuses.reduce((sum, s) => sum + s.plannedCount, 0);
+  const totalTaken = statuses.reduce((sum, s) => sum + s.takenCount, 0);
 
   if (totalPlanned === 0) {
     return null;
@@ -78,5 +72,3 @@ export async function getAdherenceSummariesForUser(
     { windowDays: 30, adherence: last30 },
   ];
 }
-
-
