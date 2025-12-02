@@ -11,12 +11,12 @@
 
 ## 🧰 Tools Used
 
-| Tool                | Purpose                                                                    |
-| ------------------- | -------------------------------------------------------------------------- |
-| **Qase.io**         | Test case management (share links, care access lifecycle, PDF export)      |
-| **Postman**         | API tests for `/api/share`, `/api/care-access`, `/api/export/pdf`          |
-| **Chrome DevTools** | Inspect cookies/tokens, verify shared schedule payloads and PDF responses  |
-| **GitHub**          | Version control for QA assets + pull-request reviews                       |
+| Tool                | Purpose                                                                   |
+| ------------------- | ------------------------------------------------------------------------- |
+| **Qase.io**         | Test case management (share links, care access lifecycle, PDF export)     |
+| **Postman**         | API tests for `/api/share`, `/api/care-access`, `/api/export/pdf`         |
+| **Chrome DevTools** | Inspect cookies/tokens, verify shared schedule payloads and PDF responses |
+| **GitHub**          | Version control for QA assets + pull-request reviews                      |
 
 ---
 
@@ -47,12 +47,12 @@ Validate end-to-end profile sharing (create → validate → accept → revoke),
 
 ## ✅ QA Artifacts Summary
 
-| Category   | Artifact                                                                                 | Format     | Location                    |
-| ---------- | ---------------------------------------------------------------------------------------- | ---------- | --------------------------- |
-| Test Suite | `PC-2025-12-02.xlsx`<br>`PC-2025-12-02.json`                                             | XLSX/JSON  | `qa/sprint 3/test-suite/`   |
-| Test Run   | `PC-Test+run+2025_12_01.csv`<br>`PC-Test+run+2025_12_01.pdf`<br>`PC-Test+run+2025_12_02.csv`<br>`PC-Test+run+2025_12_02.pdf` | CSV/PDF    | `qa/sprint 3/test runs/`    |
-| Defects    | `PC-2025-12-02.csv`                                                                      | CSV        | `qa/sprint 3/defects/`      |
-| API Tests  | `goit-capstone-project-g5.postman_collection-3.json`                                     | JSON       | `qa/sprint 3/postman/`      |
+| Category   | Artifact                                                                                                                     | Format    | Location                  |
+| ---------- | ---------------------------------------------------------------------------------------------------------------------------- | --------- | ------------------------- |
+| Test Suite | `PC-2025-12-02.xlsx`<br>`PC-2025-12-02.json`                                                                                 | XLSX/JSON | `qa/sprint 3/test-suite/` |
+| Test Run   | `PC-Test+run+2025_12_01.csv`<br>`PC-Test+run+2025_12_01.pdf`<br>`PC-Test+run+2025_12_02.csv`<br>`PC-Test+run+2025_12_02.pdf` | CSV/PDF   | `qa/sprint 3/test runs/`  |
+| Defects    | `PC-2025-12-02.csv`                                                                                                          | CSV       | `qa/sprint 3/defects/`    |
+| API Tests  | `goit-capstone-project-g5.postman_collection-3.json`                                                                         | JSON      | `qa/sprint 3/postman/`    |
 
 ---
 
