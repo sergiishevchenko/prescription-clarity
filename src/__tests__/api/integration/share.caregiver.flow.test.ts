@@ -159,6 +159,7 @@ describe("Integration flow: share → caregiver view → PDF → revoke", () => 
 
     // 5) Viewer opens read-only calendar and exports PDF
     sessionSpy.mockResolvedValueOnce(owner);
+    prismaMock.user.findUnique.mockResolvedValueOnce(owner);
     prismaMock.scheduleEntry.count.mockResolvedValueOnce(1);
     prismaMock.scheduleEntry.findMany.mockResolvedValueOnce([
       {

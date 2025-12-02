@@ -60,6 +60,8 @@ describe("POST /api/export/pdf", () => {
   });
 
   it("returns 403 when userId does not match", async () => {
+    prismaMock.careAccess.findFirst.mockResolvedValueOnce(null);
+
     const res = await POST(
       makeRequest({
         userId: "different",
@@ -71,11 +73,14 @@ describe("POST /api/export/pdf", () => {
 
     expect(res.status).toBe(403);
     await expect(res.json()).resolves.toEqual(
-      expect.objectContaining({ error: "Forbidden" }),
+      expect.objectContaining({
+        error: "Forbidden: No access to this user's schedule",
+      }),
     );
   });
 
   it("returns 404 when no schedule entries are found", async () => {
+    prismaMock.user.findUnique.mockResolvedValueOnce(mockUser);
     prismaMock.scheduleEntry.count.mockResolvedValueOnce(0);
     prismaMock.scheduleEntry.findMany.mockResolvedValueOnce([]);
 
@@ -99,6 +104,7 @@ describe("POST /api/export/pdf", () => {
   });
 
   it("returns PDF buffer when data exists", async () => {
+    prismaMock.user.findUnique.mockResolvedValueOnce(mockUser);
     prismaMock.scheduleEntry.count.mockResolvedValueOnce(1);
     prismaMock.scheduleEntry.findMany.mockResolvedValueOnce([
       {
@@ -161,6 +167,7 @@ describe("POST /api/export/pdf", () => {
   });
 
   it("returns 422 when PDF rendering times out", async () => {
+    prismaMock.user.findUnique.mockResolvedValueOnce(mockUser);
     prismaMock.scheduleEntry.count.mockResolvedValueOnce(1);
     prismaMock.scheduleEntry.findMany.mockResolvedValueOnce([
       {
@@ -207,6 +214,7 @@ describe("POST /api/export/pdf", () => {
   });
 
   it("returns 500 when PDF rendering fails with generic error", async () => {
+    prismaMock.user.findUnique.mockResolvedValueOnce(mockUser);
     prismaMock.scheduleEntry.count.mockResolvedValueOnce(1);
     prismaMock.scheduleEntry.findMany.mockResolvedValueOnce([
       {
@@ -253,6 +261,7 @@ describe("POST /api/export/pdf", () => {
   });
 
   it("sets Content-Length header based on PDF size", async () => {
+    prismaMock.user.findUnique.mockResolvedValueOnce(mockUser);
     prismaMock.scheduleEntry.count.mockResolvedValueOnce(1);
     prismaMock.scheduleEntry.findMany.mockResolvedValueOnce([
       {

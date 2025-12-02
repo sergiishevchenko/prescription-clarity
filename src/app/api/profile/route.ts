@@ -70,11 +70,17 @@ export async function PATCH(request: NextRequest) {
         ...(validatedData.email !== undefined && {
           email: validatedData.email,
         }),
+        ...(validatedData.dateOfBirth !== undefined && {
+          dateOfBirth: validatedData.dateOfBirth
+            ? new Date(validatedData.dateOfBirth)
+            : null,
+        }),
       },
       select: {
         id: true,
         email: true,
         name: true,
+        dateOfBirth: true,
       },
     });
 

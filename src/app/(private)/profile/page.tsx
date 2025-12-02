@@ -6,11 +6,13 @@ type Profile = {
   id: string;
   email: string;
   name: string | null;
+  dateOfBirth: string | null;
 };
 
 export default function ProfilePage() {
   const [name, setName] = useState<string>("");
   const [email, setEmail] = useState<string>("");
+  const [dateOfBirth, setDateOfBirth] = useState<string>("");
   const [loading, setLoading] = useState<boolean>(true);
   const [saving, setSaving] = useState<boolean>(false);
   const [message, setMessage] = useState<string>("");
@@ -30,6 +32,11 @@ export default function ProfilePage() {
         if (!isMounted) return;
         setName(data.user.name ?? "");
         setEmail(data.user.email);
+        setDateOfBirth(
+          data.user.dateOfBirth
+            ? data.user.dateOfBirth.slice(0, 10) // YYYY-MM-DD for date input
+            : "",
+        );
       } catch {
         if (!isMounted) return;
         setError("Unable to load profile. Please try again.");
@@ -52,7 +59,11 @@ export default function ProfilePage() {
       const res = await fetch("/api/profile", {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ name, email }),
+        body: JSON.stringify({
+          name,
+          email,
+          dateOfBirth: dateOfBirth ? new Date(dateOfBirth).toISOString() : "",
+        }),
       });
       if (!res.ok) {
         const body = await res.json().catch(() => ({}));
@@ -119,6 +130,25 @@ export default function ProfilePage() {
                         className="block w-full rounded-lg border border-gray-300 bg-white px-3.5 py-2.5 text-base text-gray-900 shadow-sm placeholder:text-gray-400 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/50 focus:outline-none sm:text-base"
                         value={email}
                         onChange={(e) => setEmail(e.target.value)}
+                        disabled={saving}
+                      />
+                    </div>
+                  </div>
+
+                  <div className="sm:col-span-3">
+                    <label
+                      htmlFor="dateOfBirth"
+                      className="block text-base font-medium text-gray-900"
+                    >
+                      Date of Birth
+                    </label>
+                    <div className="mt-1">
+                      <input
+                        type="date"
+                        id="dateOfBirth"
+                        className="block w-full rounded-lg border border-gray-300 bg-white px-3.5 py-2.5 text-base text-gray-900 shadow-sm placeholder:text-gray-400 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/50 focus:outline-none sm:text-base"
+                        value={dateOfBirth}
+                        onChange={(e) => setDateOfBirth(e.target.value)}
                         disabled={saving}
                       />
                     </div>

@@ -62,6 +62,7 @@ const mockShareLink = {
 const mockCareAccess = {
   create: jest.fn() as AsyncMockFn<[unknown], unknown>,
   findUnique: jest.fn() as AsyncMockFn<[unknown], unknown>,
+  findFirst: jest.fn() as AsyncMockFn<[unknown], unknown>,
   findMany: jest.fn() as AsyncMockFn<[unknown], unknown>,
   delete: jest.fn() as AsyncMockFn<[unknown], unknown>,
 };
