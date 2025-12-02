@@ -47,6 +47,13 @@ describe("/api/profile route", () => {
       .mocked(verifySession)
       .mockResolvedValueOnce({ id: "u1", email: "a@b.com", name: "User" });
 
+    prismaMock.user.findUnique.mockResolvedValueOnce({
+      id: "u1",
+      email: "a@b.com",
+      name: "User",
+      dateOfBirth: null,
+    });
+
     const res = await ProfileRoute.GET();
     expect(res.status).toBe(200);
     const json = await res.json();

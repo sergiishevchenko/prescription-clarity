@@ -150,7 +150,7 @@ export default function ProfilePage() {
                       <input
                         type="date"
                         id="dateOfBirth"
-                        className="block w-full rounded-lg border border-gray-300 bg-white pl-3 pr-9 py-2 text-sm text-gray-900 shadow-sm placeholder:text-gray-400 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/50 focus:outline-none sm:pl-3.5 sm:pr-12 sm:py-2.5 sm:text-base"
+                        className="block w-full rounded-lg border border-gray-300 bg-white py-2 pr-9 pl-3 text-sm text-gray-900 shadow-sm placeholder:text-gray-400 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/50 focus:outline-none sm:py-2.5 sm:pr-12 sm:pl-3.5 sm:text-base"
                         value={dateOfBirth}
                         onChange={(e) => setDateOfBirth(e.target.value)}
                         disabled={saving}
