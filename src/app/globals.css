@@ -53,6 +53,15 @@ html {
 }
 
 /* Date input calendar icon positioning */
+input[type="date"] {
+  position: relative; /* Ensure pseudo-element is positioned relative to the input (Safari/WebKit) */
+}
+
+/* Hide the native picker icon specifically for the DOB field; we render our own SVG */
+input#dateOfBirth::-webkit-calendar-picker-indicator {
+  opacity: 0;
+}
+
 input[type="date"]::-webkit-calendar-picker-indicator {
   position: absolute;
   right: 0.75rem;

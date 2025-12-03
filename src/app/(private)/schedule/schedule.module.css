@@ -809,9 +809,33 @@
   padding-right: 2.5rem;
 }
 
+/* Hide native date picker icon in the edit schedule dialog;
+   we render a custom calendar SVG instead. */
+.dateInputWrapper input[type="date"]::-webkit-calendar-picker-indicator {
+  opacity: 0;
+}
+
+.dateIcon {
+  position: absolute;
+  right: 0.75rem;
+  top: 50%;
+  transform: translateY(-50%);
+  color: #94a3b8;
+  pointer-events: none;
+}
+
+.dateIconGlyph {
+  width: 1rem;
+  height: 1rem;
+}
+
 @media (min-width: 640px) {
   .dateInput {
     padding-right: 3rem;
+  }
+
+  .dateIcon {
+    right: 1rem;
   }
 }
 
@@ -822,6 +846,40 @@
   padding: 0.55rem 0.9rem;
   font-size: 0.9rem;
   color: #0f172a;
+}
+
+/* Normalize select height to match text inputs in the edit schedule dialog */
+select.input {
+  height: 2.5rem;
+  padding: 0.55rem 0.9rem;
+  line-height: 1.25;
+  border-radius: 0.5rem;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  appearance: none;
+  background-color: #ffffff;
+}
+
+.selectWrapper {
+  position: relative;
+}
+
+.selectInput {
+  padding-right: 2.5rem;
+}
+
+.selectChevron {
+  position: absolute;
+  right: 0.75rem;
+  top: 50%;
+  transform: translateY(-50%);
+  color: #94a3b8;
+  pointer-events: none;
+}
+
+.selectChevronGlyph {
+  width: 0.85rem;
+  height: 0.85rem;
 }
 
 .weekdayGrid {

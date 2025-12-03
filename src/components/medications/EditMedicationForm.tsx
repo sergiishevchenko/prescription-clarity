@@ -58,6 +58,27 @@ export default function EditMedicationForm({
     },
   });
 
+  function CalendarIcon({ className }: { className?: string }) {
+    return (
+      <svg
+        className={className}
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth={2}
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        aria-hidden="true"
+      >
+        <rect x="3" y="4" width="18" height="18" rx="2" ry="2" />
+        <line x1="16" y1="2" x2="16" y2="6" />
+        <line x1="8" y1="2" x2="8" y2="6" />
+        <line x1="3" y1="10" x2="21" y2="10" />
+        <rect x="8" y="14" width="3" height="3" rx="0.5" />
+      </svg>
+    );
+  }
+
   async function onSubmit(values: FormShape) {
     setSaving(true);
     setError(null);
@@ -165,13 +186,17 @@ export default function EditMedicationForm({
                 <label className="block text-base font-medium text-gray-900">
                   Start Date
                 </label>
-                <div className="mt-2">
+                <div className="relative mt-2">
                   <Input
                     type="date"
+                    className="pr-10 sm:pr-12"
                     {...register("startDate", {
                       required: "Start date is required",
                     })}
                   />
+                  <span className="pointer-events-none absolute inset-y-0 right-3 flex items-center text-gray-400">
+                    <CalendarIcon className="h-5 w-5 sm:h-6 sm:w-6" />
+                  </span>
                 </div>
                 {errors.startDate && (
                   <p className="mt-1 text-sm text-red-600">
@@ -183,13 +208,17 @@ export default function EditMedicationForm({
                 <label className="block text-base font-medium text-gray-900">
                   End Date
                 </label>
-                <div className="mt-2">
+                <div className="relative mt-2">
                   <Input
                     type="date"
+                    className="pr-10 sm:pr-12"
                     {...register("endDate", {
                       required: "End date is required",
                     })}
                   />
+                  <span className="pointer-events-none absolute inset-y-0 right-3 flex items-center text-gray-400">
+                    <CalendarIcon className="h-5 w-5 sm:h-6 sm:w-6" />
+                  </span>
                 </div>
                 {errors.endDate && (
                   <p className="mt-1 text-sm text-red-600">
