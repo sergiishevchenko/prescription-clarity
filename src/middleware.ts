@@ -21,8 +21,8 @@ export function middleware(request: NextRequest) {
     return NextResponse.next();
   }
 
-  // Check for protected routes - just check if session cookie exists
-  // Full session validation happens in the API routes
+  // Check for protected routes - just check if session cookie exists.
+  // Full session validation happens in the API routes.
   if (
     pathname.startsWith("/dashboard") ||
     pathname.startsWith("/today") ||
@@ -30,6 +30,8 @@ export function middleware(request: NextRequest) {
     pathname.startsWith("/schedule") ||
     pathname.startsWith("/profile") ||
     pathname.startsWith("/medications") ||
+    pathname.startsWith("/dependents") ||
+    pathname.startsWith("/share") ||
     pathname.startsWith("/support")
   ) {
     if (!sessionToken) {

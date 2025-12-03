@@ -467,6 +467,9 @@ function ScheduleEditDialog({
                     onChange={(event) => setDateStart(event.target.value)}
                     className={`${styles.input} ${styles.dateInput}`}
                   />
+                  <span className={styles.dateIcon}>
+                    <CalendarIcon className={styles.dateIconGlyph} />
+                  </span>
                 </div>
               </label>
               <label className={styles.formLabel}>
@@ -544,20 +547,25 @@ function ScheduleEditDialog({
             <div className={styles.formSection}>
               <label className={styles.formLabel}>
                 Meal timing
-                <select
-                  value={mealTiming}
-                  onChange={(event) =>
-                    setMealTiming(
-                      event.target.value as ScheduleCardData["mealTiming"],
-                    )
-                  }
-                  className={styles.input}
-                >
-                  <option value="before">Before meal</option>
-                  <option value="with">With meal</option>
-                  <option value="after">After meal</option>
-                  <option value="anytime">Anytime</option>
-                </select>
+                <div className={styles.selectWrapper}>
+                  <select
+                    value={mealTiming}
+                    onChange={(event) =>
+                      setMealTiming(
+                        event.target.value as ScheduleCardData["mealTiming"],
+                      )
+                    }
+                    className={`${styles.input} ${styles.selectInput}`}
+                  >
+                    <option value="before">Before meal</option>
+                    <option value="with">With meal</option>
+                    <option value="after">After meal</option>
+                    <option value="anytime">Anytime</option>
+                  </select>
+                  <span className={styles.selectChevron}>
+                    <ChevronDownIcon className={styles.selectChevronGlyph} />
+                  </span>
+                </div>
               </label>
             </div>
 
@@ -728,6 +736,23 @@ function CalendarIcon({ className }: IconProps) {
       <path d="M16 2v4" />
       <rect x="3" y="4" width="18" height="18" rx="2" />
       <path d="M3 10h18" />
+    </svg>
+  );
+}
+
+function ChevronDownIcon({ className }: IconProps) {
+  return (
+    <svg
+      className={className}
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth={2}
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      aria-hidden="true"
+    >
+      <polyline points="6 9 12 15 18 9" />
     </svg>
   );
 }

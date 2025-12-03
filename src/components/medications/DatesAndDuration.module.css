@@ -6,8 +6,31 @@
   padding-right: 2.5rem;
 }
 
+/* Hide native date picker icon; we render our own calendar SVG */
+.dateInputWrapper input[type="date"]::-webkit-calendar-picker-indicator {
+  opacity: 0;
+}
+
+.dateIcon {
+  position: absolute;
+  right: 0.75rem;
+  top: 50%;
+  transform: translateY(-50%);
+  color: #9ca3af;
+  pointer-events: none;
+}
+
+.dateIconGlyph {
+  width: 1rem;
+  height: 1rem;
+}
+
 @media (min-width: 640px) {
   .dateInput {
     padding-right: 3rem;
+  }
+
+  .dateIcon {
+    right: 1rem;
   }
 }
