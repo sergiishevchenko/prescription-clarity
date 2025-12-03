@@ -319,7 +319,7 @@ export default function DatesAndDuration() {
                   handleUnitChange(event.target.value as DurationUnit)
                 }
                 disabled={ongoing}
-                className="h-[48px] w-full rounded-xl border-2 border-[#E0E7FF] bg-white px-3 pr-9 text-sm font-medium text-[#0F172A] transition appearance-none outline-none focus:border-[#2563EB] focus:ring-2 focus:ring-[#93C5FD] disabled:cursor-not-allowed disabled:opacity-50 sm:h-[56px] sm:rounded-2xl sm:px-4 sm:pr-10 sm:text-base"
+                className="h-[48px] w-full appearance-none rounded-xl border-2 border-[#E0E7FF] bg-white px-3 pr-9 text-sm font-medium text-[#0F172A] transition outline-none focus:border-[#2563EB] focus:ring-2 focus:ring-[#93C5FD] disabled:cursor-not-allowed disabled:opacity-50 sm:h-[56px] sm:rounded-2xl sm:px-4 sm:pr-10 sm:text-base"
               >
                 {DURATION_UNITS.map((option) => (
                   <option key={option.value} value={option.value}>
@@ -382,7 +382,7 @@ export default function DatesAndDuration() {
             <div className={`${styles.dateInputWrapper} relative mt-2`}>
               <Input
                 type="date"
-                className={`${styles.dateInput} h-[48px] w-full rounded-xl border-2 border-[#E0E7FF] pl-3 pr-10 text-sm sm:h-[52px] sm:rounded-2xl sm:pl-4 sm:pr-12 sm:text-base`}
+                className={`${styles.dateInput} h-[48px] w-full rounded-xl border-2 border-[#E0E7FF] pr-10 pl-3 text-sm sm:h-[52px] sm:rounded-2xl sm:pr-12 sm:pl-4 sm:text-base`}
                 {...register("startDate", {
                   required: "Start date is required",
                 })}
@@ -405,7 +405,7 @@ export default function DatesAndDuration() {
               <Input
                 type="date"
                 disabled={ongoing}
-                className={`${styles.dateInput} h-[48px] w-full rounded-xl border-2 border-[#E0E7FF] pl-3 pr-10 text-sm disabled:cursor-not-allowed disabled:opacity-50 sm:h-[52px] sm:rounded-2xl sm:pl-4 sm:pr-12 sm:text-base`}
+                className={`${styles.dateInput} h-[48px] w-full rounded-xl border-2 border-[#E0E7FF] pr-10 pl-3 text-sm disabled:cursor-not-allowed disabled:opacity-50 sm:h-[52px] sm:rounded-2xl sm:pr-12 sm:pl-4 sm:text-base`}
                 {...register("endDate", {
                   validate: (value) => {
                     if (!ongoing && !value) {
