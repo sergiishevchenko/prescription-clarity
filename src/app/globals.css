@@ -52,10 +52,8 @@ html {
   animation: fadeUp 1.2s ease-out;
 }
 
-/* Date input calendar icon positioning and sizing */
+/* Date input sizing for mobile (including Safari) */
 input[type="date"] {
-  /* Ensure pseudo-element is positioned relative to the input (Safari/WebKit) */
-  position: relative;
   /* Prevent mobile browsers from making the control wider than its container */
   width: 100%;
   max-width: 100%;
@@ -63,28 +61,12 @@ input[type="date"] {
   display: block;
 }
 
-/* Hide the native picker icon specifically for the DOB field; we render our own SVG */
-input#dateOfBirth::-webkit-calendar-picker-indicator {
-  opacity: 0;
-}
-
+/* Hide the native picker icon everywhere; we render our own SVG icons next to the field */
 input[type="date"]::-webkit-calendar-picker-indicator {
-  position: absolute;
-  right: 0.75rem;
-  top: 50%;
-  transform: translateY(-50%);
-  cursor: pointer;
-  opacity: 1;
-  width: 1.25rem;
-  height: 1.25rem;
-}
-
-@media (min-width: 640px) {
-  input[type="date"]::-webkit-calendar-picker-indicator {
-    right: 1rem;
-    width: 1.5rem;
-    height: 1.5rem;
-  }
+  opacity: 0;
+  -webkit-appearance: none;
+  appearance: none;
+  display: none;
 }
 
 /* Time of day cards: 2 columns on tablet (641px-1024px), 3 columns on desktop (1025px+) */
