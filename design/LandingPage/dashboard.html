@@ -1,660 +1,663 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Dashboard - Prescription Clarity</title>
-  <meta
-    name="description"
-    content="Track your daily medication schedule, adherence, and access roles."
-  />
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Dashboard - Prescription Clarity</title>
+    <meta
+      name="description"
+      content="Track your daily medication schedule, adherence, and access roles."
+    />
 
-  <script src="https://cdn.tailwindcss.com"></script>
-  <script src="https://unpkg.com/lucide@latest"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
 
-  <style>
-    @import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap");
+    <style>
+      @import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap");
 
-    * {
-      font-family: "Inter", system-ui, -apple-system, BlinkMacSystemFont,
-        "Segoe UI", sans-serif;
-    }
+      * {
+        font-family:
+          "Inter",
+          system-ui,
+          -apple-system,
+          BlinkMacSystemFont,
+          "Segoe UI",
+          sans-serif;
+      }
 
-    html,
-    body {
-      margin: 0;
-      padding: 0;
-      height: 100%;
-      overflow-x: hidden;
-    }
+      html,
+      body {
+        margin: 0;
+        padding: 0;
+        height: 100%;
+        overflow-x: hidden;
+      }
 
-    @keyframes fadeInUp {
-      from {
+      @keyframes fadeInUp {
+        from {
+          opacity: 0;
+          transform: translateY(24px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+
+      @keyframes slideInLeft {
+        from {
+          opacity: 0;
+          transform: translateX(-16px);
+        }
+        to {
+          opacity: 1;
+          transform: translateX(0);
+        }
+      }
+
+      .hero-section {
         opacity: 0;
-        transform: translateY(24px);
+        animation: fadeInUp 0.4s ease-out 0.05s forwards;
       }
-      to {
-        opacity: 1;
-        transform: translateY(0);
-      }
-    }
 
-    @keyframes slideInLeft {
-      from {
+      .schedule-card {
         opacity: 0;
-        transform: translateX(-16px);
+        animation: fadeInUp 0.5s ease-out 0.1s forwards;
       }
-      to {
-        opacity: 1;
-        transform: translateX(0);
+
+      .access-card {
+        opacity: 0;
+        animation: slideInLeft 0.45s ease-out 0.15s forwards;
       }
-    }
 
-    .hero-section {
-      opacity: 0;
-      animation: fadeInUp 0.4s ease-out 0.05s forwards;
-    }
+      /* Keep this class unused now (active state is defined via Tailwind classes) */
+      .sidebar-active {
+        position: relative;
+        display: flex;
+        align-items: center;
+        width: 100%;
+        border-radius: 0.75rem;
+        background: #eef3ff;
+        color: #2563eb;
+        box-shadow: 0 8px 18px rgba(15, 23, 42, 0.06);
+      }
 
-    .schedule-card {
-      opacity: 0;
-      animation: fadeInUp 0.5s ease-out 0.1s forwards;
-    }
-
-    .access-card {
-      opacity: 0;
-      animation: slideInLeft 0.45s ease-out 0.15s forwards;
-    }
-
-    /* Keep this class unused now (active state is defined via Tailwind classes) */
-    .sidebar-active {
-      position: relative;
-      display: flex;
-      align-items: center;
-      width: 100%;
-      border-radius: 0.75rem;
-      background: #eef3ff;
-      color: #2563eb;
-      box-shadow: 0 8px 18px rgba(15, 23, 42, 0.06);
-    }
-
-    .sidebar-active::before {
-      content: "";
-      position: absolute;
-      left: 0;
-      top: 6px;
-      bottom: 6px;
-      width: 4px;
-      border-radius: 9999px;
-      background: #2563eb;
-    }
-  </style>
-</head>
-<body class="bg-slate-50">
-  <div class="min-h-screen bg-slate-50 flex flex-col">
-    <!-- Mobile top bar -->
-    <header
-      class="flex items-center justify-between px-4 py-3 border-b bg-white lg:hidden"
-    >
-      <button
-        id="sidebar-open"
-        type="button"
-        class="inline-flex items-center justify-center rounded-full border border-slate-200 w-9 h-9 text-slate-700"
-        aria-label="Open navigation"
+      .sidebar-active::before {
+        content: "";
+        position: absolute;
+        left: 0;
+        top: 6px;
+        bottom: 6px;
+        width: 4px;
+        border-radius: 9999px;
+        background: #2563eb;
+      }
+    </style>
+  </head>
+  <body class="bg-slate-50">
+    <div class="flex min-h-screen flex-col bg-slate-50">
+      <!-- Mobile top bar -->
+      <header
+        class="flex items-center justify-between border-b bg-white px-4 py-3 lg:hidden"
       >
-        <i data-lucide="menu" class="w-5 h-5"></i>
-      </button>
-      <div class="flex items-center gap-2">
-        <img src="logo.svg" alt="Prescription Clarity" class="w-8 h-8" />
-        <span class="text-sm font-semibold text-slate-900">
-          Prescription Clarity
-        </span>
-      </div>
-      <div class="w-9 h-9"></div>
-    </header>
-
-    <div class="flex flex-1 lg:h-screen overflow-hidden">
-      <!-- Mobile backdrop -->
-      <div
-        id="sidebar-backdrop"
-        class="fixed inset-0 bg-black/30 z-30 opacity-0 pointer-events-none transition-opacity duration-300 lg:hidden"
-      ></div>
-
-      <!-- Sidebar -->
-      <aside
-        id="sidebar"
-        class="fixed inset-y-0 left-0 z-40 w-72 bg-white border-r border-slate-200 transform -translate-x-full transition-transform duration-300 ease-out lg:static lg:inset-auto lg:translate-x-0 lg:w-64 lg:flex-shrink-0"
-        aria-label="Main navigation"
-      >
-        <div class="flex flex-col h-full overflow-y-auto">
-          <!-- Logo + header -->
-          <div class="p-4 border-b border-slate-200 flex items-center gap-3">
-            <img
-              src="logo.svg"
-              alt="Prescription Clarity"
-              class="w-11 h-11 flex-shrink-0"
-            />
-            <div>
-              <h1 class="font-bold text-lg text-slate-900 leading-tight">
-                Prescription Clarity
-              </h1>
-              <p class="text-xs text-slate-500">
-                Medication Management Made Simple
-              </p>
-            </div>
-
-            <button
-              id="sidebar-close"
-              type="button"
-              class="lg:hidden inline-flex items-center justify-center rounded-full border border-slate-200 w-8 h-8 text-slate-600 ml-auto"
-              aria-label="Close navigation"
-            >
-              <i data-lucide="x" class="w-4 h-4"></i>
-            </button>
-          </div>
-
-          <!-- Navigation + Add Medication -->
-          <div class="flex flex-col flex-1">
-            <nav class="py-2 px-2 space-y-4">
-              <!-- Overview -->
-              <div>
-                <button
-                  type="button"
-                  class="flex items-center justify-between w-full px-2 mb-1 text-xs font-semibold text-slate-500 bg-transparent border-0 rounded-md h-7 appearance-none focus:outline-none focus:ring-0"
-                  data-section-toggle="overview"
-                >
-                  <span>Overview</span>
-                  <i
-                    data-lucide="chevron-up"
-                    class="w-4 h-4 text-slate-400 transition-transform duration-200"
-                  ></i>
-                </button>
-
-                <div id="section-overview" class="space-y-1">
-                  <!-- Active Dashboard (style ported from version 8) -->
-                  <a
-                    href="#"
-                    class="flex items-center gap-2 px-3 py-2 rounded-lg bg-blue-50 text-blue-700 text-sm font-medium border border-transparent border-l-4 border-l-blue-600"
-                  >
-                    <i
-                      data-lucide="layout-dashboard"
-                      class="w-5 h-5 text-blue-600"
-                    ></i>
-                    <span>Dashboard</span>
-                    <i
-                      data-lucide="chevron-right"
-                      class="w-4 h-4 text-blue-500 ml-auto"
-                    ></i>
-                  </a>
-
-                  <!-- Today -->
-                  <a
-                    href="#"
-                    class="flex items-center gap-2 px-3 py-2 rounded-lg text-slate-700 hover:bg-slate-50 text-sm"
-                  >
-                    <i
-                      data-lucide="calendar"
-                      class="w-5 h-5 text-slate-600"
-                    ></i>
-                    <span>Today</span>
-                  </a>
-
-                  <!-- Week View -->
-                  <a
-                    href="#"
-                    class="flex items-center gap-2 px-3 py-2 rounded-lg text-slate-700 hover:bg-slate-50 text-sm"
-                  >
-                    <i
-                      data-lucide="calendar-days"
-                      class="w-5 h-5 text-slate-600"
-                    ></i>
-                    <span>Week View</span>
-                  </a>
-                </div>
-              </div>
-
-              <!-- Tracking -->
-              <div>
-                <button
-                  type="button"
-                  class="flex items-center justify-between w-full px-2 mb-1 text-xs font-semibold text-slate-500 bg-transparent border-0 rounded-md h-7 appearance-none focus:outline-none focus:ring-0"
-                  data-section-toggle="tracking"
-                >
-                  <span>Tracking</span>
-                  <i
-                    data-lucide="chevron-up"
-                    class="w-4 h-4 text-slate-400 transition-transform duration-200"
-                  ></i>
-                </button>
-
-                <div id="section-tracking" class="space-y-1">
-                  <!-- Medications -->
-                  <a
-                    href="#"
-                    class="flex items-center gap-2 px-3 py-2 rounded-lg text-slate-700 hover:bg-slate-50 text-sm"
-                  >
-                    <i data-lucide="pill" class="w-5 h-5 text-slate-600"></i>
-                    <span>Medications</span>
-                  </a>
-
-                  <!-- Schedule -->
-                  <a
-                    href="#"
-                    class="flex items-center gap-2 px-3 py-2 rounded-lg text-slate-700 hover:bg-slate-50 text-sm"
-                  >
-                    <i
-                      data-lucide="clock-3"
-                      class="w-5 h-5 text-slate-600"
-                    ></i>
-                    <span>Schedule</span>
-                  </a>
-
-                  <!-- Dependents -->
-                  <a
-                    href="#"
-                    class="flex items-center gap-2 px-3 py-2 rounded-lg text-slate-700 hover:bg-slate-50 text-sm"
-                  >
-                    <i data-lucide="users" class="w-5 h-5 text-slate-600"></i>
-                    <span>Dependents</span>
-                  </a>
-                </div>
-              </div>
-
-              <!-- Personal -->
-              <div>
-                <button
-                  type="button"
-                  class="flex items-center justify-between w-full px-2 mb-1 text-xs font-semibold text-slate-500 bg-transparent border-0 rounded-md h-7 appearance-none focus:outline-none focus:ring-0"
-                  data-section-toggle="personal"
-                >
-                  <span>Personal</span>
-                  <i
-                    data-lucide="chevron-up"
-                    class="w-4 h-4 text-slate-400 transition-transform duration-200"
-                  ></i>
-                </button>
-
-                <div id="section-personal" class="space-y-1">
-                  <!-- Achievements -->
-                  <a
-                    href="#"
-                    class="flex items-center gap-2 px-3 py-2 rounded-lg text-slate-700 hover:bg-slate-50 text-sm"
-                  >
-                    <i data-lucide="award" class="w-5 h-5 text-slate-600"></i>
-                    <span>Achievements</span>
-                  </a>
-
-                  <!-- Data Sharing -->
-                  <a
-                    href="#"
-                    class="flex items-center gap-2 px-3 py-2 rounded-lg text-slate-700 hover:bg-slate-50 text-sm"
-                  >
-                    <i data-lucide="shield" class="w-5 h-5 text-slate-600"></i>
-                    <span>Data Sharing</span>
-                  </a>
-
-                  <!-- Profile -->
-                  <a
-                    href="#"
-                    class="flex items-center gap-2 px-3 py-2 rounded-lg text-slate-700 hover:bg-slate-50 text-sm"
-                  >
-                    <i data-lucide="user" class="w-5 h-5 text-slate-600"></i>
-                    <span>Profile</span>
-                  </a>
-
-                  <!-- Support -->
-                  <a
-                    href="#"
-                    class="flex items-center gap-2 px-3 py-2 rounded-lg text-slate-700 hover:bg-slate-50 text-sm"
-                  >
-                    <i
-                      data-lucide="life-buoy"
-                      class="w-5 h-5 text-slate-600"
-                    ></i>
-                    <span>Support</span>
-                  </a>
-                </div>
-              </div>
-            </nav>
-
-            <!-- Add Medication (above bottom area) -->
-            <div class="px-3 mt-2 mb-4">
-              <button
-                class="w-full h-10 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-medium flex items-center justify-center gap-2 transition-colors text-sm shadow-[0_10px_30px_rgba(37,99,235,0.35)]"
-              >
-                <i data-lucide="plus" class="w-4 h-4"></i>
-                <span>Add Medication</span>
-              </button>
-            </div>
-
-            <!-- Spacer to push patient + sign-out down -->
-            <div class="flex-1"></div>
-
-            <!-- Patient + Sign Out -->
-            <div class="border-t border-slate-200 pt-3 pb-4">
-              <div class="px-3 mb-3">
-                <div class="flex items-center gap-3 px-2 py-2 rounded-xl">
-                  <div
-                    class="w-9 h-9 rounded-full bg-blue-100 flex items-center justify-center font-semibold text-blue-600 flex-shrink-0 text-sm"
-                  >
-                    SS
-                  </div>
-                  <div class="flex-1 min-w-0">
-                    <p class="text-sm font-semibold text-slate-900 truncate">
-                      Steve Smith
-                    </p>
-                    <p class="text-xs text-slate-500">Patient</p>
-                  </div>
-                </div>
-              </div>
-
-              <div class="px-3">
-                <button
-                  class="w-full h-10 border-2 border-slate-200 hover:bg-slate-50 text-rose-500 rounded-lg font-medium flex items-center justify-center gap-2 transition-colors text-sm"
-                >
-                  <i data-lucide="log-out" class="w-4 h-4"></i>
-                  <span>Sign Out</span>
-                </button>
-              </div>
-            </div>
-          </div>
-        </div>
-      </aside>
-
-      <!-- Main content -->
-      <main class="flex-1 overflow-y-visible lg:overflow-y-auto">
-        <div
-          class="px-3 sm:px-5 lg:px-8 py-3 sm:py-3 lg:py-4 max-w-6xl mx-auto"
+        <button
+          id="sidebar-open"
+          type="button"
+          class="inline-flex h-9 w-9 items-center justify-center rounded-full border border-slate-200 text-slate-700"
+          aria-label="Open navigation"
         >
-          <!-- Welcome -->
-          <section class="hero-section mb-3 sm:mb-3">
-            <h1
-              class="text-lg sm:text-2xl lg:text-2xl font-bold text-slate-900"
-            >
-              Welcome, Steve Smith
-            </h1>
-            <p class="text-xs sm:text-sm mt-1 text-slate-600">
-              Here’s a quick snapshot of your current schedule performance.
-            </p>
-          </section>
-
-          <!-- Schedule overview -->
-          <section
-            class="schedule-card bg-white border border-slate-200 rounded-3xl p-3 sm:p-4 mb-3"
-          >
-            <div
-              class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between mb-3"
-            >
-              <div>
-                <p
-                  class="text-[11px] sm:text-xs font-bold tracking-wide text-blue-700 uppercase"
-                >
-                  Schedule overview
-                </p>
-                <p class="text-sm sm:text[15px] text-slate-800 font-medium">
-                  This Week · Dec 1 – Dec 7
-                </p>
-              </div>
-
-              <button
-                class="inline-flex items-center justify-center rounded-xl bg-blue-600 px-4 py-2 text-xs sm:text-sm font-semibold text-white hover:bg-blue-700 transition-colors w-full sm:w-auto"
-              >
-                Manage schedules
-              </button>
-            </div>
-
-            <!-- 2 cards on mobile, 4 on desktop -->
-            <div class="grid grid-cols-2 md:grid-cols-4 gap-3 sm:gap-3.5">
-              <!-- Planned entries -->
-              <article
-                class="rounded-2xl border border-slate-200 bg-slate-50 px-3 py-2 sm:py-3 flex flex-col"
-              >
-                <div class="flex items-center gap-2 mb-2">
-                  <div
-                    class="w-8 h-8 sm:w-9 sm:h-9 rounded-full bg-blue-600 flex items-center justify-center shadow-sm"
-                  >
-                    <i
-                      data-lucide="sliders-horizontal"
-                      class="w-4 h-4 text-white"
-                    ></i>
-                  </div>
-                  <p class="text-xs font-semibold text-slate-800">
-                    Planned entries
-                  </p>
-                </div>
-
-                <p
-                  class="text-2xl sm:text-3xl font-bold text-slate-900 leading-tight mb-1"
-                >
-                  57
-                </p>
-
-                <div class="mt-auto">
-                  <p class="text-[11px] text-slate-500">All doses</p>
-                </div>
-              </article>
-
-              <!-- Taken -->
-              <article
-                class="rounded-2xl border border-emerald-200 bg-emerald-50 px-3 py-2 sm:py-3 flex flex-col"
-              >
-                <div class="flex items-center gap-2 mb-2">
-                  <div
-                    class="w-8 h-8 sm:w-9 sm:h-9 rounded-full bg-emerald-500 flex items-center justify-center shadow-sm"
-                  >
-                    <i
-                      data-lucide="check-circle-2"
-                      class="w-4 h-4 text-white"
-                    ></i>
-                  </div>
-                  <p class="text-xs font-semibold text-emerald-900">Taken</p>
-                </div>
-
-                <p
-                  class="text-2xl sm:text-3xl font-bold text-slate-900 leading-tight mb-1"
-                >
-                  14
-                </p>
-
-                <div class="mt-auto">
-                  <p class="text-[11px] text-emerald-700">On time</p>
-                  <p class="text-[11px] text-emerald-900">
-                    43 still planned for this week
-                  </p>
-                </div>
-              </article>
-
-              <!-- Still planned -->
-              <article
-                class="rounded-2xl border border-blue-200 bg-blue-50 px-3 py-2 sm:py-3 flex flex-col"
-              >
-                <div class="flex items-center gap-2 mb-2">
-                  <div
-                    class="w-8 h-8 sm:w-9 sm:h-9 rounded-full bg-blue-600 flex items-center justify-center shadow-sm"
-                  >
-                    <i data-lucide="clock" class="w-4 h-4 text-white"></i>
-                  </div>
-                  <p class="text-xs font-semibold text-blue-900">
-                    Still planned
-                  </p>
-                </div>
-
-                <p
-                  class="text-2xl sm:text-3xl font-bold text-slate-900 leading-tight mb-1"
-                >
-                  43
-                </p>
-
-                <div class="mt-auto">
-                  <p class="text-[11px] text-blue-800 mb-1">This week</p>
-                  <div class="h-2 rounded-full bg-slate-200 overflow-hidden">
-                    <div
-                      class="h-full bg-blue-600"
-                      style="width: 75%;"
-                    ></div>
-                  </div>
-                  <p class="text-[11px] text-slate-600 mt-1">
-                    75% of weekly doses still ahead
-                  </p>
-                </div>
-              </article>
-
-              <!-- Upcoming -->
-              <article
-                class="rounded-2xl border border-indigo-200 bg-indigo-50 px-3 py-2 sm:py-3 flex flex-col"
-              >
-                <div class="flex items-center gap-2 mb-2">
-                  <div
-                    class="w-8 h-8 sm:w-9 sm:h-9 rounded-full bg-indigo-500 flex items-center justify-center shadow-sm"
-                  >
-                    <i
-                      data-lucide="arrow-right-circle"
-                      class="w-4 h-4 text-white"
-                    ></i>
-                  </div>
-                  <p class="text-xs font-semibold text-indigo-900">
-                    Upcoming
-                  </p>
-                </div>
-
-                <p
-                  class="text-2xl sm:text-3xl font-bold text-slate-900 leading-tight mb-1"
-                >
-                  33
-                </p>
-
-                <div class="mt-auto">
-                  <p class="text-[11px] text-indigo-800">Next 7 days</p>
-                  <p class="text-[11px] text-slate-600 mt-0.5">
-                    Includes morning, daytime and evening doses
-                  </p>
-                </div>
-              </article>
-            </div>
-          </section>
-
-          <!-- Access roles -->
-          <section
-            class="access-card bg-white border border-slate-200 rounded-3xl p-3 sm:p-4 mb-3"
-          >
-            <div
-              class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 mb-3"
-            >
-              <div>
-                <p
-                  class="text-[11px] sm:text-xs font-bold tracking-wide text-slate-500 uppercase"
-                >
-                  Access roles
-                </p>
-                <h2 class="text-base sm:text-lg font-semibold text-slate-900">
-                  Who can view what
-                </h2>
-                <p class="text-xs sm:text-[13px] text-slate-600 mt-1">
-                  You are an owner of your profile and a viewer for people who
-                  shared access with you.
-                </p>
-              </div>
-              <button
-                class="inline-flex items-center gap-1.5 text-xs sm:text-sm text-blue-700 hover:text-blue-800 font-semibold"
-              >
-                <i data-lucide="shield" class="w-4 h-4"></i>
-                <span>Manage access</span>
-              </button>
-            </div>
-
-            <div class="grid gap-3 sm:gap-4 md:grid-cols-2">
-              <!-- People who can view my data -->
-              <article
-                class="rounded-2xl border border-slate-200 bg-slate-50 px-3.5 py-3"
-              >
-                <p class="text-xs font-semibold text-slate-800 mb-1">
-                  People who can view my data
-                </p>
-                <p class="text-[13px] text-slate-600 mb-2">
-                  These users have accepted a share link from you and can see
-                  your schedule.
-                </p>
-                <p class="text-[11px] text-slate-500">
-                  No active viewers yet.
-                </p>
-              </article>
-
-              <!-- Profiles I can view -->
-              <article
-                class="rounded-2xl border border-slate-200 bg-slate-50 px-3.5 py-3"
-              >
-                <p class="text-xs font-semibold text-slate-800 mb-1">
-                  Profiles I can view
-                </p>
-                <p class="text-[13px] text-slate-600 mb-2">
-                  These users shared their profile with you. You are viewing
-                  their schedule as a viewer.
-                </p>
-                <p class="text-[11px] text-slate-500">
-                  You don’t have access to other profiles yet.
-                </p>
-              </article>
-            </div>
-          </section>
+          <i data-lucide="menu" class="h-5 w-5"></i>
+        </button>
+        <div class="flex items-center gap-2">
+          <img src="logo.svg" alt="Prescription Clarity" class="h-8 w-8" />
+          <span class="text-sm font-semibold text-slate-900">
+            Prescription Clarity
+          </span>
         </div>
-      </main>
+        <div class="h-9 w-9"></div>
+      </header>
+
+      <div class="flex flex-1 overflow-hidden lg:h-screen">
+        <!-- Mobile backdrop -->
+        <div
+          id="sidebar-backdrop"
+          class="pointer-events-none fixed inset-0 z-30 bg-black/30 opacity-0 transition-opacity duration-300 lg:hidden"
+        ></div>
+
+        <!-- Sidebar -->
+        <aside
+          id="sidebar"
+          class="fixed inset-y-0 left-0 z-40 w-72 -translate-x-full transform border-r border-slate-200 bg-white transition-transform duration-300 ease-out lg:static lg:inset-auto lg:w-64 lg:flex-shrink-0 lg:translate-x-0"
+          aria-label="Main navigation"
+        >
+          <div class="flex h-full flex-col overflow-y-auto">
+            <!-- Logo + header -->
+            <div class="flex items-center gap-3 border-b border-slate-200 p-4">
+              <img
+                src="logo.svg"
+                alt="Prescription Clarity"
+                class="h-11 w-11 flex-shrink-0"
+              />
+              <div>
+                <h1 class="text-lg leading-tight font-bold text-slate-900">
+                  Prescription Clarity
+                </h1>
+                <p class="text-xs text-slate-500">
+                  Medication Management Made Simple
+                </p>
+              </div>
+
+              <button
+                id="sidebar-close"
+                type="button"
+                class="ml-auto inline-flex h-8 w-8 items-center justify-center rounded-full border border-slate-200 text-slate-600 lg:hidden"
+                aria-label="Close navigation"
+              >
+                <i data-lucide="x" class="h-4 w-4"></i>
+              </button>
+            </div>
+
+            <!-- Navigation + Add Medication -->
+            <div class="flex flex-1 flex-col">
+              <nav class="space-y-4 px-2 py-2">
+                <!-- Overview -->
+                <div>
+                  <button
+                    type="button"
+                    class="mb-1 flex h-7 w-full appearance-none items-center justify-between rounded-md border-0 bg-transparent px-2 text-xs font-semibold text-slate-500 focus:ring-0 focus:outline-none"
+                    data-section-toggle="overview"
+                  >
+                    <span>Overview</span>
+                    <i
+                      data-lucide="chevron-up"
+                      class="h-4 w-4 text-slate-400 transition-transform duration-200"
+                    ></i>
+                  </button>
+
+                  <div id="section-overview" class="space-y-1">
+                    <!-- Active Dashboard (style ported from version 8) -->
+                    <a
+                      href="#"
+                      class="flex items-center gap-2 rounded-lg border border-l-4 border-transparent border-l-blue-600 bg-blue-50 px-3 py-2 text-sm font-medium text-blue-700"
+                    >
+                      <i
+                        data-lucide="layout-dashboard"
+                        class="h-5 w-5 text-blue-600"
+                      ></i>
+                      <span>Dashboard</span>
+                      <i
+                        data-lucide="chevron-right"
+                        class="ml-auto h-4 w-4 text-blue-500"
+                      ></i>
+                    </a>
+
+                    <!-- Today -->
+                    <a
+                      href="#"
+                      class="flex items-center gap-2 rounded-lg px-3 py-2 text-sm text-slate-700 hover:bg-slate-50"
+                    >
+                      <i
+                        data-lucide="calendar"
+                        class="h-5 w-5 text-slate-600"
+                      ></i>
+                      <span>Today</span>
+                    </a>
+
+                    <!-- Week View -->
+                    <a
+                      href="#"
+                      class="flex items-center gap-2 rounded-lg px-3 py-2 text-sm text-slate-700 hover:bg-slate-50"
+                    >
+                      <i
+                        data-lucide="calendar-days"
+                        class="h-5 w-5 text-slate-600"
+                      ></i>
+                      <span>Week View</span>
+                    </a>
+                  </div>
+                </div>
+
+                <!-- Tracking -->
+                <div>
+                  <button
+                    type="button"
+                    class="mb-1 flex h-7 w-full appearance-none items-center justify-between rounded-md border-0 bg-transparent px-2 text-xs font-semibold text-slate-500 focus:ring-0 focus:outline-none"
+                    data-section-toggle="tracking"
+                  >
+                    <span>Tracking</span>
+                    <i
+                      data-lucide="chevron-up"
+                      class="h-4 w-4 text-slate-400 transition-transform duration-200"
+                    ></i>
+                  </button>
+
+                  <div id="section-tracking" class="space-y-1">
+                    <!-- Medications -->
+                    <a
+                      href="#"
+                      class="flex items-center gap-2 rounded-lg px-3 py-2 text-sm text-slate-700 hover:bg-slate-50"
+                    >
+                      <i data-lucide="pill" class="h-5 w-5 text-slate-600"></i>
+                      <span>Medications</span>
+                    </a>
+
+                    <!-- Schedule -->
+                    <a
+                      href="#"
+                      class="flex items-center gap-2 rounded-lg px-3 py-2 text-sm text-slate-700 hover:bg-slate-50"
+                    >
+                      <i
+                        data-lucide="clock-3"
+                        class="h-5 w-5 text-slate-600"
+                      ></i>
+                      <span>Schedule</span>
+                    </a>
+
+                    <!-- Dependents -->
+                    <a
+                      href="#"
+                      class="flex items-center gap-2 rounded-lg px-3 py-2 text-sm text-slate-700 hover:bg-slate-50"
+                    >
+                      <i data-lucide="users" class="h-5 w-5 text-slate-600"></i>
+                      <span>Dependents</span>
+                    </a>
+                  </div>
+                </div>
+
+                <!-- Personal -->
+                <div>
+                  <button
+                    type="button"
+                    class="mb-1 flex h-7 w-full appearance-none items-center justify-between rounded-md border-0 bg-transparent px-2 text-xs font-semibold text-slate-500 focus:ring-0 focus:outline-none"
+                    data-section-toggle="personal"
+                  >
+                    <span>Personal</span>
+                    <i
+                      data-lucide="chevron-up"
+                      class="h-4 w-4 text-slate-400 transition-transform duration-200"
+                    ></i>
+                  </button>
+
+                  <div id="section-personal" class="space-y-1">
+                    <!-- Achievements -->
+                    <a
+                      href="#"
+                      class="flex items-center gap-2 rounded-lg px-3 py-2 text-sm text-slate-700 hover:bg-slate-50"
+                    >
+                      <i data-lucide="award" class="h-5 w-5 text-slate-600"></i>
+                      <span>Achievements</span>
+                    </a>
+
+                    <!-- Data Sharing -->
+                    <a
+                      href="#"
+                      class="flex items-center gap-2 rounded-lg px-3 py-2 text-sm text-slate-700 hover:bg-slate-50"
+                    >
+                      <i
+                        data-lucide="shield"
+                        class="h-5 w-5 text-slate-600"
+                      ></i>
+                      <span>Data Sharing</span>
+                    </a>
+
+                    <!-- Profile -->
+                    <a
+                      href="#"
+                      class="flex items-center gap-2 rounded-lg px-3 py-2 text-sm text-slate-700 hover:bg-slate-50"
+                    >
+                      <i data-lucide="user" class="h-5 w-5 text-slate-600"></i>
+                      <span>Profile</span>
+                    </a>
+
+                    <!-- Support -->
+                    <a
+                      href="#"
+                      class="flex items-center gap-2 rounded-lg px-3 py-2 text-sm text-slate-700 hover:bg-slate-50"
+                    >
+                      <i
+                        data-lucide="life-buoy"
+                        class="h-5 w-5 text-slate-600"
+                      ></i>
+                      <span>Support</span>
+                    </a>
+                  </div>
+                </div>
+              </nav>
+
+              <!-- Add Medication (above bottom area) -->
+              <div class="mt-2 mb-4 px-3">
+                <button
+                  class="flex h-10 w-full items-center justify-center gap-2 rounded-lg bg-blue-600 text-sm font-medium text-white shadow-[0_10px_30px_rgba(37,99,235,0.35)] transition-colors hover:bg-blue-700"
+                >
+                  <i data-lucide="plus" class="h-4 w-4"></i>
+                  <span>Add Medication</span>
+                </button>
+              </div>
+
+              <!-- Spacer to push patient + sign-out down -->
+              <div class="flex-1"></div>
+
+              <!-- Patient + Sign Out -->
+              <div class="border-t border-slate-200 pt-3 pb-4">
+                <div class="mb-3 px-3">
+                  <div class="flex items-center gap-3 rounded-xl px-2 py-2">
+                    <div
+                      class="flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-full bg-blue-100 text-sm font-semibold text-blue-600"
+                    >
+                      SS
+                    </div>
+                    <div class="min-w-0 flex-1">
+                      <p class="truncate text-sm font-semibold text-slate-900">
+                        Steve Smith
+                      </p>
+                      <p class="text-xs text-slate-500">Patient</p>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="px-3">
+                  <button
+                    class="flex h-10 w-full items-center justify-center gap-2 rounded-lg border-2 border-slate-200 text-sm font-medium text-rose-500 transition-colors hover:bg-slate-50"
+                  >
+                    <i data-lucide="log-out" class="h-4 w-4"></i>
+                    <span>Sign Out</span>
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </aside>
+
+        <!-- Main content -->
+        <main class="flex-1 overflow-y-visible lg:overflow-y-auto">
+          <div
+            class="mx-auto max-w-6xl px-3 py-3 sm:px-5 sm:py-3 lg:px-8 lg:py-4"
+          >
+            <!-- Welcome -->
+            <section class="hero-section mb-3 sm:mb-3">
+              <h1
+                class="text-lg font-bold text-slate-900 sm:text-2xl lg:text-2xl"
+              >
+                Welcome, Steve Smith
+              </h1>
+              <p class="mt-1 text-xs text-slate-600 sm:text-sm">
+                Here’s a quick snapshot of your current schedule performance.
+              </p>
+            </section>
+
+            <!-- Schedule overview -->
+            <section
+              class="schedule-card mb-3 rounded-3xl border border-slate-200 bg-white p-3 sm:p-4"
+            >
+              <div
+                class="mb-3 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between"
+              >
+                <div>
+                  <p
+                    class="text-[11px] font-bold tracking-wide text-blue-700 uppercase sm:text-xs"
+                  >
+                    Schedule overview
+                  </p>
+                  <p class="sm:text[15px] text-sm font-medium text-slate-800">
+                    This Week · Dec 1 – Dec 7
+                  </p>
+                </div>
+
+                <button
+                  class="inline-flex w-full items-center justify-center rounded-xl bg-blue-600 px-4 py-2 text-xs font-semibold text-white transition-colors hover:bg-blue-700 sm:w-auto sm:text-sm"
+                >
+                  Manage schedules
+                </button>
+              </div>
+
+              <!-- 2 cards on mobile, 4 on desktop -->
+              <div class="grid grid-cols-2 gap-3 sm:gap-3.5 md:grid-cols-4">
+                <!-- Planned entries -->
+                <article
+                  class="flex flex-col rounded-2xl border border-slate-200 bg-slate-50 px-3 py-2 sm:py-3"
+                >
+                  <div class="mb-2 flex items-center gap-2">
+                    <div
+                      class="flex h-8 w-8 items-center justify-center rounded-full bg-blue-600 shadow-sm sm:h-9 sm:w-9"
+                    >
+                      <i
+                        data-lucide="sliders-horizontal"
+                        class="h-4 w-4 text-white"
+                      ></i>
+                    </div>
+                    <p class="text-xs font-semibold text-slate-800">
+                      Planned entries
+                    </p>
+                  </div>
+
+                  <p
+                    class="mb-1 text-2xl leading-tight font-bold text-slate-900 sm:text-3xl"
+                  >
+                    57
+                  </p>
+
+                  <div class="mt-auto">
+                    <p class="text-[11px] text-slate-500">All doses</p>
+                  </div>
+                </article>
+
+                <!-- Taken -->
+                <article
+                  class="flex flex-col rounded-2xl border border-emerald-200 bg-emerald-50 px-3 py-2 sm:py-3"
+                >
+                  <div class="mb-2 flex items-center gap-2">
+                    <div
+                      class="flex h-8 w-8 items-center justify-center rounded-full bg-emerald-500 shadow-sm sm:h-9 sm:w-9"
+                    >
+                      <i
+                        data-lucide="check-circle-2"
+                        class="h-4 w-4 text-white"
+                      ></i>
+                    </div>
+                    <p class="text-xs font-semibold text-emerald-900">Taken</p>
+                  </div>
+
+                  <p
+                    class="mb-1 text-2xl leading-tight font-bold text-slate-900 sm:text-3xl"
+                  >
+                    14
+                  </p>
+
+                  <div class="mt-auto">
+                    <p class="text-[11px] text-emerald-700">On time</p>
+                    <p class="text-[11px] text-emerald-900">
+                      43 still planned for this week
+                    </p>
+                  </div>
+                </article>
+
+                <!-- Still planned -->
+                <article
+                  class="flex flex-col rounded-2xl border border-blue-200 bg-blue-50 px-3 py-2 sm:py-3"
+                >
+                  <div class="mb-2 flex items-center gap-2">
+                    <div
+                      class="flex h-8 w-8 items-center justify-center rounded-full bg-blue-600 shadow-sm sm:h-9 sm:w-9"
+                    >
+                      <i data-lucide="clock" class="h-4 w-4 text-white"></i>
+                    </div>
+                    <p class="text-xs font-semibold text-blue-900">
+                      Still planned
+                    </p>
+                  </div>
+
+                  <p
+                    class="mb-1 text-2xl leading-tight font-bold text-slate-900 sm:text-3xl"
+                  >
+                    43
+                  </p>
+
+                  <div class="mt-auto">
+                    <p class="mb-1 text-[11px] text-blue-800">This week</p>
+                    <div class="h-2 overflow-hidden rounded-full bg-slate-200">
+                      <div class="h-full bg-blue-600" style="width: 75%"></div>
+                    </div>
+                    <p class="mt-1 text-[11px] text-slate-600">
+                      75% of weekly doses still ahead
+                    </p>
+                  </div>
+                </article>
+
+                <!-- Upcoming -->
+                <article
+                  class="flex flex-col rounded-2xl border border-indigo-200 bg-indigo-50 px-3 py-2 sm:py-3"
+                >
+                  <div class="mb-2 flex items-center gap-2">
+                    <div
+                      class="flex h-8 w-8 items-center justify-center rounded-full bg-indigo-500 shadow-sm sm:h-9 sm:w-9"
+                    >
+                      <i
+                        data-lucide="arrow-right-circle"
+                        class="h-4 w-4 text-white"
+                      ></i>
+                    </div>
+                    <p class="text-xs font-semibold text-indigo-900">
+                      Upcoming
+                    </p>
+                  </div>
+
+                  <p
+                    class="mb-1 text-2xl leading-tight font-bold text-slate-900 sm:text-3xl"
+                  >
+                    33
+                  </p>
+
+                  <div class="mt-auto">
+                    <p class="text-[11px] text-indigo-800">Next 7 days</p>
+                    <p class="mt-0.5 text-[11px] text-slate-600">
+                      Includes morning, daytime and evening doses
+                    </p>
+                  </div>
+                </article>
+              </div>
+            </section>
+
+            <!-- Access roles -->
+            <section
+              class="access-card mb-3 rounded-3xl border border-slate-200 bg-white p-3 sm:p-4"
+            >
+              <div
+                class="mb-3 flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between"
+              >
+                <div>
+                  <p
+                    class="text-[11px] font-bold tracking-wide text-slate-500 uppercase sm:text-xs"
+                  >
+                    Access roles
+                  </p>
+                  <h2 class="text-base font-semibold text-slate-900 sm:text-lg">
+                    Who can view what
+                  </h2>
+                  <p class="mt-1 text-xs text-slate-600 sm:text-[13px]">
+                    You are an owner of your profile and a viewer for people who
+                    shared access with you.
+                  </p>
+                </div>
+                <button
+                  class="inline-flex items-center gap-1.5 text-xs font-semibold text-blue-700 hover:text-blue-800 sm:text-sm"
+                >
+                  <i data-lucide="shield" class="h-4 w-4"></i>
+                  <span>Manage access</span>
+                </button>
+              </div>
+
+              <div class="grid gap-3 sm:gap-4 md:grid-cols-2">
+                <!-- People who can view my data -->
+                <article
+                  class="rounded-2xl border border-slate-200 bg-slate-50 px-3.5 py-3"
+                >
+                  <p class="mb-1 text-xs font-semibold text-slate-800">
+                    People who can view my data
+                  </p>
+                  <p class="mb-2 text-[13px] text-slate-600">
+                    These users have accepted a share link from you and can see
+                    your schedule.
+                  </p>
+                  <p class="text-[11px] text-slate-500">
+                    No active viewers yet.
+                  </p>
+                </article>
+
+                <!-- Profiles I can view -->
+                <article
+                  class="rounded-2xl border border-slate-200 bg-slate-50 px-3.5 py-3"
+                >
+                  <p class="mb-1 text-xs font-semibold text-slate-800">
+                    Profiles I can view
+                  </p>
+                  <p class="mb-2 text-[13px] text-slate-600">
+                    These users shared their profile with you. You are viewing
+                    their schedule as a viewer.
+                  </p>
+                  <p class="text-[11px] text-slate-500">
+                    You don’t have access to other profiles yet.
+                  </p>
+                </article>
+              </div>
+            </section>
+          </div>
+        </main>
+      </div>
     </div>
-  </div>
 
-  <script>
-    lucide.createIcons();
+    <script>
+      lucide.createIcons();
 
-    const sidebar = document.getElementById("sidebar");
-    const backdrop = document.getElementById("sidebar-backdrop");
-    const openBtn = document.getElementById("sidebar-open");
-    const closeBtn = document.getElementById("sidebar-close");
+      const sidebar = document.getElementById("sidebar");
+      const backdrop = document.getElementById("sidebar-backdrop");
+      const openBtn = document.getElementById("sidebar-open");
+      const closeBtn = document.getElementById("sidebar-close");
 
-    function openSidebar() {
-      if (!sidebar || !backdrop) return;
-      sidebar.classList.remove("-translate-x-full");
-      backdrop.classList.add("opacity-100", "pointer-events-auto");
-    }
-
-    function closeSidebar() {
-      if (!sidebar || !backdrop) return;
-      sidebar.classList.add("-translate-x-full");
-      backdrop.classList.remove("opacity-100", "pointer-events-auto");
-    }
-
-    if (openBtn) openBtn.addEventListener("click", openSidebar);
-    if (closeBtn) closeBtn.addEventListener("click", closeSidebar);
-    if (backdrop) backdrop.addEventListener("click", closeSidebar);
-
-    document.addEventListener("keydown", (event) => {
-      if (event.key === "Escape") closeSidebar();
-    });
-
-    window.addEventListener("resize", () => {
-      if (!sidebar || !backdrop) return;
-      if (window.innerWidth >= 1024) {
+      function openSidebar() {
+        if (!sidebar || !backdrop) return;
         sidebar.classList.remove("-translate-x-full");
-        backdrop.classList.remove("opacity-100", "pointer-events-auto");
-      } else {
-        sidebar.classList.add("-translate-x-full");
+        backdrop.classList.add("opacity-100", "pointer-events-auto");
       }
-    });
 
-    const sectionIds = ["overview", "tracking", "personal"];
+      function closeSidebar() {
+        if (!sidebar || !backdrop) return;
+        sidebar.classList.add("-translate-x-full");
+        backdrop.classList.remove("opacity-100", "pointer-events-auto");
+      }
 
-    sectionIds.forEach((id) => {
-      const toggle = document.querySelector(
-        `[data-section-toggle="${id}"]`
-      );
-      const section = document.getElementById(`section-${id}`);
+      if (openBtn) openBtn.addEventListener("click", openSidebar);
+      if (closeBtn) closeBtn.addEventListener("click", closeSidebar);
+      if (backdrop) backdrop.addEventListener("click", closeSidebar);
 
-      if (!toggle || !section) return;
-
-      const icon = toggle.querySelector("i");
-
-      toggle.addEventListener("click", () => {
-        section.classList.toggle("hidden");
-        if (icon) icon.classList.toggle("rotate-180");
+      document.addEventListener("keydown", (event) => {
+        if (event.key === "Escape") closeSidebar();
       });
-    });
-  </script>
-</body>
+
+      window.addEventListener("resize", () => {
+        if (!sidebar || !backdrop) return;
+        if (window.innerWidth >= 1024) {
+          sidebar.classList.remove("-translate-x-full");
+          backdrop.classList.remove("opacity-100", "pointer-events-auto");
+        } else {
+          sidebar.classList.add("-translate-x-full");
+        }
+      });
+
+      const sectionIds = ["overview", "tracking", "personal"];
+
+      sectionIds.forEach((id) => {
+        const toggle = document.querySelector(`[data-section-toggle="${id}"]`);
+        const section = document.getElementById(`section-${id}`);
+
+        if (!toggle || !section) return;
+
+        const icon = toggle.querySelector("i");
+
+        toggle.addEventListener("click", () => {
+          section.classList.toggle("hidden");
+          if (icon) icon.classList.toggle("rotate-180");
+        });
+      });
+    </script>
+  </body>
 </html>

@@ -52,9 +52,14 @@ html {
   animation: fadeUp 1.2s ease-out;
 }
 
-/* Date input calendar icon positioning */
+/* Date input calendar icon positioning and sizing */
 input[type="date"] {
-  position: relative; /* Ensure pseudo-element is positioned relative to the input (Safari/WebKit) */
+  /* Ensure pseudo-element is positioned relative to the input (Safari/WebKit) */
+  position: relative;
+  /* Prevent mobile browsers from making the control wider than its container */
+  width: 100%;
+  max-width: 100%;
+  box-sizing: border-box;
 }
 
 /* Hide the native picker icon specifically for the DOB field; we render our own SVG */
