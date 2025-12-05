@@ -1,6 +1,5 @@
 "use client";
 
-//import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
 import { getWeekDays, formatWeekRange } from "@/lib/week";
 import styles from "./dependents.module.css";
@@ -62,80 +61,6 @@ function HeartIcon({ className }: { className?: string }) {
   );
 }
 
-/*function TrendingUpIcon({ className }: { className?: string }) {
-  return (
-    <svg
-      className={className}
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth={2}
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      aria-hidden="true"
-    >
-      <polyline points="23 6 13.5 15.5 8.5 10.5 1 18" />
-      <polyline points="17 6 23 6 23 12" />
-    </svg>
-  );
-}*/
-
-/*function AlertCircleIcon({ className }: { className?: string }) {
-  return (
-    <svg
-      className={className}
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth={2}
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      aria-hidden="true"
-    >
-      <circle cx="12" cy="12" r="10" />
-      <line x1="12" y1="8" x2="12" y2="12" />
-      <line x1="12" y1="16" x2="12.01" y2="16" />
-    </svg>
-  );
-}*/
-
-/*function PlusIcon({ className }: { className?: string }) {
-  return (
-    <svg
-      className={className}
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth={2.5}
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      aria-hidden="true"
-    >
-      <line x1="12" y1="5" x2="12" y2="19" />
-      <line x1="5" y1="12" x2="19" y2="12" />
-    </svg>
-  );
-}*/
-
-/*function BarChartIcon({ className }: { className?: string }) {
-  return (
-    <svg
-      className={className}
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth={2}
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      aria-hidden="true"
-    >
-      <line x1="18" y1="20" x2="18" y2="10" />
-      <line x1="12" y1="20" x2="12" y2="4" />
-      <line x1="6" y1="20" x2="6" y2="14" />
-    </svg>
-  );
-}*/
-
 function PrinterIcon({ className }: { className?: string }) {
   return (
     <svg
@@ -155,41 +80,6 @@ function PrinterIcon({ className }: { className?: string }) {
   );
 }
 
-/*function EditIcon({ className }: { className?: string }) {
-  return (
-    <svg
-      className={className}
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth={2}
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      aria-hidden="true"
-    >
-      <path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7" />
-      <path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z" />
-    </svg>
-  );
-}*/
-
-/*function ChevronDownIcon({ className }: { className?: string }) {
-  return (
-    <svg
-      className={className}
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth={2.5}
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      aria-hidden="true"
-    >
-      <polyline points="6 9 12 15 18 9" />
-    </svg>
-  );
-}*/
-
 function CheckCircleIcon({ className }: { className?: string }) {
   return (
     <svg
@@ -206,61 +96,6 @@ function CheckCircleIcon({ className }: { className?: string }) {
     </svg>
   );
 }
-
-/*function PencilIcon({ className }: { className?: string }) {
-  return (
-    <svg
-      className={className}
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth={2}
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      aria-hidden="true"
-    >
-      <path d="M17 3a2.828 2.828 0 114 4L7.5 20.5 2 22l1.5-5.5L17 3z" />
-    </svg>
-  );
-}*/
-
-/*function TrashIcon({ className }: { className?: string }) {
-  return (
-    <svg
-      className={className}
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth={2}
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      aria-hidden="true"
-    >
-      <polyline points="3 6 5 6 21 6" />
-      <path d="M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a2 2 0 012-2h4a2 2 0 012 2v2" />
-    </svg>
-  );
-}*/
-
-/*function UsersIcon({ className }: { className?: string }) {
-  return (
-    <svg
-      className={className}
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth={2}
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      aria-hidden="true"
-    >
-      <path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2" />
-      <circle cx="9" cy="7" r="4" />
-      <path d="M23 21v-2a4 4 0 00-3-3.87" />
-      <path d="M16 3.13a4 4 0 010 7.75" />
-    </svg>
-  );
-}*/
 
 function Spinner({ className }: { className?: string }) {
   return (
@@ -341,24 +176,9 @@ function DependentCard({
           >
             <PrinterIcon className={styles.actionIcon} />
           </button>
-          {/* Future actions for dependents */}
-          {/*
-          <button type="button" className={styles.editButton}>
-            <EditIcon className={styles.editButtonIcon} />
-            Edit
-          </button>
-          <button
-            type="button"
-            className={styles.expandButton}
-            aria-label="Expand"
-          >
-            <ChevronDownIcon className={styles.expandIcon} />
-          </button>
-          */}
         </div>
       </div>
 
-      {/* Placeholder for future medications list sourced from real data */}
       <div className={styles.medicationsList}>
         {dependent.medications.map((med) => (
           <div key={med.id} className={styles.medicationItem}>
@@ -374,25 +194,6 @@ function DependentCard({
                 {med.form ? ` • ${med.form}` : ""}
               </span>
             </div>
-            {/* Future per-medication actions */}
-            {/*
-            <div className={styles.medicationActions}>
-              <button
-                type="button"
-                className={styles.medActionButton}
-                aria-label="Edit medication"
-              >
-                <PencilIcon className={styles.medActionIcon} />
-              </button>
-              <button
-                type="button"
-                className={styles.medActionButton}
-                aria-label="Delete medication"
-              >
-                <TrashIcon className={styles.medActionIcon} />
-              </button>
-            </div>
-            */}
           </div>
         ))}
       </div>
@@ -677,33 +478,7 @@ export default function DependentsPage() {
           </div>
         </div>
 
-        <div className={styles.headerActions}>
-          {/* Filter buttons reserved for future use */}
-          {/*
-          <button type="button" className={styles.filterButton}>
-            <TrendingUpIcon className={styles.filterIcon} />
-            All
-          </button>
-          <button
-            type="button"
-            className={`${styles.filterButton} ${styles.filterButtonRisk}`}
-          >
-            <AlertCircleIcon className={styles.filterIcon} />
-            Risk
-          </button>
-          <Link
-            href="/dependents/new"
-            className={`${styles.filterButton} ${styles.filterButtonAdd}`}
-          >
-            <PlusIcon className={styles.filterIcon} />
-            Add
-          </Link>
-          <button type="button" className={styles.analyticsButton}>
-            <BarChartIcon className={styles.filterIcon} />
-            Analytics
-          </button>
-          */}
-        </div>
+        <div className={styles.headerActions}></div>
       </header>
 
       <main className={styles.main}>
@@ -894,16 +669,6 @@ export default function DependentsPage() {
           </div>
         )}
       </main>
-
-      {/*
-      <Link
-        href="/dependents/new"
-        className={styles.fab}
-        aria-label="Add Dependent"
-      >
-        <UsersIcon className={styles.fabIcon} />
-      </Link>
-      */}
     </div>
   );
 }

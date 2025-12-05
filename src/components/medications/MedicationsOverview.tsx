@@ -95,7 +95,6 @@ export default function MedicationsOverview({
               <div className={styles.heroTopRow}>
                 <h1>Medications</h1>
                 <div className={styles.heroActions}>
-                  {/* <ExportMenu medications={filteredMedications} /> */}
                   <Link
                     href="/medications/new"
                     className={clsx(styles.heroButton, styles.heroPrimary)}

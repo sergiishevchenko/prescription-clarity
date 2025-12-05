@@ -251,25 +251,6 @@ export function SidebarNav({ user, onClose }: SidebarNavProps) {
         </div>
       </div>
 
-      {/* User section at top - commented out as same info is shown in footer */}
-      {/* <div className={styles.userSection}>
-        <div className={styles.userRow}>
-          <span className={styles.userAvatar}>
-            <span className={styles.avatarFallback}>{initials}</span>
-          </span>
-          <div className={styles.userInfo}>
-            <p className={styles.userName}>{preferredName || "Guest User"}</p>
-            <button
-              type="button"
-              className={styles.switchRoleButton}
-              aria-label="Switch role"
-            >
-              Patient • Switch Role
-            </button>
-          </div>
-        </div>
-      </div> */}
-
       <nav className={clsx(styles.nav, styles.scrollArea)} aria-label="Sidebar">
         <div className={styles.navSections}>
           {NAV_GROUPS.map((group) => {
