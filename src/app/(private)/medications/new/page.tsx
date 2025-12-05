@@ -20,7 +20,6 @@ export default function NewMedicationFormPage() {
   const toast = useToast();
   const totalSteps = 5;
 
-  // Початково завжди 1 — без читання localStorage / readWizardStep у SSR
   const [step, setStep] = useState(1);
   const [isStepValid, setIsStepValid] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -28,14 +27,11 @@ export default function NewMedicationFormPage() {
   const ensureMedicationRef = useRef<(() => Promise<boolean>) | null>(null);
   const submitFormRef = useRef<(() => Promise<void> | void) | null>(null);
 
-  // Після гідратації відновлюємо крок з storage
   useEffect(() => {
     const stored = readWizardStep(totalSteps);
-    // eslint-disable-next-line react-hooks/set-state-in-effect
     setStep(stored);
   }, [totalSteps]);
 
-  // Зберігаємо поточний крок
   useEffect(() => {
     persistWizardStep(step);
   }, [step, totalSteps]);

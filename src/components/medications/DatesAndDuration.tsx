@@ -125,7 +125,6 @@ export default function DatesAndDuration() {
     return convertDaysToUnitValue(sourceDays, displayUnit);
   }, [displayUnit, durationDays]);
 
-  // Допоміжна функція для обчислення кінцевої дати
   const calculateEndDateFromStartAndDuration = (
     start: string,
     days: number,
@@ -135,13 +134,11 @@ export default function DatesAndDuration() {
 
     const safeDays = Math.max(1, Math.round(days));
     const e = new Date(s);
-    // включно: 1 день => +0, 7 днів => +6
     e.setUTCDate(e.getUTCDate() + (safeDays - 1));
 
     return e.toISOString().slice(0, 10);
   };
 
-  // Коли змінюються startDate / durationDays і курс не ongoing — перераховуємо endDate
   useEffect(() => {
     if (ongoing) return;
     if (!startDate || !durationDays) return;
@@ -157,7 +154,6 @@ export default function DatesAndDuration() {
     }
   }, [startDate, endDate, durationDays, ongoing, setValue]);
 
-  // Стежимо, щоб endDate не був раніше за startDate
   useEffect(() => {
     if (ongoing) return;
     if (!startDate || !endDate) return;
@@ -170,7 +166,6 @@ export default function DatesAndDuration() {
     const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24)) + 1;
 
     if (diffDays < 1) {
-      // end date не може бути раніше start date
       setValue("endDate", startDate, { shouldDirty: true });
     }
   }, [startDate, endDate, ongoing, setValue]);
@@ -206,7 +201,6 @@ export default function DatesAndDuration() {
     const next = !ongoing;
     setValue("ongoing", next, { shouldDirty: true });
 
-    // Якщо переходимо з ongoing = true на false — одразу порахувати endDate
     if (!next && startDate && durationDays) {
       const endStr = calculateEndDateFromStartAndDuration(
         String(startDate),
@@ -224,7 +218,6 @@ export default function DatesAndDuration() {
 
   return (
     <div className="mt-0 space-y-4 sm:mt-0 sm:space-y-6">
-      {/* durationDays у формі як hidden field */}
       <input
         type="number"
         className="hidden"
@@ -234,7 +227,6 @@ export default function DatesAndDuration() {
           required: "Duration is required",
         })}
       />
-      {/* ongoing у формі як hidden checkbox */}
       <input type="checkbox" className="hidden" {...register("ongoing")} />
 
       <div className="rounded-[20px] border border-[#E0E7FF] bg-white px-4 py-4 shadow-[0_24px_60px_rgba(15,23,42,0.08)] sm:rounded-[28px] sm:px-6 sm:py-6">

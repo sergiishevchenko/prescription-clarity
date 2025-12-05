@@ -89,7 +89,6 @@ export default function NewMedicationForm({
     const end = new Date(start);
     end.setDate(start.getDate() + defaultDuration - 1);
     return end.toISOString().slice(0, 10);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const baseDefaultValues = useMemo<FormValues>(
@@ -231,7 +230,6 @@ export default function NewMedicationForm({
     }
   }, []);
 
-  // NEW: плавний скрол до Units
   const scrollToUnitsField = useCallback(() => {
     if (typeof document === "undefined") return;
     const unitsSelect = document.getElementById("medication-units");
@@ -296,7 +294,6 @@ export default function NewMedicationForm({
     }
 
     if (step === 2) {
-      // 1) Quantity / fraction (top of the form)
       const quantityValidSecond = await trigger("quantity");
       if (!quantityValidSecond) {
         validator.lastErrorMessage =
@@ -323,7 +320,6 @@ export default function NewMedicationForm({
       }
       clearErrors("form");
 
-      // 3) Times of day (preset + custom)
       if (timeError) {
         validator.lastErrorMessage =
           timeError || "Please complete the dosing schedule.";
@@ -349,7 +345,6 @@ export default function NewMedicationForm({
         return false;
       }
 
-      // NEW: валідація Units (form)
       if (!allValues.form) {
         validator.lastErrorMessage =
           "Please select a unit for this medication.";
@@ -416,9 +411,6 @@ export default function NewMedicationForm({
       onValidate(Boolean(nameValue));
       return;
     }
-    // For steps 2+, rely on explicit validation via validateStepRef
-    // (triggered from the "Next" button) to avoid scrolling and
-    // error highlighting while the user is still filling the form.
     onValidate(true);
   }, [allValues.name, onValidate, step]);
 

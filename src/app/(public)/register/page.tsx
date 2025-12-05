@@ -28,7 +28,7 @@ export default function RegisterPage() {
       email,
       password,
     };
-    if (nameRaw) payload.name = nameRaw; // не відправляємо порожній name
+    if (nameRaw) payload.name = nameRaw;
 
     try {
       const res = await fetch("/api/auth/register", {
@@ -38,8 +38,8 @@ export default function RegisterPage() {
       });
 
       if (res.ok) {
-        router.push("/dashboard"); // Navigate and refresh
-        router.refresh(); // Force refresh
+        router.push("/dashboard");
+        router.refresh();
         return;
       }
 

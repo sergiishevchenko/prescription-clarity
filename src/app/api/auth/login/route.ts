@@ -13,10 +13,8 @@ export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
 
-    // Валідація вхідних даних
     const { email, password } = loginSchema.parse(body);
 
-    // Знайти користувача
     const user = await prisma.user.findUnique({ where: { email } });
     if (!user) {
       return NextResponse.json(
@@ -25,7 +23,6 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Перевірити пароль
     const isValid = await bcrypt.compare(password, user.passwordHash);
     if (!isValid) {
       return NextResponse.json(
@@ -34,10 +31,8 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // (Опційно) ротація попередніх сесій
     await destroyAllUserSessions(user.id);
 
-    // Створити нову сесію і виставити cookie через NextResponse
     const sessionToken = await createSession(user.id);
 
     const res = NextResponse.json(
@@ -49,7 +44,6 @@ export async function POST(request: NextRequest) {
 
     return res;
   } catch (err: unknown) {
-    // Помилки валідації Zod
     if (err instanceof ZodError) {
       return NextResponse.json(
         { error: "Invalid input data", details: err.flatten() },
@@ -57,7 +51,6 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Інші помилки
     console.error("Login error:", err);
     return NextResponse.json(
       { error: "Internal server error" },

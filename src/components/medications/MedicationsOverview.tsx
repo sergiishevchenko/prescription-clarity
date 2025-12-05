@@ -55,7 +55,6 @@ export default function MedicationsOverview({
   }, [filters.hasDoseOnly, initial, search]);
 
   const hasAnyMedications = initial.length > 0;
-  //const hasQueryOrFilters = search.trim().length > 0 || activeFilterCount > 0;
   const resultCount = filteredMedications.length;
 
   const handleClearAll = () => {
@@ -475,7 +474,6 @@ type IconProps = {
   className?: string;
 };
 
-/** Та сама пігулка, що на 3-му скріні (lucide-pill) */
 function PillIcon({ className }: IconProps) {
   return (
     <svg

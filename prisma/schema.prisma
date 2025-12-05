@@ -52,8 +52,8 @@ model Medication {
   id                   String    @id @default(cuid()) @db.VarChar(32)
   userId               String    @db.VarChar(32)
   name                 String    @db.VarChar(150)
-  dose                 Int?                     // <= робимо необов'язковим
-  form                 String?   @db.VarChar(50) // <= теж необов'язкове
+  dose                 Int?
+  form                 String?   @db.VarChar(50)
   deletedAt            DateTime?
   previousMedicationId String?   @db.VarChar(32) // Version linking for edit flow
   createdAt            DateTime  @default(now())
