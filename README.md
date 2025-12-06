@@ -2,6 +2,8 @@
 
 A modern, full-stack medication scheduling and tracking application built with Next.js 16. Features secure authentication, medication management, timezone-aware scheduling, PDF export, and care access sharing. Built with TypeScript, Tailwind CSS, Prisma ORM, and deployed on Vercel with Docker support.
 
+![Demo Screenshot](img/demo.png)
+
 ## 🚀 Features
 
 - **🔐 Secure Authentication**: HTTP-only cookie-based sessions with bcrypt password hashing
